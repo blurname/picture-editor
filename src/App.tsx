@@ -7,11 +7,12 @@ import { globalContext } from './context'
 import { globalCanvas } from './store/globalCanvas'
 
 function App() {
+const [cmpCount,setCmpCount] = useState(0)
   return (
     <div className="App">
       <h1>picture editor</h1>
       <div className="Container">
-        <globalContext.Provider value={globalCanvas}>
+        <globalContext.Provider value={{globalCanvas,cmpCount,setCmpCount}}>
           <Components />
           <Canvas />
           <Editor />

@@ -1,3 +1,8 @@
 import React from 'react'
 import { Canvas } from './store/globalCanvas'
-export const globalContext = React.createContext({} as Canvas)
+type globalCanvasType = {
+  globalCanvas: Canvas
+  cmpCount: number
+  setCmpCount: React.Dispatch<React.SetStateAction<number>>
+}
+export const globalContext = React.createContext({} as globalCanvasType)
