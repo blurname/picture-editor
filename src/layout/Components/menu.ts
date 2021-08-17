@@ -4,7 +4,7 @@ export const menu = {
     {
       desc: 'img',
       props: {
-        style: { width: 200, height: 100, backgroundColor: '#389201' },
+        style: { width: 250, height: 100, backgroundColor: '#389201' },
       },
     },
   ],

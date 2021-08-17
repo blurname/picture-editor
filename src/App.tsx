@@ -3,15 +3,19 @@ import './App.css'
 import { Editor } from './layout/Editor'
 import { Canvas } from './layout/Canvas'
 import { Components } from './layout/Components'
+import { globalContext } from './context'
+import { globalCanvas } from './store/globalCanvas'
 
 function App() {
   return (
     <div className="App">
       <h1>picture editor</h1>
       <div className="Container">
-        <Canvas />
-        <Editor />
-        <Components />
+        <globalContext.Provider value={globalCanvas}>
+          <Components />
+          <Canvas />
+          <Editor />
+        </globalContext.Provider>
       </div>
     </div>
   )
