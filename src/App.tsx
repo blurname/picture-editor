@@ -5,7 +5,6 @@ import { Canvas } from './layout/Canvas'
 import { Components } from './layout/Components'
 import { globalContext } from './context'
 import { globalCanvas } from './store/globalCanvas'
-
 function App() {
 const [cmpCount,setCmpCount] = useState(0)
   return (

@@ -8,10 +8,10 @@ export function Canvas() {
     <div className="Canvas">
 				<div>Canvas</div>
 				<div>cmpCount:{cmpCount}</div>
-      <div>
+      <div style={{position:'relative'}}>
         {globalCanvas.cmps.map((cmp,index) => (
           <CanvasWrapper key={index.toString()}
-					img={{style:{width:100,height:100},value:cmp.value}} />
+					img={{style:{width:cmp.width,height:cmp.height},value:cmp.value}} />
         ))}
       </div>
     </div>

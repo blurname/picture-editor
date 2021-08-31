@@ -35,7 +35,6 @@ export function Img() {
   return (
     <>
 		{imgs.map((img,index) => {
-
 				return <Wrapper key={index.toString()} base={imgBase.props} img={img} />
       })}
     </>

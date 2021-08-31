@@ -30,8 +30,8 @@ export function Wrapper(props: Props) {
       onClick={() =>
         addCmp({
           id: 1,
-          height: 100,
-          width: 100,
+          height: img.style.height,
+          width: img.style.width,
           posX: 100,
           posY: 100,
           value:
