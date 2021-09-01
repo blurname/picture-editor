@@ -42,7 +42,7 @@ export function CanvasWrapper(props: Props) {
 		console.log(e)
 	}
   return (
-    <div onMouseMove={moveHandler} onMouseUp={upHandler} onMouseDown={downHandler} style={{ position:'absolute', height: img.style.height, width: img.style.width,top:pos.top,left:pos.left }}>
+    <div  style={{ height: img.style.height, width: img.style.width,top:pos.top,left:pos.left }}>
       <img className="img" src={img.value} alt="" />
     </div>
   )
