@@ -3,18 +3,20 @@ import { globalContext } from '../../context'
 import {} from './index.css'
 import { editorSchema } from './editorSchema'
 export function Editor() {
-  const { globalCanvas } = useContext(globalContext)
+  const { globalCanvas,adjustNum,setAdjustNum } = useContext(globalContext)
   const curCmpId = globalCanvas.selectedCmp?.id
   const rangeInput = editorSchema.children[0]
-  const { max, min } = rangeInput.props
   const onChangeInput = (desc:string)=>(e:ChangeEvent<HTMLInputElement>) => {
-	console.log('kkk');
-     console.log(`desc:${desc},value:${e.target.value}`)
+	const value = parseFloat(e.target.value) 
+     console.log(`desc:${desc},value:${e.target.value},curId:${curCmpId}`)
+		 globalCanvas.updateSelectedCmp(desc,value)
+		 globalCanvas.updateCmps()
+		 setAdjustNum(adjustNum+1)
   }
   return (
     <div className="Editor">
       Editor
-      <div style={{ height: 50 }}>{curCmpId}</div>
+      <div style={{ height: 50 }}>curCmpId:{curCmpId}</div>
       <div>
         {rangeInput.children.map((cur, index) => {
           return (
@@ -22,8 +24,8 @@ export function Editor() {
               {cur.desc}
               <input
                 type="range"
-                min={min}
-                max={max}
+                min={cur.props.range.min}
+                max={cur.props.range.max}
                 defaultValue={cur.props.value}
                 onInput={onChangeInput(cur.desc)}
               />

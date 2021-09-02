@@ -6,5 +6,7 @@ type globalCanvasType = {
   setCmpCount: React.Dispatch<React.SetStateAction<number>>
 	selectNum:number
   setSelectNum: React.Dispatch<React.SetStateAction<number>>
+	adjustNum:number
+  setAdjustNum: React.Dispatch<React.SetStateAction<number>>
 }
 export const globalContext = React.createContext({} as globalCanvasType)
