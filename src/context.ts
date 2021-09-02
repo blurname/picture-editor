@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {createContext} from 'react'
 import { Canvas } from './store/globalCanvas'
 type globalCanvasType = {
   globalCanvas: Canvas

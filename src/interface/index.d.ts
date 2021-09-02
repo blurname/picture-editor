@@ -6,3 +6,7 @@ interface Cmp{
 	posY:number
 	value:string
 }
+interface EditPand{
+	id:nubmer
+
+}
