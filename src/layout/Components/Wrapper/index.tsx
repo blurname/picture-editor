@@ -26,6 +26,8 @@ export function Wrapper(props: Props) {
     setCmpCount(cmpCount + 1)
     console.log(globalCanvas.cmps)
   }
+	const image = new Image()
+	image.src = img.value
   return (
     <div
       onClick={():void =>
@@ -37,6 +39,7 @@ export function Wrapper(props: Props) {
           posX: 100,
           posY: 100,
           value: img.value,
+					image
         })
 				console.log(img.id);
 				}

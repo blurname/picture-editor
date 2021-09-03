@@ -5,4 +5,5 @@ interface Cmp{
 	posX:number
 	posY:number
 	value:string
+	image:HTMLImageElement | undefined
 }

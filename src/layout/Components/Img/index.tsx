@@ -15,12 +15,12 @@ const imgs: ImgType[] = [
   {
     id: 2,
     style: { width: 20, height: 190 },
-    value: '../../../../public/test.jpg',
+    value: '../../../../public/t2.jpg',
   },
   {
     id: 3,
     style: { width: 30, height: 180 },
-    value: '../../../../public/test.jpg',
+    value: '../../../../public/t3.jpg',
   },
   {
     id: 4,

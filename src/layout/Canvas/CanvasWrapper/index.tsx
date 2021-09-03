@@ -1,6 +1,6 @@
 import React, { DragEvent, MouseEvent, useContext, useState } from 'react'
 import { globalContext } from '../../../context'
-import  './index.css';
+import './index.css'
 type Style = {
   width: number
   height: number
@@ -12,6 +12,7 @@ type ImgType = {
   id: number
   style: Style
   value: string
+	image: HTMLImageElement
 }
 type Props = {
   img: ImgType
@@ -23,7 +24,14 @@ type Pos = {
 export function CanvasWrapper(props: Props) {
   const { img } = props
   const [pos, setPos] = useState<Pos>({ top: 100, left: 500 })
-  const { globalCanvas, cmpCount,selectNum,setSelectNum } = useContext(globalContext)
+  const { globalCanvas, cmpCount, selectNum, setSelectNum } =
+    useContext(globalContext)
+		
+		//todo: optimze render components by useState in image
+  // const [curImage, SetCurImage] = useState(
+  //   new Image(img.style.height, img.style.width),
+  // )
+
   let curTop = 0
   let curLeft = 0
   const moveHandler = (e: MouseEvent) => {
@@ -46,7 +54,7 @@ export function CanvasWrapper(props: Props) {
     console.log(e)
   }
   const onChoosen = (e: MouseEvent) => {
-    const { id, style, value } = img
+    const { id, style, value,image } = img
     globalCanvas.selectCmp({
       id,
       width: style.width,
@@ -54,8 +62,9 @@ export function CanvasWrapper(props: Props) {
       posX: pos.left,
       posY: pos.top,
       value: value,
+      image: image,
     })
-		setSelectNum(selectNum+1)
+    setSelectNum(selectNum + 1)
     console.log('has benn choosen')
     console.log(globalCanvas.selectedCmp)
   }
@@ -67,10 +76,11 @@ export function CanvasWrapper(props: Props) {
         width: img.style.width,
         top: pos.top,
         left: pos.left,
-			backgroundColor:globalCanvas?.selectedCmp?.id == img.id?'red':'blue' 
+        backgroundColor:
+          globalCanvas?.selectedCmp?.id == img.id ? 'red' : 'blue',
       }}
     >
-      <img className="imgCanvas" src={img.value} alt="" />
+      <img className="imgCanvas" src={img.image.src} alt="" />
     </div>
   )
 }
