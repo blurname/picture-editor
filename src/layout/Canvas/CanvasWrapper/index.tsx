@@ -1,5 +1,6 @@
 import React, { DragEvent, MouseEvent, useContext, useState } from 'react'
 import { globalContext } from '../../../context'
+import { ImageCanvas } from '../../../filter/ImageCanvas'
 import './index.css'
 type Style = {
   width: number
@@ -12,7 +13,7 @@ type ImgType = {
   id: number
   style: Style
   value: string
-	image: HTMLImageElement
+  image: HTMLImageElement
 }
 type Props = {
   img: ImgType
@@ -26,8 +27,8 @@ export function CanvasWrapper(props: Props) {
   const [pos, setPos] = useState<Pos>({ top: 100, left: 500 })
   const { globalCanvas, cmpCount, selectNum, setSelectNum } =
     useContext(globalContext)
-		
-		//todo: optimze render components by useState in image
+
+  //todo: optimze render components by useState in image
   // const [curImage, SetCurImage] = useState(
   //   new Image(img.style.height, img.style.width),
   // )
@@ -54,7 +55,7 @@ export function CanvasWrapper(props: Props) {
     console.log(e)
   }
   const onChoosen = (e: MouseEvent) => {
-    const { id, style, value,image } = img
+    const { id, style, value, image } = img
     globalCanvas.selectCmp({
       id,
       width: style.width,
@@ -80,6 +81,7 @@ export function CanvasWrapper(props: Props) {
           globalCanvas?.selectedCmp?.id == img.id ? 'red' : 'blue',
       }}
     >
+      <ImageCanvas imgSrc={img.value} width={img.style.width} height={img.style.height}  />
       <img className="imgCanvas" src={img.image.src} alt="" />
     </div>
   )
