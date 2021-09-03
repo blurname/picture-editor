@@ -272,6 +272,11 @@ ansi-styles@^3.2.1:
   dependencies:
     color-convert "^1.9.0"
 
+beam-gl@^0.1912.0:
+  version "0.1912.0"
+  resolved "https://registry.nlark.com/beam-gl/download/beam-gl-0.1912.0.tgz#d864f7619e7c924d5cd0b36b03dbb1656c4ecf11"
+  integrity sha1-2GT3YZ58kk1c0LNrA9uxZWxOzxE=
+
 browserslist@^4.16.6:
   version "4.16.7"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.16.7.tgz#108b0d1ef33c4af1b587c54f390e7041178e4335"
