@@ -1,12 +1,19 @@
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { MouseEvent, useContext, useEffect, useRef } from 'react'
 import { globalContext } from '../../context'
 import { CanvasWrapper } from './CanvasWrapper'
 import {} from './index.css'
 // import {render} from '../../filter/t'
 import { TCanvas } from '../../filter/t'
 import { ImageCanvas } from '../../filter/ImageCanvas'
+import { CanvasPos, getCursorPosInCanvas, Pos } from '../../utils/geo-utils'
 export function Canvas() {
   const { globalCanvas, cmpCount } = useContext(globalContext)
+  const canvas: CanvasPos = {
+    width: 500,
+    height: 500,
+    left: 550,
+    top: 100,
+  }
   const tCmp: Cmp = {
     id: 0,
     width: 200,
@@ -21,20 +28,36 @@ export function Canvas() {
   // tCmp.image.width = tCmp.width
   // tCmp.image.height = tCmp.height
   // tCmp.image.src = tCmp.value
+
+  const canvasRef = useRef(null)
+  const handleOnMouseMove = (e: MouseEvent) => {
+    console.log('x' + e.pageX)
+    console.log('y' + e.pageY)
+    const cursor: Pos = {
+      left: e.clientX,
+      top: e.clientY,
+    }
+    console.log(getCursorPosInCanvas(cursor, canvas))
+  }
+  useEffect(() => {
+    ImageCanvas({ canvas: canvasRef })
+  }, [])
+
   return (
     <div className="Canvas">
-      <div>
-        <img
-          src={tCmp.image.src}
-          width={tCmp.image.width}
-          height={tCmp.image.height}
-          alt=""
-        />
-      </div>
+      <canvas
+        ref={canvasRef}
+        style={{
+          top: canvas.top,
+          left: canvas.left,
+          backgroundColor: 'yellowgreen',
+          position: 'absolute',
+        }}
+        width={400}
+        height={400}
+        onMouseMove={handleOnMouseMove}
+      ></canvas>
       <div>Canvas</div>
-      <ImageCanvas />
-      <TCanvas />
-      <TCanvas />
       <div>cmpCount:{cmpCount}</div>
       <div style={{ position: 'relative' }}>
         {globalCanvas.cmps.map((cmp, index) => {

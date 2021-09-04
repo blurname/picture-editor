@@ -78,10 +78,9 @@ export function CanvasWrapper(props: Props) {
         top: pos.top,
         left: pos.left,
         backgroundColor:
-          globalCanvas?.selectedCmp?.id == img.id ? 'red' : 'blue',
+          globalCanvas?.selectedCmp?.id === img.id ? 'red' : 'blue'
       }}
     >
-      <ImageCanvas imgSrc={img.value} width={img.style.width} height={img.style.height}  />
       <img className="imgCanvas" src={img.image.src} alt="" />
     </div>
   )
