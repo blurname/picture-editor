@@ -7,3 +7,6 @@ interface Cmp{
 	value:string
 	image:HTMLImageElement | undefined
 }
+interface {
+
+}

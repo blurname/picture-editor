@@ -3,9 +3,8 @@ import { globalContext } from '../../context'
 import { CanvasWrapper } from './CanvasWrapper'
 import {} from './index.css'
 // import {render} from '../../filter/t'
-import { TCanvas } from '../../filter/t'
 import { ImageCanvas } from '../../filter/ImageCanvas'
-import { CanvasPos, getCursorPosInCanvas, Pos } from '../../utils/geo-utils'
+import { CanvasPos, createRectangle, getCursorIsInQuad, getCursorPosInCanvas, Pos } from '../../utils/geo-utils'
 export function Canvas() {
   const { globalCanvas, cmpCount } = useContext(globalContext)
   const canvas: CanvasPos = {
@@ -14,33 +13,29 @@ export function Canvas() {
     left: 550,
     top: 100,
   }
-  const tCmp: Cmp = {
-    id: 0,
-    width: 200,
-    height: 200,
-    posX: 100,
-    posY: 100,
-    value: '../../../../public/test.jpg',
-    image: undefined,
-  }
-  tCmp.image = new Image(tCmp.width, tCmp.height)
-  tCmp.image.src = tCmp.value
-  // tCmp.image.width = tCmp.width
-  // tCmp.image.height = tCmp.height
-  // tCmp.image.src = tCmp.value
+  const quad = createRectangle(-0.5)
+  const quad2 = createRectangle(0.1)
+	const quads:number[][] = new Array()
+	quads.push(quad.vertex.position)
+	quads.push(quad2.vertex.position)
+	console.log(quads);
 
   const canvasRef = useRef(null as HTMLCanvasElement)
   const handleOnMouseMove = (e: MouseEvent) => {
-    console.log('x' + (e.pageX-canvas.left))
-    console.log('y' + (e.pageY-canvas.top))
     const cursor: Pos = {
       left: e.clientX,
       top: e.clientY,
     }
-    console.log(getCursorPosInCanvas(cursor, canvas))
+    const cursorPos =  getCursorPosInCanvas(cursor, canvas) as Pos
+		// console.log(cursorPos);
+		// console.log("lux:"+quad.vertex.position[3]+" luy:"+quad.vertex.position[4]);
+		// console.log("rdx:"+quad.vertex.position[9]+" rdy:"+quad.vertex.position[10]);
+		console.log(getCursorIsInQuad({x:cursorPos.left,y:cursorPos.top}, quad.vertex.position));
   }
+
   useEffect(() => {
     ImageCanvas({ canvas: canvasRef })
+		console.log(canvasRef.current)
   }, [])
 
   return (
