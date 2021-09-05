@@ -9,8 +9,8 @@ import { CanvasPos, getCursorPosInCanvas, Pos } from '../../utils/geo-utils'
 export function Canvas() {
   const { globalCanvas, cmpCount } = useContext(globalContext)
   const canvas: CanvasPos = {
-    width: 500,
-    height: 500,
+    width: 600,
+    height: 600,
     left: 550,
     top: 100,
   }
@@ -29,10 +29,10 @@ export function Canvas() {
   // tCmp.image.height = tCmp.height
   // tCmp.image.src = tCmp.value
 
-  const canvasRef = useRef(null)
+  const canvasRef = useRef(null as HTMLCanvasElement)
   const handleOnMouseMove = (e: MouseEvent) => {
-    console.log('x' + e.pageX)
-    console.log('y' + e.pageY)
+    console.log('x' + (e.pageX-canvas.left))
+    console.log('y' + (e.pageY-canvas.top))
     const cursor: Pos = {
       left: e.clientX,
       top: e.clientY,
@@ -53,8 +53,8 @@ export function Canvas() {
           backgroundColor: 'yellowgreen',
           position: 'absolute',
         }}
-        width={400}
-        height={400}
+        width={canvas.width}
+        height={canvas.height}
         onMouseMove={handleOnMouseMove}
       ></canvas>
       <div>Canvas</div>

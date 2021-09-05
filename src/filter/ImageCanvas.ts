@@ -17,11 +17,14 @@ export function ImageCanvas(props: Props) {
   } = props
   const init = () => {
     const beam = new Beam(canvas.current)
+		console.log(canvas.current.getContext('webgl'))
     const shader = beam.shader(renderImage)
 
     const quad = createRectangle(-0.5)
     const quad2 = createRectangle(0.1)
 
+    console.log(quad.vertex.position.map((pos) => pos + 1))
+    console.log(quad2.vertex.position.map((pos) => pos + 1))
     const vertexBuffers = beam.resource(
       ResourceTypes.VertexBuffers,
       quad.vertex,
@@ -35,8 +38,9 @@ export function ImageCanvas(props: Props) {
     const indexBuffer2 = beam.resource(ResourceTypes.IndexBuffer, quad2.index)
 
     const textures = beam.resource(ResourceTypes.Textures)
-    const image = new Image()
+    const image = new Image(100,100)
     image.src = imgSrc
+		console.log(image.src);
     textures.set('img', { image, flip: true })
     beam
       .clear()
@@ -44,5 +48,5 @@ export function ImageCanvas(props: Props) {
       .draw(shader, vertexBuffers2 as any, indexBuffer2 as any, textures as any)
     // console.log(canvas.current.nextSibling.src);
   }
-  init()
+    init()
 }
