@@ -7,16 +7,17 @@ import { ImageCanvas } from '../../filter/ImageCanvas'
 import {
   CanvasPos,
   createRectangle,
+  drawRectBorder,
   getCursorIsInQuad,
   getCursorPosInCanvas,
   Pos,
 } from '../../utils/geo-utils'
 
 type DrawInCanvas = {
-	x:number
-	y:number
-	width:number
-	height:number
+  x: number
+  y: number
+  width: number
+  height: number
 }
 export function Canvas() {
   const { globalCanvas, cmpCount } = useContext(globalContext)
@@ -27,7 +28,7 @@ export function Canvas() {
     top: 100,
   }
   const quad = createRectangle(-0.5)
-  const quad2 = createRectangle(0.4)
+  const quad2 = createRectangle(0.5)
   const quads: number[][] = new Array()
   quads.push(quad.vertex.position)
   quads.push(quad2.vertex.position)
@@ -44,23 +45,7 @@ export function Canvas() {
     // console.log(cursorPos);
     // console.log("lux:"+quad.vertex.position[3]+" luy:"+quad.vertex.position[4]);
     // console.log("rdx:"+quad.vertex.position[9]+" rdy:"+quad.vertex.position[10]);
-    const webglPosInCanvas = quad.vertex.position.map((pos, index) => {
-      const remainder = index % 3
-      if (remainder === 0) return pos * canvas.width/2
-			// changing y to be negtive since the canvs2d's y positive axis is downward
-      else if (remainder === 1) return -(pos * canvas.height/2)
-      else return pos
-    })
-		const glPosInCanvas = {
-			x:webglPosInCanvas[3],
-			y:webglPosInCanvas[1],
-			width:webglPosInCanvas[6]-webglPosInCanvas[3],
-			height:webglPosInCanvas[4]-webglPosInCanvas[1],
-		}
-
-    const ctx = canvas2dRef.current.getContext('2d')
-    ctx.strokeStyle = 'blue'
-    ctx.strokeRect(glPosInCanvas.x, glPosInCanvas.y, glPosInCanvas.width, glPosInCanvas.height)
+    drawRectBorder(canvas2dRef.current, quad.vertex.position)
     console.log(
       getCursorIsInQuad(
         { x: cursorPos.left, y: cursorPos.top },
@@ -68,22 +53,38 @@ export function Canvas() {
       ),
     )
   }
+  const handleOnMouseClick = (e: MouseEvent) => {
+    const cursor: Pos = {
+      left: e.clientX,
+      top: e.clientY,
+    }
+    for (let i = 0; i < quads.length; i++) {
+      const cursorPos = getCursorPosInCanvas(cursor, canvas) as Pos
+      const result = getCursorIsInQuad(
+        { x: cursorPos.left, y: cursorPos.top },
+        quads[i],
+      )
+      if (result !== 'out') {
+        drawRectBorder(canvas2dRef.current, quads[i])
+      }
+    }
+  }
 
   useEffect(() => {
     ImageCanvas({ canvas: canvas3dRef })
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
-    ctx.fillStyle = 'rgb(200,0,0)'
-    ctx.fillRect(0, 0, 60, 50)
-    ctx.fillStyle = 'rgb(0,200,0)'
-    ctx.fillRect(0, 50, 60, 50)
-    ctx.strokeStyle = 'blue'
-    ctx.strokeRect(0, 0, 60, 50)
+    // ctx.fillStyle = 'rgb(200,0,0)'
+    // ctx.fillRect(0, 0, 60, 50)
+    // ctx.fillStyle = 'rgb(0,200,0)'
+    // ctx.fillRect(0, 50, 60, 50)
+    // ctx.strokeStyle = 'blue'
+    // ctx.strokeRect(0, 0, 60, 50)
     console.log(canvas2dRef.current)
   }, [])
 
   return (
-		<div>
+    <div>
       <canvas
         ref={canvas2dRef}
         style={{
@@ -104,7 +105,7 @@ export function Canvas() {
         }}
         width={canvas.width}
         height={canvas.height}
-        onMouseMove={handleOnMouseMove}
+				onClick={handleOnMouseClick}
       ></canvas>
       <div>Canvas</div>
       <div>cmpCount:{cmpCount}</div>

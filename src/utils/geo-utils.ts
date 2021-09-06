@@ -21,17 +21,6 @@ export interface CanvasPos extends Pos {
   width: number
   height: number
 }
-const cursor: Pos = {
-  left: 1,
-  top: 1231,
-}
-const canvas: CanvasPos = {
-  left: 50,
-  top: 153,
-  width: 400,
-  height: 400,
-}
-
 type Forward = 'left' | 'down'
 export const getCursorPosInCanvas = (
   cursor: Pos,
@@ -128,4 +117,33 @@ const getIsInTriangle = (p: Point, a: Point, b: Point, c: Point) => {
   const pcaNormalDir = getCross(pc, pa)
 
   return pabNormalDir <= 0 && pbcNormalDir <= 0 && pcaNormalDir <= 0
+}
+
+export const drawRectBorder = (
+  canvas2dRef: HTMLCanvasElement,
+  position: number[],
+) => {
+  const webglPosInCanvas = position.map((pos, index) => {
+    const remainder = index % 3
+    if (remainder === 0) return (pos * canvas2dRef.width) / 2
+    // changing y to be negtive since the canvs2d's y positive axis is downward
+    else if (remainder === 1) return -((pos * canvas2dRef.height) / 2)
+    else return pos
+  })
+  const glPosInCanvas = {
+    x: webglPosInCanvas[3],
+    y: webglPosInCanvas[1],
+    width: webglPosInCanvas[6] - webglPosInCanvas[3],
+    height: webglPosInCanvas[4] - webglPosInCanvas[1],
+  }
+
+  const ctx = canvas2dRef.getContext('2d')
+	ctx.clearRect(-canvas2dRef.width/2,-canvas2dRef.height/2 , canvas2dRef.width, canvas2dRef.height)
+  ctx.strokeStyle = 'purple'
+  ctx.strokeRect(
+    glPosInCanvas.x,
+    glPosInCanvas.y,
+    glPosInCanvas.width,
+    glPosInCanvas.height,
+  )
 }
