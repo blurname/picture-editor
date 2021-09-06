@@ -26,7 +26,7 @@ export function ImageCanvas(props: Props) {
 		const imagesT:ImageProp[] = []
     const quad = createRectangle(-0.5)
 		imagesT.push({id:1,position:quad.vertex.position})
-    const quad2 = createRectangle(0.1)
+    const quad2 = createRectangle(0.5)
 		imagesT.push({id:2,position:quad2.vertex.position})
 
     console.log(quad.vertex.position)
