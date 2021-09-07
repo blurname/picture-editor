@@ -1,24 +1,25 @@
-import React, { MouseEvent, useContext, useEffect, useRef } from 'react'
+import React, {
+  DragEvent,
+  MouseEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { globalContext } from '../../context'
 import { CanvasWrapper } from './CanvasWrapper'
 import {} from './index.css'
 // import {render} from '../../filter/t'
 import { ImageCanvas } from '../../filter/ImageCanvas'
 import {
-  CanvasPos,
   createRectangle,
   drawRectBorder,
   getCursorIsInQuad,
+  getCursorMovDistance,
   getCursorPosInCanvas,
-  Pos,
 } from '../../utils/geo-utils'
+import { BeamSpirit } from '../../utils/gl-uitls'
 
-type DrawInCanvas = {
-  x: number
-  y: number
-  width: number
-  height: number
-}
 export function Canvas() {
   const { globalCanvas, cmpCount } = useContext(globalContext)
   const canvas: CanvasPos = {
@@ -29,9 +30,13 @@ export function Canvas() {
   }
   const quad = createRectangle(-0.5)
   const quad2 = createRectangle(0.5)
+  const quad3 = createRectangle(0.1)
+  const quad4 = createRectangle(0.2)
   const quads: number[][] = new Array()
   quads.push(quad.vertex.position)
   quads.push(quad2.vertex.position)
+  quads.push(quad3.vertex.position)
+  quads.push(quad4.vertex.position)
   console.log(quads)
 
   const canvas3dRef = useRef(null as HTMLCanvasElement)
@@ -46,12 +51,12 @@ export function Canvas() {
     // console.log("lux:"+quad.vertex.position[3]+" luy:"+quad.vertex.position[4]);
     // console.log("rdx:"+quad.vertex.position[9]+" rdy:"+quad.vertex.position[10]);
     drawRectBorder(canvas2dRef.current, quad.vertex.position)
-    console.log(
-      getCursorIsInQuad(
-        { x: cursorPos.left, y: cursorPos.top },
-        quad.vertex.position,
-      ),
-    )
+    // console.log(
+    //   getCursorIsInQuad(
+    //     { x: cursorPos.left, y: cursorPos.top },
+    //     quad.vertex.position,
+    //   ),
+    // )
   }
   const handleOnMouseClick = (e: MouseEvent) => {
     const cursor: Pos = {
@@ -69,22 +74,39 @@ export function Canvas() {
       }
     }
   }
+  // const [preCursor, setPreCursor] = useState({left:0,top:0} as Pos);
 
+  let preCursor: Pos = { left: 0, top: 0 }
+
+  const handleOnMouseDown = (e: MouseEvent) => {
+    const cursor: Pos = {
+      left: e.clientX,
+      top: e.clientY,
+    }
+    preCursor = cursor
+  }
+  const handleOnMouseUp = (e: MouseEvent) => {
+    const cursor: Pos = {
+      left: e.clientX,
+      top: e.clientY,
+    }
+    const distance = getCursorMovDistance(preCursor, cursor, canvas)
+		pic2.updatePosition(distance)
+  }
+  let pic2: BeamSpirit = undefined
   useEffect(() => {
     ImageCanvas({ canvas: canvas3dRef })
+    const image2 = new Image()
+    image2.src = '../../public/t3.jpg'
+    pic2 = new BeamSpirit(canvas3dRef.current, image2, 0.2)
+    pic2.render()
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
-    // ctx.fillStyle = 'rgb(200,0,0)'
-    // ctx.fillRect(0, 0, 60, 50)
-    // ctx.fillStyle = 'rgb(0,200,0)'
-    // ctx.fillRect(0, 50, 60, 50)
-    // ctx.strokeStyle = 'blue'
-    // ctx.strokeRect(0, 0, 60, 50)
     console.log(canvas2dRef.current)
   }, [])
 
   return (
-    <div>
+    <div className="Canvas">
       <canvas
         ref={canvas2dRef}
         style={{
@@ -105,7 +127,10 @@ export function Canvas() {
         }}
         width={canvas.width}
         height={canvas.height}
-				onClick={handleOnMouseClick}
+        onClick={handleOnMouseClick}
+        onMouseUp={handleOnMouseUp}
+				// onMouseMove={handleOnMouseUp}
+        onMouseDown={handleOnMouseDown}
       ></canvas>
       <div>Canvas</div>
       <div>cmpCount:{cmpCount}</div>

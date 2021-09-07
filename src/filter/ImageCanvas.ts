@@ -2,6 +2,7 @@ import { Beam, ResourceTypes } from 'beam-gl'
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { renderImage } from './saturationShader'
 import { createRectangle } from '../utils/geo-utils'
+import {BeamSpirit} from '../utils/gl-uitls'
 type Props = {
   imgSrc?: string
   width?: number
@@ -44,15 +45,18 @@ export function ImageCanvas(props: Props) {
     const indexBuffer2 = beam.resource(ResourceTypes.IndexBuffer, quad2.index)
 
     const textures = beam.resource(ResourceTypes.Textures)
-    const image = new Image(100,100)
+    const image = new Image()
     image.src = imgSrc
 		console.log(image.src);
     textures.set('img', { image, flip: true })
-    beam
-      .clear()
-      .draw(shader, vertexBuffers as any, indexBuffer as any, textures as any)
-      .draw(shader, vertexBuffers2 as any, indexBuffer2 as any, textures as any)
+    // beam
+    //   .clear()
+    //   .draw(shader, vertexBuffers as any, indexBuffer as any, textures as any)
+    //   .draw(shader, vertexBuffers2 as any, indexBuffer2 as any, textures as any)
     // console.log(canvas.current.nextSibling.src);
+		
+		const pic1 = new BeamSpirit(canvas.current,image,-0.5)
+		pic1.render()
   }
     init()
 }

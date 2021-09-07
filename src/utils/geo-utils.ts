@@ -13,14 +13,6 @@ export const createRectangle = (offset: number) => {
     index,
   }
 }
-export interface Pos {
-  left: number
-  top: number
-}
-export interface CanvasPos extends Pos {
-  width: number
-  height: number
-}
 type Forward = 'left' | 'down'
 export const getCursorPosInCanvas = (
   cursor: Pos,
@@ -33,7 +25,6 @@ export const getCursorPosInCanvas = (
   const isOutsideVeritcle: boolean =
     curTop < 0 ? true : curTop > canvas.height ? true : false
   if (isOutsideVeritcle || isOutsideHorizontal) return 'outOfCanvas'
-  const { widthRatio, heightRatio } = normallizeStandard(canvas)
 
   return {
     left: normalize2(curLeft, canvas.width, 'left'),
@@ -58,6 +49,14 @@ const normalize2 = (
       return -(oneDimPos - edge / 2) / (edge / 2)
     }
   }
+}
+type Exclude<T,U> =T extends U?false:U
+
+export const getCursorMovDistance =(pre:Pos,cur:Pos,canvas:CanvasPos):Pos =>{
+	const prePos =  getCursorPosInCanvas(pre,canvas) as Pos
+	const curPos =  getCursorPosInCanvas(cur,canvas) as Pos
+	return {left:curPos.left-prePos.left,top:curPos.top-prePos.top}
+
 }
 const normallizeStandard = (canvas: CanvasPos) => {
   const widthRatio = getBitLength(canvas.width)

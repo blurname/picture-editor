@@ -65,6 +65,17 @@ export const renderImage={
 		img:{type:tex2D}
 	}
 }
+export const basicImageShader={
+	vs:tVs,
+	fs:tFs,
+	buffers:{
+		position:{type:vec4,n:3},
+		texCoord:{type:vec2},
+	},
+	textures:{
+		img:{type:tex2D}
+	}
+}
 
 
 
