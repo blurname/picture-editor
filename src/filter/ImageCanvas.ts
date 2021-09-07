@@ -49,14 +49,11 @@ export function ImageCanvas(props: Props) {
     image.src = imgSrc
 		console.log(image.src);
     textures.set('img', { image, flip: true })
-    // beam
-    //   .clear()
-    //   .draw(shader, vertexBuffers as any, indexBuffer as any, textures as any)
-    //   .draw(shader, vertexBuffers2 as any, indexBuffer2 as any, textures as any)
-    // console.log(canvas.current.nextSibling.src);
+    beam
+      .clear()
+      .draw(shader, vertexBuffers as any, indexBuffer as any, textures as any)
+      .draw(shader, vertexBuffers2 as any, indexBuffer2 as any, textures as any)
 		
-		const pic1 = new BeamSpirit(canvas.current,image,-0.5)
-		pic1.render()
   }
     init()
 }

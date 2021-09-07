@@ -38,6 +38,8 @@ const normalize2 = (
 ): number => {
   if (oneDimPos < edge / 2) {
     // console.log(edge)
+		// preCursor = cursor
+		// g
     if (forward === 'left') return oneDimPos / (edge / 2) - 1
     else return -(oneDimPos / (edge / 2) - 1)
   } else {
