@@ -23,7 +23,7 @@ export function Canvas() {
   const canvas: CanvasPos = {
     width: 600,
     height: 600,
-    left: 300,
+    left: 260,
     top: 100,
   }
   const quad = createRectangle(-0.4)
@@ -73,7 +73,7 @@ export function Canvas() {
   // const [preCursor, setPreCursor] = useState({left:0,top:0} as Pos);
 
   let preCursor: Pos | null
-	let curImage:number
+  let curImage: number
 
   const handleOnMouseDown = (e: MouseEvent) => {
     const cursor: Pos = {
@@ -82,21 +82,22 @@ export function Canvas() {
     }
     preCursor = null
     const cursorPos = getCursorPosInCanvas(cursor, canvas) as Pos
-		let i=0
+    let i = 0
     for (let image of images) {
       const result = getCursorIsInQuad(
         { x: cursorPos.left, y: cursorPos.top },
         image.position,
       )
-			console.log(result);
+      console.log(result)
       if (result !== 'out') {
         preCursor = cursor
-				curImage = i
+        curImage = i
         break
       }
-			i++
+      i++
     }
   }
+  let maxZOffset = 1
   const handleOnMouseUp = (e: MouseEvent) => {
     const cursor: Pos = {
       left: e.clientX,
@@ -104,31 +105,39 @@ export function Canvas() {
     }
     if (preCursor !== null) {
       const distance = getCursorMovDistance(preCursor, cursor, canvas)
+      maxZOffset -= 0.0000001
+      images[curImage].zOffset = maxZOffset
       images[curImage].updatePosition(distance)
       for (let i = 0; i < images.length; i++) {
         images[i].render()
-				if(curImage===i){
-				drawRectBorder(canvas2dRef.current,images[i].position)
-				}
+        if (curImage === i) {
+          drawRectBorder(canvas2dRef.current, images[i].position)
+        }
       }
     }
   }
 
-  let pic2: BeamSpirit = undefined
   let pic1: BeamSpirit = undefined
+  let pic2: BeamSpirit = undefined
+  let pic3: BeamSpirit = undefined
 
   useEffect(() => {
-    // ImageCanvas({ canvas: canvas3dRef })
-    const image2 = new Image()
-    image2.src = '../../public/t3.jpg'
-    pic2 = new BeamSpirit(canvas3dRef.current, image2, 0.2)
-    pic2.render()
+    //the z position more big,the view more far
     const image = new Image()
     image.src = '../../public/t2.jpg'
     pic1 = new BeamSpirit(canvas3dRef.current, image, -0.5)
+    const image2 = new Image()
+    image2.src = '../../public/t3.jpg'
+    pic2 = new BeamSpirit(canvas3dRef.current, image2, -0.2)
+    const image3 = new Image()
+    image2.src = '../../public/test.jpg'
+    pic3 = new BeamSpirit(canvas3dRef.current, image2, 0.2)
     pic1.render()
+    pic2.render()
+    pic3.render()
     images.push(pic1)
     images.push(pic2)
+    images.push(pic3)
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)

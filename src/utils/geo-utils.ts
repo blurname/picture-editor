@@ -1,6 +1,13 @@
 export const createRectangle = (offset: number) => {
   const basePosition = [-1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0]
   const position = basePosition.map((pos) => pos * 0.3 + offset)
+	// const position = pos.map((item) => {
+	// 	if(item%3 ==2){
+	// 		return item+offset
+	// 	}else {
+	// 		return item
+	// 	}
+	// })
   const texCoord = [0, 0, 0, 1, 1, 1, 1, 0]
   const index = {
     array: [0, 1, 2, 0, 2, 3],
@@ -38,8 +45,6 @@ const normalize2 = (
 ): number => {
   if (oneDimPos < edge / 2) {
     // console.log(edge)
-		// preCursor = cursor
-		// g
     if (forward === 'left') return oneDimPos / (edge / 2) - 1
     else return -(oneDimPos / (edge / 2) - 1)
   } else {

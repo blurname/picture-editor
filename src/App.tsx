@@ -11,6 +11,7 @@ function App() {
   const [adjustNum, setAdjustNum] = useState(0)
   return (
     <div className="App" style={{backgroundColor:'gray'}}>
+		
       <h1>picture editor</h1>
       <div className="Container">
         <globalContext.Provider
