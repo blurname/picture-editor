@@ -19,41 +19,21 @@ import {
 import { BeamSpirit } from '../../utils/gl-uitls'
 
 export function Canvas() {
-  const { globalCanvas, cmpCount } = useContext(globalContext)
+  const {spiritCanvas,selectNum, setSelectNum,adjustNum } =
+    useContext(globalContext)
   const canvas: CanvasPos = {
     width: 600,
     height: 600,
     left: 260,
-    top: 100,
+    top: 130,
   }
-  const quad = createRectangle(-0.4)
-  const quad4 = createRectangle(0.2)
-  const quads: number[][] = new Array()
-  quads.push(quad.vertex.position)
-  quads.push(quad4.vertex.position)
-  console.log(quads)
+  const [images, setImages] = useState([] as BeamSpirit[])
 
-  const images: BeamSpirit[] = new Array()
+  const [maxZOffset, setMaxZOffset] = useState(1)
 
   const canvas3dRef = useRef(null as HTMLCanvasElement)
   const canvas2dRef = useRef(null as HTMLCanvasElement)
-  const handleOnMouseMove = (e: MouseEvent) => {
-    const cursor: Pos = {
-      left: e.clientX,
-      top: e.clientY,
-    }
-    const cursorPos = getCursorPosInCanvas(cursor, canvas) as Pos
-    // console.log(cursorPos);
-    // console.log("lux:"+quad.vertex.position[3]+" luy:"+quad.vertex.position[4]);
-    // console.log("rdx:"+quad.vertex.position[9]+" rdy:"+quad.vertex.position[10]);
-    drawRectBorder(canvas2dRef.current, quad.vertex.position)
-    // console.log(
-    //   getCursorIsInQuad(
-    //     { x: cursorPos.left, y: cursorPos.top },
-    //     quad.vertex.position,
-    //   ),
-    // )
-  }
+  const handleOnMouseMove = (e: MouseEvent) => {}
   const handleOnMouseClick = (e: MouseEvent) => {
     const cursor: Pos = {
       left: e.clientX,
@@ -70,7 +50,6 @@ export function Canvas() {
       }
     }
   }
-  // const [preCursor, setPreCursor] = useState({left:0,top:0} as Pos);
 
   let preCursor: Pos | null
   let curImage: number
@@ -82,22 +61,18 @@ export function Canvas() {
     }
     preCursor = null
     const cursorPos = getCursorPosInCanvas(cursor, canvas) as Pos
-    let i = 0
-    for (let image of images) {
+    for (let i = 0; i < images.length; i++) {
       const result = getCursorIsInQuad(
         { x: cursorPos.left, y: cursorPos.top },
-        image.position,
+        images[i].position,
       )
-      console.log(result)
       if (result !== 'out') {
         preCursor = cursor
         curImage = i
         break
       }
-      i++
     }
   }
-  let maxZOffset = 1
   const handleOnMouseUp = (e: MouseEvent) => {
     const cursor: Pos = {
       left: e.clientX,
@@ -105,15 +80,22 @@ export function Canvas() {
     }
     if (preCursor !== null) {
       const distance = getCursorMovDistance(preCursor, cursor, canvas)
-      maxZOffset -= 0.0000001
+      console.log(maxZOffset)
       images[curImage].zOffset = maxZOffset
       images[curImage].updatePosition(distance)
+      setSelectNum(curImage)
+      setMaxZOffset(maxZOffset - 0.000001)
       for (let i = 0; i < images.length; i++) {
         images[i].render()
         if (curImage === i) {
           drawRectBorder(canvas2dRef.current, images[i].position)
         }
       }
+    }
+  }
+  const renderImages = () => {
+    for (const image of images) {
+      image.render()
     }
   }
 
@@ -125,29 +107,32 @@ export function Canvas() {
     //the z position more big,the view more far
     const image = new Image()
     image.src = '../../public/t2.jpg'
-    pic1 = new BeamSpirit(canvas3dRef.current, image, -0.5)
+    pic1 = new BeamSpirit(canvas3dRef.current, image)
     const image2 = new Image()
     image2.src = '../../public/t3.jpg'
-    pic2 = new BeamSpirit(canvas3dRef.current, image2, -0.2)
+    pic2 = new BeamSpirit(canvas3dRef.current, image2)
     const image3 = new Image()
-    image2.src = '../../public/test.jpg'
-    pic3 = new BeamSpirit(canvas3dRef.current, image2, 0.2)
-    pic1.render()
-    pic2.render()
-    pic3.render()
+    image3.src = '../../public/test.jpg'
+    pic3 = new BeamSpirit(canvas3dRef.current, image3)
     images.push(pic1)
     images.push(pic2)
     images.push(pic3)
+		renderImages()
+		spiritCanvas.spirits = images
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
   }, [])
-  // useEffect(() => {
-  //   console.log(`preCursor+${preCursor}`)
-  // }, [preCursor])
+  useEffect(() => {
+    // console.log(`preCursor+${selectNum}`)
+    // console.log(images)
+    renderImages()
+  }, [adjustNum])
 
   return (
     <div className="Canvas">
+      <div>Canvas</div>
+		{adjustNum}
       <canvas
         ref={canvas2dRef}
         style={{
@@ -173,23 +158,6 @@ export function Canvas() {
         // onMouseMove={handleOnMouseUp}
         onMouseDown={handleOnMouseDown}
       ></canvas>
-      <div>Canvas</div>
-      <div>cmpCount:{cmpCount}</div>
-      <div style={{ position: 'relative' }}>
-        {globalCanvas.cmps.map((cmp, index) => {
-          return (
-            <CanvasWrapper
-              key={index.toString()}
-              img={{
-                id: cmp.id,
-                style: { width: cmp.width, height: cmp.height },
-                value: cmp.value,
-                image: cmp.image,
-              }}
-            />
-          )
-        })}
-      </div>
     </div>
   )
 }

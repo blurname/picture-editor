@@ -15,15 +15,19 @@ import {
   createTranslateMat,
 } from './geo-utils'
 
-const quadClearCommand = (gl: WebGLRenderingContext, rect: Rect) => {
-  // console.log(rect)
-  gl.enable(gl.SCISSOR_TEST)
-  gl.scissor(rect.x, rect.y, rect.width, rect.height)
-  gl.clearColor(0, 0, 0, 0)
-  // gl.clearDepth(1)
-  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-  // gl.enable(gl.DEPTH_TEST)
-  gl.disable(gl.SCISSOR_TEST)
+const quadClearCommand = {
+  name: 'quadClear',
+  onBefore(gl: WebGLRenderingContext, rect: Rect) {
+    // console.log(rect)
+    gl.enable(gl.SCISSOR_TEST)
+    gl.scissor(rect.x, rect.y, rect.width, rect.height)
+    gl.clearColor(0, 0, 0, 0)
+    gl.clearDepth(1)
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+    // gl.enable(gl.DEPTH_TEST)
+    gl.disable(gl.SCISSOR_TEST)
+  },
+	onAfter(){}
 }
 const depthCommand = {
   name: 'depth',
@@ -49,16 +53,13 @@ export class BeamSpirit {
   transMat: number[]
   rotateMat: number[]
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    image: HTMLImageElement,
-    offset: number,
-  ) {
-    const quad = createRectangle(offset)
+  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement) {
+    const quad = createRectangle(0)
     this.image = image
     this.canvas = canvas
     this.beam = new Beam(canvas)
     this.beam.define(depthCommand)
+    this.beam.define(quadClearCommand)
     this.shader = this.beam.shader(basicImageShader)
     this.position = quad.vertex.position
     this.prePosition = quad.vertex.position
@@ -69,7 +70,7 @@ export class BeamSpirit {
     this.indexBuffer = this.beam.resource(ResourceTypes.IndexBuffer, quad.index)
     this.textures = this.beam.resource(ResourceTypes.Textures)
     this.textures.set('img', { image: this.image, flip: true })
-    this.rotateMat = createRotateMat(-20)
+    this.rotateMat = createRotateMat(0)
     this.transMat = createTranslateMat(0, 0)
     this.scaleMat = createScaleMat(1, 1)
     this.uniforms = this.beam.resource(ResourceTypes.Uniforms, {
@@ -103,20 +104,21 @@ export class BeamSpirit {
     this.zOffset = maxZOffset
   }
   updateScaleMat(sx: number, sy: number) {
-		this.scaleMat = createScaleMat(sx,sy)
-
-	}
-  updateRotateMat(rx: number, ry: number) {
-
-		this.rotateMat = createScaleMat(rx,ry)
-	}
+    this.scaleMat = createScaleMat(sx, sy)
+		this.uniforms.set('scaleMat', this.scaleMat)
+}
+  updateRotateMat(rotate:number) {
+    this.rotateMat = createRotateMat(rotate)
+		this.uniforms.set('rotateMat', this.rotateMat)
+  }
   updateTransMat(tx: number, ty: number) {
-		this.transMat = createScaleMat(tx,ty)
-	}
+    this.transMat = createTranslateMat(tx, ty)
+		this.uniforms.set('transMat', this.transMat)
+  }
   render() {
     this.beam
-      // .clear()
-      .depth()
+      // .quadClear(this.getRect())
+			.depth()
       .draw(
         this.shader,
         this.vertexBuffers as any,
@@ -124,6 +126,8 @@ export class BeamSpirit {
         this.textures as any,
         this.uniforms as any,
       )
+    console.log('rendered')
+
     return this
   }
 }

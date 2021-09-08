@@ -1,7 +1,7 @@
 import React, {createContext} from 'react'
-import { Canvas } from './store/globalCanvas'
+import { Canvas, SpiritsCanvas } from './store/globalCanvas'
 type globalCanvasType = {
-  globalCanvas: Canvas
+	spiritCanvas:SpiritsCanvas
   cmpCount: number
   setCmpCount: React.Dispatch<React.SetStateAction<number>>
 	selectNum:number

@@ -1,3 +1,5 @@
+import {BeamSpirit} from "../utils/gl-uitls"
+
 export class Canvas {
   cmps: Cmp[]
   selectedCmp: null | Cmp
@@ -34,3 +36,21 @@ export class Canvas {
 	}
 }
 export const globalCanvas = new Canvas()
+
+export class SpiritsCanvas{
+	spirits:BeamSpirit[]
+	curSpirit:BeamSpirit|null
+	canvas3d:HTMLCanvasElement
+	canvas2d:HTMLCanvasElement
+	constructor(){
+		this.spirits = []
+		this.curSpirit = null
+	}
+	addSpirit(imgSrc:string){
+		const image = new Image();
+		image.src = imgSrc
+		const spirit = new BeamSpirit(this.canvas2d,image);
+		this.spirits.push(spirit)
+	}
+}
+export const spiritCanvas = new SpiritsCanvas()

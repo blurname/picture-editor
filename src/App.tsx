@@ -4,25 +4,25 @@ import { Editor } from './layout/Editor'
 import { Canvas } from './layout/Canvas'
 import { Components } from './layout/Components'
 import { globalContext } from './context'
-import { globalCanvas } from './store/globalCanvas'
+import { spiritCanvas } from './store/globalCanvas'
 function App() {
   const [cmpCount, setCmpCount] = useState(0)
   const [selectNum, setSelectNum] = useState(0)
   const [adjustNum, setAdjustNum] = useState(0)
+	
   return (
-    <div className="App" style={{backgroundColor:'gray'}}>
-		
+    <div className="App" style={{backgroundColor:''}}>
       <h1>picture editor</h1>
       <div className="Container">
         <globalContext.Provider
           value={{
-            globalCanvas,
             cmpCount,
             setCmpCount,
             selectNum,
             setSelectNum,
             adjustNum,
             setAdjustNum,
+						spiritCanvas
           }}
         >
           <Components />
