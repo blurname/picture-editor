@@ -21,7 +21,8 @@ export function Editor() {
         {rangeInput.children.map((cur, index) => {
           return (
             <div style={{ marginBottom: 30 }} key={index}>
-              {cur.desc}
+						<div>
+
               <input
                 type="range"
                 min={cur.props.range.min}
@@ -29,6 +30,8 @@ export function Editor() {
                 defaultValue={cur.props.value}
                 onInput={onChangeInput(cur.desc)}
               />
+							</div>
+              {cur.desc}
             </div>
           )
         })}

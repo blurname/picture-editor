@@ -4,10 +4,16 @@ import {
   ResourceTypes,
   Shader,
   TexturesResource,
+  UniformsResource,
   VertexBuffersResource,
 } from 'beam-gl'
 import { basicImageShader } from '../filter/saturationShader'
-import { createRectangle } from './geo-utils'
+import {
+  createRectangle,
+  createRotateMat,
+  createScaleMat,
+  createTranslateMat,
+} from './geo-utils'
 
 const quadClearCommand = (gl: WebGLRenderingContext, rect: Rect) => {
   // console.log(rect)
@@ -24,7 +30,7 @@ const depthCommand = {
   onBefore(gl: WebGLRenderingContext) {
     gl.enable(gl.DEPTH_TEST)
   },
-	onAfter(){}
+  onAfter() {},
 }
 
 export class BeamSpirit {
@@ -36,8 +42,12 @@ export class BeamSpirit {
   indexBuffer: IndexBufferResource
   shader: Shader
   textures: TexturesResource
+  uniforms: UniformsResource
   canvas: HTMLCanvasElement
-	zOffset:number
+  zOffset: number
+  scaleMat: number[]
+  transMat: number[]
+  rotateMat: number[]
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -59,8 +69,16 @@ export class BeamSpirit {
     this.indexBuffer = this.beam.resource(ResourceTypes.IndexBuffer, quad.index)
     this.textures = this.beam.resource(ResourceTypes.Textures)
     this.textures.set('img', { image: this.image, flip: true })
+    this.rotateMat = createRotateMat(-20)
+    this.transMat = createTranslateMat(0, 0)
+    this.scaleMat = createScaleMat(1, 1)
+    this.uniforms = this.beam.resource(ResourceTypes.Uniforms, {
+      scaleMat: this.scaleMat,
+      transMat: this.transMat,
+      rotateMat: this.rotateMat,
+    })
   }
-  updatePosition(distance: Pos={left:0,top:0}) {
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.prePosition = this.position.map((pos) => pos)
     this.position = this.position.map((pos, index) => {
       const remainder = index % 3
@@ -81,8 +99,19 @@ export class BeamSpirit {
     }
     return glPosInCanvas
   }
-	updateZ(maxZOffset:number){
-		this.zOffset = maxZOffset
+  updateZ(maxZOffset: number) {
+    this.zOffset = maxZOffset
+  }
+  updateScaleMat(sx: number, sy: number) {
+		this.scaleMat = createScaleMat(sx,sy)
+
+	}
+  updateRotateMat(rx: number, ry: number) {
+
+		this.rotateMat = createScaleMat(rx,ry)
+	}
+  updateTransMat(tx: number, ty: number) {
+		this.transMat = createScaleMat(tx,ty)
 	}
   render() {
     this.beam
@@ -93,6 +122,7 @@ export class BeamSpirit {
         this.vertexBuffers as any,
         this.indexBuffer as any,
         this.textures as any,
+        this.uniforms as any,
       )
     return this
   }

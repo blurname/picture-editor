@@ -1,5 +1,5 @@
 import {SchemaTypes} from 'beam-gl'
-const {vec4,vec2,tex2D,float} = SchemaTypes
+const {vec4,vec2,tex2D,float,mat4} = SchemaTypes
 const vs = `
 attribute vec4 position;
 attribute vec4 color;
@@ -37,10 +37,13 @@ export const Texture ={
 const tVs =`
 attribute vec4 position;
 attribute vec2 texCoord;
+uniform mat4 transMat;
+uniform mat4 rotateMat;
+uniform mat4 scaleMat;
 
 varying highp vec2 vTexCoord;
 void main(){
-	gl_Position = position;
+	gl_Position = position * transMat * rotateMat * scaleMat;
 	vTexCoord = texCoord;
 }
 
@@ -74,6 +77,11 @@ export const basicImageShader={
 	},
 	textures:{
 		img:{type:tex2D}
+	},
+	uniforms:{
+		scaleMat:{type:mat4},
+		transMat:{type:mat4},
+		rotateMat:{type:mat4},
 	}
 }
 

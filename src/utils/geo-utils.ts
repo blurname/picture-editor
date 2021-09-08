@@ -153,3 +153,34 @@ export const drawRectBorder = (
     glPosInCanvas.height,
   )
 }
+
+export const createTranslateMat=(tx:number, ty:number)=> {
+    return [
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        tx, ty, 0, 1
+    ]
+}
+
+export const  createRotateMat=(rotate:number)=> {
+    rotate = rotate * Math.PI / 180;
+    const cos = Math.cos(rotate);
+    const sin = Math.sin(rotate);
+    return [
+        cos, sin, 0, 0,
+        -sin, cos, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ]
+}
+
+export const  createScaleMat=(sx:number, sy:number)=> {
+    return [
+        sx, 0, 0, 0,
+        0, sy, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ]
+}
+
