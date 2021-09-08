@@ -19,7 +19,7 @@ import {
 import { BeamSpirit } from '../../utils/gl-uitls'
 
 export function Canvas() {
-  const {spiritCanvas,selectNum, setSelectNum,adjustNum } =
+  const {spiritCanvas,selectNum, setSelectNum,adjustNum,cmpCount } =
     useContext(globalContext)
   const canvas: CanvasPos = {
     width: 600,
@@ -99,39 +99,21 @@ export function Canvas() {
     }
   }
 
-  let pic1: BeamSpirit = undefined
-  let pic2: BeamSpirit = undefined
-  let pic3: BeamSpirit = undefined
-
   useEffect(() => {
     //the z position more big,the view more far
-    const image = new Image()
-    image.src = '../../public/t2.jpg'
-    pic1 = new BeamSpirit(canvas3dRef.current, image)
-    const image2 = new Image()
-    image2.src = '../../public/t3.jpg'
-    pic2 = new BeamSpirit(canvas3dRef.current, image2)
-    const image3 = new Image()
-    image3.src = '../../public/test.jpg'
-    pic3 = new BeamSpirit(canvas3dRef.current, image3)
-    images.push(pic1)
-    images.push(pic2)
-    images.push(pic3)
-		renderImages()
+		spiritCanvas.setCanvas3d(canvas3dRef.current)
 		spiritCanvas.spirits = images
-
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
   }, [])
   useEffect(() => {
-    // console.log(`preCursor+${selectNum}`)
-    // console.log(images)
     renderImages()
-  }, [adjustNum])
+  }, [adjustNum,cmpCount])
 
   return (
     <div className="Canvas">
       <div>Canvas</div>
+			{cmpCount}
 		{adjustNum}
       <canvas
         ref={canvas2dRef}

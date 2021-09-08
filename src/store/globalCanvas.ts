@@ -49,8 +49,13 @@ export class SpiritsCanvas{
 	addSpirit(imgSrc:string){
 		const image = new Image();
 		image.src = imgSrc
-		const spirit = new BeamSpirit(this.canvas2d,image);
+		const spirit = new BeamSpirit(this.canvas3d,image);
 		this.spirits.push(spirit)
+		console.log('add new')
 	}
+	setCanvas3d (canvas:HTMLCanvasElement) {
+		this.canvas3d = canvas
+	}
+
 }
 export const spiritCanvas = new SpiritsCanvas()

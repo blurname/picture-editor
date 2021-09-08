@@ -1,5 +1,5 @@
-import React, {createContext} from 'react'
-import { Canvas, SpiritsCanvas } from './store/globalCanvas'
+import React from 'react'
+import {  SpiritsCanvas } from './store/globalCanvas'
 type globalCanvasType = {
 	spiritCanvas:SpiritsCanvas
   cmpCount: number

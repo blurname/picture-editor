@@ -9,9 +9,9 @@ function App() {
   const [cmpCount, setCmpCount] = useState(0)
   const [selectNum, setSelectNum] = useState(0)
   const [adjustNum, setAdjustNum] = useState(0)
-	
+
   return (
-    <div className="App" style={{backgroundColor:''}}>
+    <div className="App" style={{ backgroundColor: '' }}>
       <h1>picture editor</h1>
       <div className="Container">
         <globalContext.Provider
@@ -22,7 +22,7 @@ function App() {
             setSelectNum,
             adjustNum,
             setAdjustNum,
-						spiritCanvas
+            spiritCanvas,
           }}
         >
           <Components />
