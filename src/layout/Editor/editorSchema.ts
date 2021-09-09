@@ -40,7 +40,7 @@ export const editorSchema = {
           },
         },
         {
-          desc: 'Britness',
+          desc: 'Brightness',
           props: {
             value: 0.0,
             range: { min: -0.5, max: 0.5 },

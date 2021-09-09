@@ -28,7 +28,18 @@ export function Editor() {
         spiritCanvas.spirits[selectNum].updateScaleMat(value, 0)
       } else if (desc === 'scaleY') {
         spiritCanvas.spirits[selectNum].updateScaleMat(0, value)
+      } else if (desc === 'Hue') {
+        spiritCanvas.spirits[selectNum].updateHue(value)
+      } else if (desc === 'Saturation') {
+        spiritCanvas.spirits[selectNum].updateSaturation(value)
+      } else if (desc === 'Contrast') {
+        spiritCanvas.spirits[selectNum].updateContrast(value)
+      } else if (desc === 'Brightness') {
+        spiritCanvas.spirits[selectNum].updateBrightness(value)
       }
+			else if (desc ==='Vignette') {
+        spiritCanvas.spirits[selectNum].updateVignette(value)
+			}
       setAdjustNum(adjustNum + 1)
     }
   return (
@@ -41,11 +52,12 @@ export function Editor() {
             <div style={{ marginBottom: 30 }} key={index}>
               <input
                 type="range"
+                step={cur.props.step}
                 min={cur.props.range.min}
                 max={cur.props.range.max}
                 defaultValue={cur.props.value}
                 onInput={onChangeInput(cur.desc)}
-								id={cur.desc}
+                id={cur.desc}
               />
               <label htmlFor={cur.desc}>{cur.desc}</label>
             </div>
