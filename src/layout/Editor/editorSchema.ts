@@ -39,6 +39,46 @@ export const editorSchema = {
             range: { min: -180, max: 180 },
           },
         },
+        {
+          desc: 'Britness',
+          props: {
+            value: 0.0,
+            range: { min: -0.5, max: 0.5 },
+						step:0.01
+          },
+        },
+        {
+          desc: 'Contrast',
+          props: {
+            value: 0.0,
+            range: { min: -0.3, max: 0.3 },
+						step:0.01
+          },
+        },
+        {
+          desc: 'Hue',
+          props: {
+            value: 0.0,
+            range: { min: -1, max: 1 },
+						step:0.005
+          },
+        },
+        {
+          desc: 'Saturation',
+          props: {
+            value: 0.0,
+            range: { min: -0.5, max: 0.5 },
+						step:0.005
+          },
+        },
+        {
+          desc: 'Vignette',
+          props: {
+            value: 0.0,
+            range: { min: 0, max: 10 },
+						step:0.005
+          },
+        },
       ],
     },
   ],

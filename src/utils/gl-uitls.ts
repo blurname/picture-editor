@@ -1,6 +1,7 @@
 import {
   Beam,
   IndexBufferResource,
+  OffscreenTargetResource,
   ResourceTypes,
   Shader,
   TexturesResource,
@@ -8,34 +9,13 @@ import {
   VertexBuffersResource,
 } from 'beam-gl'
 import { basicImageShader } from '../filter/saturationShader'
+import {depthCommand,Offscreen2DCommand} from './command'
 import {
   createRectangle,
   createRotateMat,
   createScaleMat,
   createTranslateMat,
 } from './geo-utils'
-
-const quadClearCommand = {
-  name: 'quadClear',
-  onBefore(gl: WebGLRenderingContext, rect: Rect) {
-    // console.log(rect)
-    gl.enable(gl.SCISSOR_TEST)
-    gl.scissor(rect.x, rect.y, rect.width, rect.height)
-    gl.clearColor(0, 0, 0, 0)
-    gl.clearDepth(1)
-    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-    // gl.enable(gl.DEPTH_TEST)
-    gl.disable(gl.SCISSOR_TEST)
-  },
-	onAfter(){}
-}
-const depthCommand = {
-  name: 'depth',
-  onBefore(gl: WebGLRenderingContext) {
-    gl.enable(gl.DEPTH_TEST)
-  },
-  onAfter() {},
-}
 
 export class BeamSpirit {
   beam: Beam
@@ -52,6 +32,8 @@ export class BeamSpirit {
   scaleMat: number[]
   transMat: number[]
   rotateMat: number[]
+	inputTextures:TexturesResource[]
+	outputTargets:OffscreenTargetResource[]
 
   constructor(canvas: HTMLCanvasElement, image: HTMLImageElement) {
     const quad = createRectangle(0)
@@ -59,7 +41,6 @@ export class BeamSpirit {
     this.canvas = canvas
     this.beam = new Beam(canvas)
     this.beam.define(depthCommand)
-    this.beam.define(quadClearCommand)
     this.shader = this.beam.shader(basicImageShader)
     this.position = quad.vertex.position
     this.prePosition = quad.vertex.position
@@ -117,7 +98,8 @@ export class BeamSpirit {
   }
   render() {
     this.beam
-      // .quadClear(this.getRect())
+		//.clear()
+      //.quadClear(this.getRect())
 			.depth()
       .draw(
         this.shader,
@@ -127,7 +109,17 @@ export class BeamSpirit {
         this.uniforms as any,
       )
     console.log('rendered')
-
     return this
   }
+	filterRender(){
+		this.beam
+		.depth()
+      .draw(
+        this.shader,
+        this.vertexBuffers as any,
+        this.indexBuffer as any,
+        this.textures as any,
+        this.uniforms as any,
+      )
+	}
 }

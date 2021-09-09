@@ -7,7 +7,6 @@ import React, {
   useState,
 } from 'react'
 import { globalContext } from '../../context'
-import { CanvasWrapper } from './CanvasWrapper'
 import {} from './index.css'
 import {
   createRectangle,
@@ -28,6 +27,7 @@ export function Canvas() {
     top: 130,
   }
   const [images, setImages] = useState([] as BeamSpirit[])
+	let upNum =0
 
   const [maxZOffset, setMaxZOffset] = useState(1)
 
@@ -78,20 +78,22 @@ export function Canvas() {
       left: e.clientX,
       top: e.clientY,
     }
-    if (preCursor !== null) {
-      const distance = getCursorMovDistance(preCursor, cursor, canvas)
-      console.log(maxZOffset)
-      images[curImage].zOffset = maxZOffset
-      images[curImage].updatePosition(distance)
-      setSelectNum(curImage)
-      setMaxZOffset(maxZOffset - 0.000001)
-      for (let i = 0; i < images.length; i++) {
-        images[i].render()
-        if (curImage === i) {
-          drawRectBorder(canvas2dRef.current, images[i].position)
-        }
-      }
-    }
+		console.log(upNum+=1)
+		if (preCursor !== null) {
+			const distance = getCursorMovDistance(preCursor, cursor, canvas)
+      //console.log(maxZOffset)
+			images[curImage].zOffset = maxZOffset
+			images[curImage].updatePosition(distance)
+			//images[curImage].render()
+			setSelectNum(curImage)
+			setMaxZOffset(maxZOffset - 0.000001)
+			for (let i = 0; i < images.length; i++) {
+				images[i].render()
+				if (curImage === i) {
+					drawRectBorder(canvas2dRef.current, images[i].position)
+				}
+			}
+		}
   }
   const renderImages = () => {
     for (const image of images) {
