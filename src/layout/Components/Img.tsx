@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { menu } from './menuSchema'
 import './index.css'
-import {globalContext} from '../../context'
+import { globalContext } from '../../context'
 type ImgType = {
   id: number
   style: { width: number; height: number }
@@ -37,21 +37,25 @@ const imgs: ImgType[] = [
 
 export function Img() {
   const { props } = menu.children.filter((child) => child.desc === 'img')[0]
-	const {spiritCanvas,cmpCount,setCmpCount} = useContext(globalContext);
+  const { spiritCanvas, cmpCount, setCmpCount } = useContext(globalContext)
   const { style } = props
-	const addToSpirits = (imgSrc:string)=>() => {
-		spiritCanvas.addSpirit(imgSrc)
-		setCmpCount(cmpCount+1)
-	}
+  const addToSpirits = (imgSrc: string) => () => {
+    spiritCanvas.addSpirit(imgSrc)
+    setCmpCount(cmpCount + 1)
+  }
   return (
-    <>
+    <div className="">
       {imgs.map((img, index) => {
         return (
-          <div onClick={addToSpirits(img.value)} key={index} style={{ width: style.width, height: style.height }}>
+          <div
+            className="auto mb-6"
+            onClick={addToSpirits(img.value)}
+            key={index}
+          >
             <img className="imgComponent" src={img.value} alt="" />
           </div>
         )
       })}
-    </>
+    </div>
   )
 }

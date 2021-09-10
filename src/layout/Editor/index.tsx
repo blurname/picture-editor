@@ -1,3 +1,4 @@
+import {Input} from 'antd'
 import React, {
   ChangeEvent,
   FormEvent,
@@ -5,7 +6,6 @@ import React, {
   useContext,
 } from 'react'
 import { globalContext } from '../../context'
-import {} from './index.css'
 import { editorSchema } from './editorSchema'
 export function Editor() {
   const { spiritCanvas, adjustNum, setAdjustNum, selectNum } =
@@ -50,7 +50,7 @@ export function Editor() {
         {rangeInput.children.map((cur, index) => {
           return (
             <div style={{ marginBottom: 30 }} key={index}>
-              <input
+              <Input
                 type="range"
                 step={cur.props.step}
                 min={cur.props.range.min}

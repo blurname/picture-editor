@@ -68,24 +68,6 @@ export const getCursorMovDistance = (
   const curPos = getCursorPosInCanvas(cur, canvas) as Pos
   return { left: curPos.left - prePos.left, top: curPos.top - prePos.top }
 }
-const normallizeStandard = (canvas: CanvasPos) => {
-  const widthRatio = getBitLength(canvas.width)
-  const heightRatio = getBitLength(canvas.height)
-  return {
-    widthRatio,
-    heightRatio,
-  }
-}
-const getBitLength = (num: number): number => {
-  let bitLength = 1
-  while (num !== 0) {
-    bitLength *= 0.1
-    num = Math.floor(num / 10)
-  }
-  return bitLength
-}
-// console.log(23432 * getBitLength(1234))
-// console.log(getCursorPosInCanvas(cursor, canvas))
 
 type Point = { x: number; y: number }
 export const getCursorIsInQuad = (
@@ -139,6 +121,7 @@ export const drawRectBorder = (
     else if (remainder === 1) return -((pos * canvas2dRef.height) / 2)
     else return pos
   })
+
   const glPosInCanvas = {
     x: webglPosInCanvas[3],
     y: webglPosInCanvas[1],
