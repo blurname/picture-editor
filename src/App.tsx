@@ -5,6 +5,9 @@ import { Canvas } from './layout/Canvas'
 import { Components } from './layout/Components'
 import { globalContext } from './context'
 import { spiritCanvas } from './store/globalCanvas'
+import Layout, { Content, Header } from 'antd/lib/layout/layout'
+import { Col, Divider, Row } from 'antd'
+import Column from 'antd/lib/table/Column'
 function App() {
   const [cmpCount, setCmpCount] = useState(0)
   const [selectNum, setSelectNum] = useState(0)
@@ -12,24 +15,39 @@ function App() {
 
   return (
     <div className="App" style={{ backgroundColor: '' }}>
-      <h1>picture editor</h1>
+		<Layout>
+      <Header className="bg-green-100">
+        <h1 className="text-blue-gray-900 font-large">picture editor</h1>
+      </Header>
+      <Divider />
       <div className="Container">
-        <globalContext.Provider
-          value={{
-            cmpCount,
-            setCmpCount,
-            selectNum,
-            setSelectNum,
-            adjustNum,
-            setAdjustNum,
-            spiritCanvas,
-          }}
-        >
-          <Components />
-          <Canvas />
-          <Editor />
-        </globalContext.Provider>
+			<Content>
+        <Row>
+          <globalContext.Provider
+            value={{
+              cmpCount,
+              setCmpCount,
+              selectNum,
+              setSelectNum,
+              adjustNum,
+              setAdjustNum,
+              spiritCanvas,
+            }}
+          >
+            <Col span={6}>
+              <Components />
+            </Col>
+            <Col span={12}>
+              <Canvas />
+            </Col>
+            <Col span={6}>
+              <Editor />
+            </Col>
+          </globalContext.Provider>
+        </Row>
+				</Content>
       </div>
+			</Layout>
     </div>
   )
 }

@@ -43,7 +43,7 @@ export function Editor() {
       setAdjustNum(adjustNum + 1)
     }
   return (
-    <div className="Editor">
+    <div className="bg-blue-100">
       Editor
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
       <div>

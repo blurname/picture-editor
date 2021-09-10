@@ -44,7 +44,7 @@ export const editorSchema = {
           props: {
             value: 0.0,
             range: { min: -0.5, max: 0.5 },
-						step:0.01
+            step: 0.01,
           },
         },
         {
@@ -52,7 +52,7 @@ export const editorSchema = {
           props: {
             value: 0.0,
             range: { min: -0.3, max: 0.3 },
-						step:0.01
+            step: 0.01,
           },
         },
         {
@@ -60,7 +60,7 @@ export const editorSchema = {
           props: {
             value: 0.0,
             range: { min: -1, max: 1 },
-						step:0.005
+            step: 0.005,
           },
         },
         {
@@ -68,7 +68,7 @@ export const editorSchema = {
           props: {
             value: 0.0,
             range: { min: -0.5, max: 0.5 },
-						step:0.005
+            step: 0.005,
           },
         },
         {
@@ -76,7 +76,7 @@ export const editorSchema = {
           props: {
             value: 0.0,
             range: { min: 0, max: 10 },
-						step:0.005
+            step: 0.005,
           },
         },
       ],

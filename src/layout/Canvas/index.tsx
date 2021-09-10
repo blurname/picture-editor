@@ -7,7 +7,6 @@ import React, {
   useState,
 } from 'react'
 import { globalContext } from '../../context'
-import {} from './index.css'
 import {
   createRectangle,
   drawRectBorder,
@@ -17,14 +16,15 @@ import {
 } from '../../utils/geo-utils'
 import { BeamSpirit } from '../../utils/gl-uitls'
 
+
 export function Canvas() {
   const { spiritCanvas, selectNum, setSelectNum, adjustNum, cmpCount } =
     useContext(globalContext)
   const canvas: CanvasPos = {
     width: 600,
     height: 600,
-    left: 260,
-    top: 130,
+    left: 0,
+    top: 0,
   }
   const [images, setImages] = useState([] as BeamSpirit[])
   let upNum = 0
@@ -33,7 +33,13 @@ export function Canvas() {
 
   const canvas3dRef = useRef(null as HTMLCanvasElement)
   const canvas2dRef = useRef(null as HTMLCanvasElement)
-  const handleOnMouseMove = (e: MouseEvent) => {}
+  const handleOnMouseMove = (e: MouseEvent) => {
+    const cursor: Pos = {
+      left: e.clientX,
+      top: e.clientY,
+    }
+		console.log(getCursorPosInCanvas(cursor,canvas))
+	}
   const handleOnMouseClick = (e: MouseEvent) => {
     const cursor: Pos = {
       left: e.clientX,
@@ -103,11 +109,11 @@ export function Canvas() {
 
   useEffect(() => {
     //the z position more big,the view more far
-    spiritCanvas.setCanvas3d(canvas3dRef.current)
-    spiritCanvas.spirits = images
-    const image = new Image()
-    image.src = '../../../public/t3.jpg'
-    const pic1 = new BeamSpirit(canvas3dRef.current, image)
+		spiritCanvas.setCanvas3d(canvas3dRef.current)
+		spiritCanvas.spirits = images
+		const image = new Image()
+		image.src = '../../../public/t3.jpg'
+		const pic1 = new BeamSpirit(canvas3dRef.current, image)
 		images.push(pic1)
 
     const ctx = canvas2dRef.current.getContext('2d')
@@ -118,33 +124,35 @@ export function Canvas() {
   }, [adjustNum, cmpCount])
 
   return (
-    <div className="Canvas">
+    <div style={{position:'relative'}} className="bg-blue-300">
       <div>Canvas</div>
       {cmpCount}
       {adjustNum}
       <canvas
+			className="bg-purple-300"
         ref={canvas2dRef}
         style={{
-          top: canvas.top,
-          left: canvas.left,
-          backgroundColor: 'whitesmoke',
-          position: 'absolute',
+          //top: canvas.top,
+          //left: 100,
+          //backgroundColor: 'whitesmoke',
+					position: 'absolute',
         }}
-        width={canvas.width}
-        height={canvas.height}
+				width={canvas.width}
+				height={canvas.height}
       ></canvas>
       <canvas
+			className="bg-purple-300"
         ref={canvas3dRef}
         style={{
           top: canvas.top,
-          left: canvas.left,
-          position: 'absolute',
+					left: canvas.left,
+					position: 'absolute',
         }}
-        width={canvas.width}
-        height={canvas.height}
+				width={canvas.width}
+				height={canvas.height}
         onClick={handleOnMouseClick}
         onMouseUp={handleOnMouseUp}
-        // onMouseMove={handleOnMouseUp}
+				 onMouseMove={handleOnMouseMove}
         onMouseDown={handleOnMouseDown}
       ></canvas>
     </div>
