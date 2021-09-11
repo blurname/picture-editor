@@ -43,13 +43,13 @@ export function Editor() {
       setAdjustNum(adjustNum + 1)
     }
   return (
-    <div className="bg-blue-100">
+    <div className="bg-blue-100 object-right">
       Editor
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
       <div>
         {rangeInput.children.map((cur, index) => {
           return (
-            <div style={{ marginBottom: 30 }} key={index}>
+            <div className="w-5/12 h-5/12 mb-3" key={index}>
               <Input
                 type="range"
                 step={cur.props.step}

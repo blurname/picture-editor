@@ -1,3 +1,5 @@
+import {MouseEvent, MutableRefObject} from "react"
+
 export const createRectangle = (offset: number) => {
   const basePosition = [-1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0]
   const position = basePosition.map((pos) => pos * 0.3 + offset)
@@ -20,22 +22,27 @@ export const createRectangle = (offset: number) => {
     index,
   }
 }
+	const getCursorPos = (e:MouseEvent,canvasPos:CanvasPos):Pos => {
+		return {
+		left:e.pageX-canvasPos.left,
+		top:e.pageY-canvasPos.top,
+		}
+	}
 type Forward = 'left' | 'down'
 export const getCursorPosInCanvas = (
-  cursor: Pos,
-  canvas: CanvasPos,
+	e:MouseEvent,
+	canvasPos:CanvasPos
 ): Pos | 'outOfCanvas' => {
-  const curLeft = cursor.left - canvas.left
-  const curTop = cursor.top - canvas.top
+	const cursorPos = getCursorPos(e,canvasPos)
   const isOutsideHorizontal: boolean =
-    curLeft < 0 ? true : curLeft > canvas.width ? true : false
+    cursorPos.left < 0 ? true : cursorPos.left > canvasPos.width ? true : false
   const isOutsideVeritcle: boolean =
-    curTop < 0 ? true : curTop > canvas.height ? true : false
+    cursorPos.top < 0 ? true : cursorPos.top > canvasPos.height ? true : false
   if (isOutsideVeritcle || isOutsideHorizontal) return 'outOfCanvas'
 
   return {
-    left: normalize2(curLeft, canvas.width, 'left'),
-    top: normalize2(curTop, canvas.height, 'down'),
+    left: normalize2(cursorPos.left, canvasPos.width, 'left'),
+    top: normalize2(cursorPos.top, canvasPos.height, 'down'),
   }
 }
 const normalize2 = (
@@ -60,8 +67,8 @@ const normalize2 = (
 type Exclude<T, U> = T extends U ? false : U
 
 export const getCursorMovDistance = (
-  pre: Pos,
-  cur: Pos,
+  pre: MouseEvent,
+  cur: MouseEvent,
   canvas: CanvasPos,
 ): Pos => {
   const prePos = getCursorPosInCanvas(pre, canvas) as Pos

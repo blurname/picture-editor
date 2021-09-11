@@ -10,7 +10,6 @@ import React, {
 } from 'react'
 import { globalContext } from '../../context'
 import {
-  createRectangle,
   drawRectBorder,
   getCursorIsInQuad,
   getCursorMovDistance,
@@ -19,19 +18,17 @@ import {
 import { BeamSpirit } from '../../utils/gl-uitls'
 
 type Props = {
-  canvasParentRef: MutableRefObject<HTMLDivElement>
 }
 
 export function Canvas(props: Props) {
   const { spiritCanvas, selectNum, setSelectNum, adjustNum, cmpCount } =
     useContext(globalContext)
   let curScrollTop = 0
-  const { canvasParentRef } = props
   let canvas: CanvasPos = {
-    width: 1100,
-    height: 890,
-    left: 0,
-    top: 0,
+    width: 1300,
+    height: 850,
+    left: 320,
+    top: 110,
   }
   const handleScroll = (e: any) => {
     let scrollTop = document.documentElement.scrollTop
@@ -46,74 +43,44 @@ export function Canvas(props: Props) {
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
   const handleOnMouseMove = (e: MouseEvent) => {
-    const cursor: Pos = {
-      left: e.clientX,
-      top: e.clientY,
-    }
-    //console.log('scroll: ' + curScrollTop)
-    //console.log(
-    //`left:${cursor.left - canvas.left},top:${cursor.top - canvas.top}`,
-    //)
-    //console.log(`offseLeft:${canvas3dRef.current.offsetLeft}`)
-    //console.log(`offsetTop${canvas3dRef.current.offsetTop}`)
-    //console.log(`offseLeft:${canvasParentRef.current.offsetLeft}`)
-    //console.log(`offsetTop${canvasParentRef.current.offsetTop}`)
-    //canvas3dRef.current.offsetLeft
-    //console.log(getCursorPosInCanvas(cursor,canvas))
-		console.log(getCursorPosInCanvas(cursor,canvas))
   }
   const handleOnMouseClick = (e: MouseEvent) => {
-    Object.keys(canvas).map((key) => {
-      console.log(canvas[key])
-    })
-
-    const cursor: Pos = {
-      left: e.clientX,
-      top: e.clientY,
+		console.log(getCursorPosInCanvas(e, canvas))
+    for (let i = 0; i < images.length; i++) {
+      const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
+      const result = getCursorIsInQuad(
+        { x: cursorPos.left, y: cursorPos.top },
+        images[i].position,
+      )
+      if (result !== 'out') {
+        drawRectBorder(canvas2dRef.current, images[i].position)
+      }
     }
-		console.log(getCursorPosInCanvas(cursor,canvas))
-		for (let i = 0; i < images.length; i++) {
-			const cursorPos = getCursorPosInCanvas(cursor, canvas) as Pos
-			const result = getCursorIsInQuad(
-				{ x: cursorPos.left, y: cursorPos.top },
-				images[i].position,
-			)
-			if (result !== 'out') {
-				drawRectBorder(canvas2dRef.current, images[i].position)
-			}
-		}
   }
 
-  let preCursor: Pos | null
+  let preCursor: MouseEvent|null
   let curImage: number
 
   const handleOnMouseDown = (e: MouseEvent) => {
-    const cursor: Pos = {
-      left: e.clientX,
-      top: e.clientY,
-    }
-    preCursor = null
-    const cursorPos = getCursorPosInCanvas(cursor, canvas) as Pos
+		e.preventDefault()
+    const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     for (let i = 0; i < images.length; i++) {
       const result = getCursorIsInQuad(
         { x: cursorPos.left, y: cursorPos.top },
         images[i].position,
       )
       if (result !== 'out') {
-        preCursor = cursor
+				preCursor = e
         curImage = i
         break
       }
     }
   }
   const handleOnMouseUp = (e: MouseEvent) => {
-    const cursor: Pos = {
-      left: e.clientX,
-      top: e.clientY,
-    }
-    console.log((upNum += 1))
+	e.preventDefault()
+
     if (preCursor !== null) {
-      const distance = getCursorMovDistance(preCursor, cursor, canvas)
+      const distance = getCursorMovDistance(preCursor, e, canvas)
       //console.log(maxZOffset)
       images[curImage].zOffset = maxZOffset
       images[curImage].updatePosition(distance)
@@ -142,20 +109,10 @@ export function Canvas(props: Props) {
     image.src = '../../../public/t3.jpg'
     const pic1 = new BeamSpirit(canvas3dRef.current, image)
     images.push(pic1)
-    const image2 = new Image()
-    image2.src = '../../../public/t2.jpg'
-    const pic2 = new BeamSpirit(canvas3dRef.current, image2)
-    images.push(pic2)
-
-    //canvas.left = canvas3dRef.current.clien
-    canvas.top = canvasParentRef.current.offsetTop
-    canvas.left = canvasParentRef.current.offsetLeft
-
-    console.log('parentref:width' + canvasParentRef.current.offsetLeft)
-    console.log('parentref:height' + canvasParentRef.current.offsetTop)
-
-    console.log('ref:width' + canvas3dRef.current.clientWidth)
-    console.log('ref:height' + canvas3dRef.current.clientHeight)
+    //const image2 = new Image()
+    //image2.src = '../../../public/t2.jpg'
+    //const pic2 = new BeamSpirit(canvas3dRef.current, image2)
+    //images.push(pic2)
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
@@ -167,18 +124,12 @@ export function Canvas(props: Props) {
   //window.removeEventListener('scroll', handleScroll)
   //}
   //},[])
-  //useEffect(() => {
-  //console.log('afterChage ref:width' + canvas3dRef.current.clientWidth)
-  //console.log('afterChage ref:height' + canvas3dRef.current.clientHeight)
-  //canvas.height = canvas3dRef.current.clientHeight
-  //canvas.width = canvas3dRef.current.clientWidth
-  //}, [canvas.height, canvas.width])
   useEffect(() => {
     renderImages()
   }, [adjustNum, cmpCount])
 
   return (
-    <div style={{}} className="w-12/12 h-12/12">
+    <div style={{}} className="bg-orange-500 w-12/12 h-12/12">
       {selectNum}
       {cmpCount}
       <canvas
@@ -205,9 +156,9 @@ export function Canvas(props: Props) {
         width={canvas.width}
         height={canvas.height}
         onClick={handleOnMouseClick}
-        onMouseUp={handleOnMouseUp}
+				onMouseUp={handleOnMouseUp}
 				//onMouseMove={handleOnMouseMove}
-        onMouseDown={handleOnMouseDown}
+				onMouseDown={handleOnMouseDown}
       />
     </div>
   )
