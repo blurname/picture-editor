@@ -1,8 +1,5 @@
 import React, {
-  DragEvent,
   MouseEvent,
-  MutableRefObject,
-  Ref,
   useContext,
   useEffect,
   useRef,
@@ -23,29 +20,23 @@ type Props = {
 export function Canvas(props: Props) {
   const { spiritCanvas, selectNum, setSelectNum, adjustNum, cmpCount } =
     useContext(globalContext)
-  let curScrollTop = 0
+  //let curScrollTop = 0
   let canvas: CanvasPos = {
     width: 1300,
     height: 850,
     left: 320,
     top: 110,
   }
-  const handleScroll = (e: any) => {
-    let scrollTop = document.documentElement.scrollTop
-    //curScrollTop = scrollTop
-    console.log(`scrollTop${scrollTop}`)
-  }
   const [images, setImages] = useState([] as BeamSpirit[])
   let upNum = 0
 
-  const [maxZOffset, setMaxZOffset] = useState(1)
+  //const [maxZOffset, setMaxZOffset] = useState(1)
 
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
   const handleOnMouseMove = (e: MouseEvent) => {
   }
   const handleOnMouseClick = (e: MouseEvent) => {
-		console.log(getCursorPosInCanvas(e, canvas))
     for (let i = 0; i < images.length; i++) {
       const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
       const result = getCursorIsInQuad(
@@ -58,7 +49,7 @@ export function Canvas(props: Props) {
     }
   }
 
-  let preCursor: MouseEvent|null
+  let preCursor: MouseEvent|undefined
   let curImage: number
 
   const handleOnMouseDown = (e: MouseEvent) => {
@@ -79,14 +70,14 @@ export function Canvas(props: Props) {
   const handleOnMouseUp = (e: MouseEvent) => {
 	e.preventDefault()
 
-    if (preCursor !== null) {
+    if (preCursor !== undefined) {
       const distance = getCursorMovDistance(preCursor, e, canvas)
       //console.log(maxZOffset)
-      images[curImage].zOffset = maxZOffset
+      //images[curImage].zOffset = maxZOffset
       images[curImage].updatePosition(distance)
       //images[curImage].render()
       setSelectNum(curImage)
-      setMaxZOffset(maxZOffset - 0.000001)
+      //setMaxZOffset(maxZOffset - 0.000001)
       for (let i = 0; i < images.length; i++) {
         images[i].render()
         if (curImage === i) {
@@ -118,12 +109,6 @@ export function Canvas(props: Props) {
     ctx.translate(canvas.width / 2, canvas.height / 2)
   }, [])
 
-  //useEffect(() => {
-  //window.addEventListener('scroll', handleScroll)
-  //return () => {
-  //window.removeEventListener('scroll', handleScroll)
-  //}
-  //},[])
   useEffect(() => {
     renderImages()
   }, [adjustNum, cmpCount])

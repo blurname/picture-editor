@@ -1,4 +1,4 @@
-import {Input} from 'antd'
+import {Input, Slider} from 'antd'
 import React, {
   ChangeEvent,
   FormEvent,
@@ -21,7 +21,7 @@ export function Editor() {
       if (desc === 'rotate') {
         spiritCanvas.spirits[selectNum].updateRotateMat(value)
       } else if (desc === 'translateX') {
-        spiritCanvas.spirits[selectNum].updateTransMat(value, value)
+        spiritCanvas.spirits[selectNum].updateTransMat(value, 0)
       } else if (desc === 'translateY') {
         spiritCanvas.spirits[selectNum].updateTransMat(0, value)
       } else if (desc === 'scaleX') {
@@ -42,12 +42,30 @@ export function Editor() {
 			}
       setAdjustNum(adjustNum + 1)
     }
+		const onLayoutChange = (value:number) => {
+        spiritCanvas.spirits[selectNum].udpateLayout(1-value)
+      setAdjustNum(adjustNum + 1)
+		}
+
   return (
     <div className="bg-blue-100 object-right">
       Editor
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
       <div>
         {rangeInput.children.map((cur, index) => {
+				if (cur.desc==='layout') {
+					return (
+					<Slider
+					key={index}
+                min={cur.props.range.min}
+                max={cur.props.range.max}
+                step={cur.props.step}
+								marks={cur.props.marks}
+                defaultValue={cur.props.value}
+								onChange={onLayoutChange}
+					></Slider>
+					)
+				}
           return (
             <div className="w-5/12 h-5/12 mb-3" key={index}>
               <Input

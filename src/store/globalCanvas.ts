@@ -59,3 +59,8 @@ export class SpiritsCanvas{
 
 }
 export const spiritCanvas = new SpiritsCanvas()
+
+export class Layout {
+	rootNodes:number[]
+
+}

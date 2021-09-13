@@ -10,7 +10,7 @@ uniform mat4 scaleMat;
 
 varying highp vec2 vTexCoord;
 void main(){
-	gl_Position = position;
+	gl_Position = transMat*scaleMat*rotateMat*position;
 	vTexCoord = texCoord;
 }
 

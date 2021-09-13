@@ -1,4 +1,5 @@
 import {MouseEvent, MutableRefObject} from "react"
+import {mat4} from 'gl-matrix'
 
 export const createRectangle = (offset: number) => {
   const basePosition = [-1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0]
@@ -71,6 +72,7 @@ export const getCursorMovDistance = (
   cur: MouseEvent,
   canvas: CanvasPos,
 ): Pos => {
+	console.log('pre:', pre)
   const prePos = getCursorPosInCanvas(pre, canvas) as Pos
   const curPos = getCursorPosInCanvas(cur, canvas) as Pos
   return { left: curPos.left - prePos.left, top: curPos.top - prePos.top }
@@ -153,16 +155,25 @@ export const drawRectBorder = (
 }
 
 export const createTranslateMat = (tx: number, ty: number) => {
-  return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, 0, 1]
+  return [1, 0, 0, 0, 
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		tx, ty, 0, 1]
 }
 
 export const createRotateMat = (rotate: number) => {
   rotate = (rotate * Math.PI) / 180
   const cos = Math.cos(rotate)
   const sin = Math.sin(rotate)
-  return [cos, sin, 0, 0, -sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+  return [cos, sin, 0, 0,
+		-sin, cos, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1]
 }
 
 export const createScaleMat = (sx: number, sy: number) => {
-  return [sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+  return [sx, 0, 0, 0,
+		0, sy, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1]
 }

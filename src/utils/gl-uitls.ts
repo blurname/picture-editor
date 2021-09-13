@@ -16,6 +16,7 @@ import {
   HueSaturation,
 } from '../filter/saturationShader'
 import { depthCommand, Offscreen2DCommand } from './command'
+import {mat4} from 'gl-matrix'
 import {
   createRectangle,
   createRotateMat,
@@ -53,9 +54,12 @@ export class BeamSpirit {
   brightnessContrastShader: Shader
   hueSaturationShader: Shader
   vignetteShader: Shader
+	layout: number
   constructor(canvas: HTMLCanvasElement, image: HTMLImageElement) {
     const quad = createRectangle(0)
     this.image = image
+		this.layout = 0.3
+
     this.canvas = canvas
     this.beam = new Beam(canvas)
     this.beam.define(depthCommand)
@@ -115,9 +119,10 @@ export class BeamSpirit {
       if (remainder === 0) return pos + distance.left
       // changing y to be negtive since the canvs2d's y positive axis is downward
       else if (remainder === 1) return pos + distance.top
-      else return this.zOffset
+      else return this.layout
     })
-    this.vertexBuffers.set('position', this.position)
+		this.vertexBuffers.set('position', this.position)
+		//this.updateTransMat(distance.left, distance.top)
   }
   getRect() {
     const webglPosInCanvas = this.prePosition.map((pos) => pos)
@@ -164,6 +169,12 @@ export class BeamSpirit {
     this.vignette = vignette
     this.uniforms.set('vignette', this.vignette)
   }
+	udpateLayout(layout:number){
+		this.layout = layout
+		console.log(this.layout)
+		this.uniforms.set('layout',this.layout)
+	}
+	
   //render() {
   //this.beam
   ////.clear()
@@ -205,17 +216,18 @@ export class BeamSpirit {
     console.log('draw')
   }
   render() {
-    //this.beam
-      ////.clear()
+		//this.beam.clear()
+		//this.beam
 			//.offscreen2D(this.targets[0], () => {
 				//this.draw(this.brightnessContrastShader, this.textures)
 			//})
-			//.offscreen2D(this.targets[1], () => {
+			// .offscreen2D(this.targets[1], () => {
 				//this.draw(this.hueSaturationShader, this.outputTextures[0])
-			//})
-		//this.draw(this.vignetteShader, this.outputTextures[1])
+			//}
+									//)
+		//this.draw(this.vignetteShader, this.outputTextures[0])
 		
 		this.draw(this.shader, this.textures)
   }
 }
-export class Filter {}
+

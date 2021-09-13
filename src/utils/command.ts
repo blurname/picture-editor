@@ -46,7 +46,7 @@ const beforeWithDepth = (gl: WebGLRenderingContext, resource) => {
 
 export const Offscreen2DCommand = {
   name: 'offscreen2D',
-  onBefore(gl: WebGLRenderingContext, resource) {
+  onBefore(gl: WebGLRenderingContext, resource:any) {
     const { depth } = resource.state
     depth ? beforeWithDepth(gl, resource) : beforeWithColor(gl, resource)
   },
