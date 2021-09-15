@@ -8,5 +8,6 @@ type globalCanvasType = {
   setSelectNum: React.Dispatch<React.SetStateAction<number>>
 	adjustNum:number
   setAdjustNum: React.Dispatch<React.SetStateAction<number>>
+	kRef:React.MutableRefObject<HTMLDivElement>
 }
 export const globalContext = React.createContext({} as globalCanvasType)

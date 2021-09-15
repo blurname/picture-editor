@@ -1,7 +1,7 @@
-import { SchemaTypes } from 'beam-gl'
+import { GLTypes, SchemaTypes } from 'beam-gl'
 const { vec4, vec2, tex2D, float, mat4 } = SchemaTypes
 
-const tVs = `
+const imageVS = `
 attribute vec4 position;
 attribute vec2 texCoord;
 uniform mat4 transMat;
@@ -10,12 +10,12 @@ uniform mat4 scaleMat;
 
 varying highp vec2 vTexCoord;
 void main(){
-	gl_Position = transMat*scaleMat*rotateMat*position;
+	gl_Position = scaleMat*rotateMat*position;
 	vTexCoord = texCoord;
 }
 
 `
-const tFs = `
+const imageFS = `
 varying highp vec2 vTexCoord;
 
 uniform sampler2D img;
@@ -24,9 +24,51 @@ void main(){
 	gl_FragColor = texture2D(img,vTexCoord);
 }
 `
+const shapeVS = `
+attribute vec4 position;
+attribute vec4 color;
+varying highp vec4 vColor;
+
+void main(){
+	gl_Position = position;
+	vColor = color;
+}
+`
+const shapeFS = `
+
+varying highp vec4 vColor;
+void main(){
+	gl_FragColor = vColor;
+}
+`
+
+export const lineShader = {
+	vs:shapeVS,
+	fs:shapeFS,
+	buffers:{
+		position:{type:vec4,n:3},
+		color:{type:vec4,n:3},
+	},
+	uniforms:{
+    rotateMat: { type: mat4 },
+	},
+	mode:GLTypes.Linear
+}
+export const hollowRectShader = {
+	vs:shapeVS,
+	fs:shapeFS,
+	buffers:{
+		position:{type:vec4,n:3},
+		color:{type:vec4,n:3},
+	},
+	uniforms:{
+    rotateMat: { type: mat4 },
+	}
+}
+
 export const basicImageShader = {
-  vs: tVs,
-  fs: tFs,
+  vs: imageVS,
+  fs: imageFS,
   buffers: {
     position: { type: vec4, n: 3 },
     texCoord: { type: vec2 },

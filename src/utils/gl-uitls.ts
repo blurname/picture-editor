@@ -14,31 +14,57 @@ import {
   BrightnessContrast,
   Vignette,
   HueSaturation,
-} from '../filter/saturationShader'
+	hollowRectShader,
+	lineShader,
+} from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {mat4} from 'gl-matrix'
 import {
+	createHollowRectangle,
+  createLine,
   createRectangle,
   createRotateMat,
   createScaleMat,
   createTranslateMat,
 } from './geo-utils'
-
-export class BeamSpirit {
-  beam: Beam
-  image: HTMLImageElement
+export class BeamSpirit{
+  protected beam: Beam
   position: number[]
-  prePosition: number[]
-  vertexBuffers: VertexBuffersResource
-  indexBuffer: IndexBufferResource
+  protected prePosition: number[]
+  protected vertexBuffers: VertexBuffersResource
+  protected indexBuffer: IndexBufferResource
+  protected uniforms: UniformsResource
+  protected canvas: HTMLCanvasElement
+  protected scaleMat: number[]
+  protected transMat: number[]
+  protected rotateMat: number[]
+  protected baseResources: Resource[]
+  protected shader: Shader
+	protected layout: number
+	constructor (canvas:HTMLCanvasElement) {
+		this.canvas = canvas
+		this.beam = new Beam(canvas)
+    this.beam.define(depthCommand)
+	}
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    this.prePosition = this.position.map((pos) => pos)
+    this.position = this.position.map((pos, index) => {
+      const remainder = index % 3
+      if (remainder === 0) return pos + distance.left
+      // changing y to be negtive since the canvs2d's y positive axis is downward
+      else if (remainder === 1) return pos + distance.top
+      else return this.layout
+    })
+		this.vertexBuffers.set('position', this.position)
+		//this.updateTransMat(distance.left, distance.top)
+  }
+	render(){}
+}
+export class ImageSpirit extends BeamSpirit {
+
+  image: HTMLImageElement
   textures: TexturesResource
-  uniforms: UniformsResource
-  canvas: HTMLCanvasElement
   zOffset: number
-  scaleMat: number[]
-  transMat: number[]
-  rotateMat: number[]
-  baseResources: Resource[]
 
   targets: OffscreenTargetResource[]
   inputTextures: TexturesResource
@@ -50,19 +76,16 @@ export class BeamSpirit {
   brightness: number
   contrast: number
 
-  shader: Shader
   brightnessContrastShader: Shader
   hueSaturationShader: Shader
   vignetteShader: Shader
-	layout: number
+
   constructor(canvas: HTMLCanvasElement, image: HTMLImageElement) {
+		super(canvas)
     const quad = createRectangle(0)
     this.image = image
 		this.layout = 0.3
 
-    this.canvas = canvas
-    this.beam = new Beam(canvas)
-    this.beam.define(depthCommand)
     this.beam.define(Offscreen2DCommand)
 
     this.shader = this.beam.shader(basicImageShader)
@@ -83,6 +106,7 @@ export class BeamSpirit {
     this.rotateMat = createRotateMat(0)
     this.transMat = createTranslateMat(0, 0)
     this.scaleMat = createScaleMat(1, 1)
+
     this.uniforms = this.beam.resource(ResourceTypes.Uniforms, {
       scaleMat: this.scaleMat,
       transMat: this.transMat,
@@ -125,7 +149,7 @@ export class BeamSpirit {
 		//this.updateTransMat(distance.left, distance.top)
   }
   getRect() {
-    const webglPosInCanvas = this.prePosition.map((pos) => pos)
+    const webglPosInCanvas = this.position.map((pos) => pos)
     const glPosInCanvas = {
       x: webglPosInCanvas[0],
       y: webglPosInCanvas[1],
@@ -146,6 +170,7 @@ export class BeamSpirit {
     this.uniforms.set('rotateMat', this.rotateMat)
   }
   updateTransMat(tx: number, ty: number) {
+		this.updatePosition({left:tx,top:ty})
     this.transMat = createTranslateMat(tx, ty)
     this.uniforms.set('transMat', this.transMat)
   }
@@ -174,6 +199,7 @@ export class BeamSpirit {
 		console.log(this.layout)
 		this.uniforms.set('layout',this.layout)
 	}
+
 	
   //render() {
   //this.beam
@@ -213,7 +239,7 @@ export class BeamSpirit {
       this.uniforms as any,
       input as any,
     )
-    console.log('draw')
+    console.log('drawImg')
   }
   render() {
 		//this.beam.clear()
@@ -231,3 +257,60 @@ export class BeamSpirit {
   }
 }
 
+type Shape='line'|'hollowRect'
+type Buffers = {
+	vertex:{
+		position:number[],
+		color:number[]
+	},
+	index:{
+		array:number[]
+	}
+}
+export class MarkSpirit extends BeamSpirit{
+	private uColor:number[]
+	private shape:'line'|'hollowRect'
+	private buffers:Buffers
+	constructor (canvas:HTMLCanvasElement,shape:Shape) {
+		super(canvas)
+		this.uColor = [1,0,0]
+		this.buffers = this.getBuffersByShape(shape)
+
+		this.vertexBuffers = this.beam.resource(ResourceTypes.VertexBuffers,this.buffers.vertex)
+		this.indexBuffer = this.beam.resource(ResourceTypes.IndexBuffer,this.buffers.index)
+		this.uniforms = this.beam.resource(ResourceTypes.Uniforms,{
+			uColor:this.uColor
+		})
+		this.shader = this.beam.shader(this.getShaderByShape(shape))
+		
+		this.position = this.buffers.vertex.position
+	}
+	getBuffersByShape(shape:Shape):Buffers{
+		if(shape==='line'){
+			return createLine()
+		}
+		else if (shape==='hollowRect') {
+			return createHollowRectangle()
+		}
+
+	}
+	getShaderByShape(shape:Shape){
+		if(shape==='line'){
+			return lineShader
+		}
+		else if (shape==='hollowRect') {
+			return hollowRectShader
+		}
+	}
+	updateColor(color:number[]){
+		this.uColor = color
+		this.uniforms.set('uColor',color)
+	}
+	private draw(){
+		this.beam.depth().draw(this.shader,this.vertexBuffers as any,this.indexBuffer as any,this.uniforms as any)
+    console.log('drawMark')
+	}
+	render(){
+		this.draw()
+	}
+}

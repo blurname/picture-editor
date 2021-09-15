@@ -10,6 +10,7 @@ function App() {
   const [cmpCount, setCmpCount] = useState(0)
   const [selectNum, setSelectNum] = useState(0)
   const [adjustNum, setAdjustNum] = useState(0)
+	const kRef = useRef(null as HTMLDivElement);
 
   const canvasParent = useRef(null as HTMLDivElement)
   useEffect(() => {
@@ -30,6 +31,7 @@ function App() {
                 adjustNum,
                 setAdjustNum,
                 spiritCanvas,
+								kRef
               }}
             >
               <Components />

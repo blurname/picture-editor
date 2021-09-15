@@ -23,6 +23,74 @@ export const createRectangle = (offset: number) => {
     index,
   }
 }
+export const createLine = (offset:number=0) =>{
+const basePosition = [-1, 0, 0,
+	1,0,0
+	]
+  const position = basePosition.map((pos) => pos * 0.3 + offset)
+  const index = {
+    array: [
+			0, 1,
+		],
+  }
+  return {
+    vertex: {
+      position,
+  color: [
+    1, 0, 0, // vertex 0
+  ]
+    },
+    index,
+  }
+}
+export const createHollowRectangle = (offset: number=0) => {
+  const basePosition = [-1, -1, 0,
+		-1, 1, 0,
+	1, 1, 0,
+	1, -1, 0,
+	-0.5,-0.5,0,
+	-0.5,0.5,0,
+	0.5,0.5,0,
+	0.5,-0.5,0,
+	]
+  const position = basePosition.map((pos) => pos * 0.3 + offset)
+  // const position = pos.map((item) => {
+  // 	if(item%3 ==2){
+  // 		return item+offset
+  // 	}else {
+  // 		return item
+  // 	}
+  // })
+  const index = {
+    array: [
+			0, 1, 4,
+			1, 4, 5,
+			1,2,5,
+			2,5,6,
+			2,3,6,
+			3,6,7,
+			3,0,7,
+			0,7,4
+		],
+  }
+  return {
+    vertex: {
+      position,
+  color: [
+    1, 0, 0, // vertex 0
+    1, 0, 0, // vertex 0
+    1, 0, 0, // vertex 0
+    1, 0, 0, // vertex 0
+    1, 0, 0, // vertex 0
+    1, 0, 0, // vertex 0
+    1, 0, 0, // vertex 0
+    1, 0, 0, // vertex 0
+  ]
+    },
+    index,
+  }
+}
+
 	const getCursorPos = (e:MouseEvent,canvasPos:CanvasPos):Pos => {
 		return {
 		left:e.pageX-canvasPos.left,
@@ -72,7 +140,6 @@ export const getCursorMovDistance = (
   cur: MouseEvent,
   canvas: CanvasPos,
 ): Pos => {
-	console.log('pre:', pre)
   const prePos = getCursorPosInCanvas(pre, canvas) as Pos
   const curPos = getCursorPosInCanvas(cur, canvas) as Pos
   return { left: curPos.left - prePos.left, top: curPos.top - prePos.top }
@@ -155,7 +222,8 @@ export const drawRectBorder = (
 }
 
 export const createTranslateMat = (tx: number, ty: number) => {
-  return [1, 0, 0, 0, 
+  return [
+		1, 0, 0, 0, 
 		0, 1, 0, 0,
 		0, 0, 1, 0,
 		tx, ty, 0, 1]
@@ -165,14 +233,16 @@ export const createRotateMat = (rotate: number) => {
   rotate = (rotate * Math.PI) / 180
   const cos = Math.cos(rotate)
   const sin = Math.sin(rotate)
-  return [cos, sin, 0, 0,
+  return [
+		cos, sin, 0, 0,
 		-sin, cos, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1]
 }
 
 export const createScaleMat = (sx: number, sy: number) => {
-  return [sx, 0, 0, 0,
+  return [
+		sx, 0, 0, 0,
 		0, sy, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1]

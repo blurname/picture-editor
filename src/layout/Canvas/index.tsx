@@ -1,3 +1,4 @@
+import { Beam, ResourceTypes } from 'beam-gl'
 import React, {
   MouseEvent,
   useContext,
@@ -7,15 +8,15 @@ import React, {
 } from 'react'
 import { globalContext } from '../../context'
 import {
+  createHollowRectangle,
   drawRectBorder,
   getCursorIsInQuad,
   getCursorMovDistance,
   getCursorPosInCanvas,
 } from '../../utils/geo-utils'
-import { BeamSpirit } from '../../utils/gl-uitls'
+import { BeamSpirit, ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
 
-type Props = {
-}
+type Props = {}
 
 export function Canvas(props: Props) {
   const { spiritCanvas, selectNum, setSelectNum, adjustNum, cmpCount } =
@@ -34,8 +35,7 @@ export function Canvas(props: Props) {
 
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
-  const handleOnMouseMove = (e: MouseEvent) => {
-  }
+  const handleOnMouseMove = (e: MouseEvent) => {}
   const handleOnMouseClick = (e: MouseEvent) => {
     for (let i = 0; i < images.length; i++) {
       const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
@@ -48,12 +48,11 @@ export function Canvas(props: Props) {
       }
     }
   }
-
-  let preCursor: MouseEvent|undefined
+  let preCursor: MouseEvent | undefined
   let curImage: number
 
   const handleOnMouseDown = (e: MouseEvent) => {
-		e.preventDefault()
+    e.preventDefault()
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     for (let i = 0; i < images.length; i++) {
       const result = getCursorIsInQuad(
@@ -61,15 +60,15 @@ export function Canvas(props: Props) {
         images[i].position,
       )
       if (result !== 'out') {
-				preCursor = e
+        preCursor = e
         curImage = i
+        canvas3dRef.current.style.cursor = 'move'
         break
       }
     }
   }
   const handleOnMouseUp = (e: MouseEvent) => {
-	e.preventDefault()
-
+    e.preventDefault()
     if (preCursor !== undefined) {
       const distance = getCursorMovDistance(preCursor, e, canvas)
       //console.log(maxZOffset)
@@ -82,6 +81,7 @@ export function Canvas(props: Props) {
         images[i].render()
         if (curImage === i) {
           drawRectBorder(canvas2dRef.current, images[i].position)
+          canvas3dRef.current.style.cursor = 'default'
         }
       }
     }
@@ -98,12 +98,27 @@ export function Canvas(props: Props) {
     spiritCanvas.spirits = images
     const image = new Image()
     image.src = '../../../public/t3.jpg'
-    const pic1 = new BeamSpirit(canvas3dRef.current, image)
+    const pic1 = new ImageSpirit(canvas3dRef.current, image)
+    pic1.updateTransMat(0.5, 0)
     images.push(pic1)
-    //const image2 = new Image()
-    //image2.src = '../../../public/t2.jpg'
-    //const pic2 = new BeamSpirit(canvas3dRef.current, image2)
-    //images.push(pic2)
+
+    const image2 = new Image()
+    image2.src = '../../../public/t2.jpg'
+    const pic2 = new ImageSpirit(canvas3dRef.current, image2)
+    pic2.updateTransMat(-0.5, 0)
+    images.push(pic2)
+    //const hollow = new Beam(canvas3dRef.current);
+    //const hollowRect = createHollowRectangle(0)
+    //const vertex = hollow.resource(ResourceTypes.VertexBuffers,hollowRect.vertex)
+    //const index = hollow.resource(ResourceTypes.IndexBuffer,hollowRect.index)
+    //const shader = hollow.shader(hollowRectShader)
+    //console.log()
+    //hollow.draw(shader,index as any,vertex as any)
+    //
+		const hollw = new MarkSpirit(canvas3dRef.current,'hollowRect')
+		images.push(hollw)
+		const line = new MarkSpirit(canvas3dRef.current,'line');
+		images.push(line)
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
@@ -114,11 +129,14 @@ export function Canvas(props: Props) {
   }, [adjustNum, cmpCount])
 
   return (
-    <div style={{}} className="bg-orange-500 w-12/12 h-12/12">
+    <div
+      //style={{cursor:}}
+      className="bg-orange-500 w-12/12 h-12/12"
+    >
       {selectNum}
       {cmpCount}
       <canvas
-        className="bg-teal-500"
+        className="bg-gray-200"
         ref={canvas2dRef}
         style={{
           top: canvas.top,
@@ -141,9 +159,9 @@ export function Canvas(props: Props) {
         width={canvas.width}
         height={canvas.height}
         onClick={handleOnMouseClick}
-				onMouseUp={handleOnMouseUp}
-				//onMouseMove={handleOnMouseMove}
-				onMouseDown={handleOnMouseDown}
+        onMouseUp={handleOnMouseUp}
+        //onMouseMove={handleOnMouseMove}
+        onMouseDown={handleOnMouseDown}
       />
     </div>
   )
