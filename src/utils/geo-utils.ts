@@ -25,19 +25,25 @@ export const createRectangle = (offset: number) => {
 }
 export const createLine = (offset:number=0) =>{
 const basePosition = [-1, 0, 0,
-	1,0,0
+	-1,0.05,0,
+	1,0.05,0,
+	1,0,0,
 	]
   const position = basePosition.map((pos) => pos * 0.3 + offset)
   const index = {
     array: [
-			0, 1,
+			0, 1,2,
+			0,2,3
 		],
   }
   return {
     vertex: {
       position,
   color: [
-    1, 0, 0, // vertex 0
+    0, 1, 0, // vertex 0
+    0, 1, 0, // vertex 0
+    0, 1, 0, // vertex 0
+    0, 1, 0, // vertex 0
   ]
     },
     index,

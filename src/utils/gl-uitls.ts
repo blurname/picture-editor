@@ -45,6 +45,7 @@ export class BeamSpirit{
 		this.canvas = canvas
 		this.beam = new Beam(canvas)
     this.beam.define(depthCommand)
+		this.layout = 0.7
 	}
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.prePosition = this.position.map((pos) => pos)
@@ -58,6 +59,11 @@ export class BeamSpirit{
 		this.vertexBuffers.set('position', this.position)
 		//this.updateTransMat(distance.left, distance.top)
   }
+	updateLayout(layout:number){
+		this.layout = layout
+		console.log(this.layout)
+		this.uniforms.set('layout',this.layout)
+	}
 	render(){}
 }
 export class ImageSpirit extends BeamSpirit {
@@ -84,7 +90,6 @@ export class ImageSpirit extends BeamSpirit {
 		super(canvas)
     const quad = createRectangle(0)
     this.image = image
-		this.layout = 0.3
 
     this.beam.define(Offscreen2DCommand)
 
@@ -194,11 +199,6 @@ export class ImageSpirit extends BeamSpirit {
     this.vignette = vignette
     this.uniforms.set('vignette', this.vignette)
   }
-	udpateLayout(layout:number){
-		this.layout = layout
-		console.log(this.layout)
-		this.uniforms.set('layout',this.layout)
-	}
 
 	
   //render() {

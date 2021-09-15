@@ -52,7 +52,7 @@ export const lineShader = {
 	uniforms:{
     rotateMat: { type: mat4 },
 	},
-	mode:GLTypes.Linear
+	//mode:GLTypes.Linear
 }
 export const hollowRectShader = {
 	vs:shapeVS,

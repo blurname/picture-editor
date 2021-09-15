@@ -1,4 +1,4 @@
-import {BeamSpirit, ImageSpirit} from "../utils/gl-uitls"
+import {BeamSpirit, ImageSpirit, MarkSpirit} from "../utils/gl-uitls"
 
 export class Canvas {
   cmps: Cmp[]
@@ -37,6 +37,7 @@ export class Canvas {
 }
 export const globalCanvas = new Canvas()
 
+type Shape = 'line'|'hollowRect'
 export class SpiritsCanvas{
 	spirits:BeamSpirit[]
 	curSpirit:ImageSpirit|null
@@ -46,12 +47,18 @@ export class SpiritsCanvas{
 		this.spirits = []
 		this.curSpirit = null
 	}
-	addSpirit(imgSrc:string){
+	addImage(imgSrc:string){
 		const image = new Image();
 		image.src = imgSrc
 		const spirit = new ImageSpirit(this.canvas3d,image);
 		this.spirits.push(spirit)
 		console.log('add new')
+	}
+	addMark(shape:Shape){
+		this.spirits.push(new MarkSpirit(this.canvas3d,shape))
+		
+
+
 	}
 	setCanvas3d (canvas:HTMLCanvasElement) {
 		this.canvas3d = canvas

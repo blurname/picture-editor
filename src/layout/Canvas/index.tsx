@@ -36,24 +36,24 @@ export function Canvas(props: Props) {
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
   const handleOnMouseMove = (e: MouseEvent) => {}
-  const handleOnMouseClick = (e: MouseEvent) => {
-    for (let i = 0; i < images.length; i++) {
-      const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
-      const result = getCursorIsInQuad(
-        { x: cursorPos.left, y: cursorPos.top },
-        images[i].position,
-      )
-      if (result !== 'out') {
-        drawRectBorder(canvas2dRef.current, images[i].position)
-      }
-    }
-  }
+  //const handleOnMouseClick = (e: MouseEvent) => {
+  //for (let i = 0; i < images.length; i++) {
+  //const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
+  //const result = getCursorIsInQuad(
+  //{ x: cursorPos.left, y: cursorPos.top },
+  //images[i].position,
+  //)
+  //if (result !== 'out') {
+  //}
+  //}
+  //}
+
   let preCursor: MouseEvent | undefined
   let curImage: number
-
   const handleOnMouseDown = (e: MouseEvent) => {
     e.preventDefault()
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
+    let isChecked: boolean = false
     for (let i = 0; i < images.length; i++) {
       const result = getCursorIsInQuad(
         { x: cursorPos.left, y: cursorPos.top },
@@ -62,9 +62,14 @@ export function Canvas(props: Props) {
       if (result !== 'out') {
         preCursor = e
         curImage = i
+        drawRectBorder(canvas2dRef.current, images[i].position)
         canvas3dRef.current.style.cursor = 'move'
+        isChecked = true
         break
       }
+    }
+    if (isChecked === false) {
+      preCursor = undefined
     }
   }
   const handleOnMouseUp = (e: MouseEvent) => {
@@ -80,6 +85,7 @@ export function Canvas(props: Props) {
       for (let i = 0; i < images.length; i++) {
         images[i].render()
         if (curImage === i) {
+          preCursor = e
           drawRectBorder(canvas2dRef.current, images[i].position)
           canvas3dRef.current.style.cursor = 'default'
         }
@@ -115,10 +121,10 @@ export function Canvas(props: Props) {
     //console.log()
     //hollow.draw(shader,index as any,vertex as any)
     //
-		const hollw = new MarkSpirit(canvas3dRef.current,'hollowRect')
-		images.push(hollw)
-		const line = new MarkSpirit(canvas3dRef.current,'line');
-		images.push(line)
+    const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
+    images.push(hollw)
+    const line = new MarkSpirit(canvas3dRef.current, 'line')
+    images.push(line)
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
@@ -158,7 +164,7 @@ export function Canvas(props: Props) {
         }}
         width={canvas.width}
         height={canvas.height}
-        onClick={handleOnMouseClick}
+        //onClick={handleOnMouseClick}
         onMouseUp={handleOnMouseUp}
         //onMouseMove={handleOnMouseMove}
         onMouseDown={handleOnMouseDown}
