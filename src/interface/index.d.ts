@@ -8,8 +8,10 @@ interface Cmp {
   image: HTMLImageElement | undefined
 }
 interface Rect {
+	// x and y are in bottom left 
   x: number
   y: number
+
   width: number
   height: number
 }

@@ -1,5 +1,5 @@
-import {MouseEvent, MutableRefObject} from "react"
-import {mat4} from 'gl-matrix'
+import { MouseEvent, MutableRefObject } from 'react'
+import { mat4 } from 'gl-matrix'
 
 export const createRectangle = (offset: number) => {
   const basePosition = [-1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0]
@@ -23,42 +23,59 @@ export const createRectangle = (offset: number) => {
     index,
   }
 }
-export const createLine = (offset:number=0) =>{
-const basePosition = [-1, 0, 0,
-	-1,0.05,0,
-	1,0.05,0,
-	1,0,0,
-	]
+export const createLine = (offset: number = 0) => {
+  const basePosition = [-1, 0, 0, 1, 0, 0]
   const position = basePosition.map((pos) => pos * 0.3 + offset)
   const index = {
-    array: [
-			0, 1,2,
-			0,2,3
-		],
+    array: [0, 1],
   }
   return {
     vertex: {
       position,
-  color: [
-    0, 1, 0, // vertex 0
-    0, 1, 0, // vertex 0
-    0, 1, 0, // vertex 0
-    0, 1, 0, // vertex 0
-  ]
+      color: [
+        0,
+        1,
+        0, // vertex 0
+        0,
+        1,
+        0, // vertex 0
+      ],
     },
     index,
   }
 }
-export const createHollowRectangle = (offset: number=0) => {
-  const basePosition = [-1, -1, 0,
-		-1, 1, 0,
-	1, 1, 0,
-	1, -1, 0,
-	-0.5,-0.5,0,
-	-0.5,0.5,0,
-	0.5,0.5,0,
-	0.5,-0.5,0,
-	]
+export const createLineRect = (offset: number = 0) => {
+  const basePosition = [-1, 0, 0, -1, 0.05, 0, 1, 0.05, 0, 1, 0, 0]
+  const position = basePosition.map((pos) => pos * 0.3 + offset)
+  const index = {
+    array: [0, 1, 2, 0, 2, 3],
+  }
+  return {
+    vertex: {
+      position,
+      color: [
+        0,
+        1,
+        0, // vertex 0
+        0,
+        1,
+        0, // vertex 0
+        0,
+        1,
+        0, // vertex 0
+        0,
+        1,
+        0, // vertex 0
+      ],
+    },
+    index,
+  }
+}
+export const createHollowRectangle = (offset: number = 0) => {
+  const basePosition = [
+    -3, -3, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0, -0.5, -0.5, 0, -0.5, 0.5, 0, 0.5,
+    0.5, 0, 0.5, -0.5, 0,
+  ]
   const position = basePosition.map((pos) => pos * 0.3 + offset)
   // const position = pos.map((item) => {
   // 	if(item%3 ==2){
@@ -69,46 +86,81 @@ export const createHollowRectangle = (offset: number=0) => {
   // })
   const index = {
     array: [
-			0, 1, 4,
-			1, 4, 5,
-			1,2,5,
-			2,5,6,
-			2,3,6,
-			3,6,7,
-			3,0,7,
-			0,7,4
-		],
+      0, 1, 4, 1, 4, 5, 1, 2, 5, 2, 5, 6, 2, 3, 6, 3, 6, 7, 3, 0, 7, 0, 7, 4,
+    ],
   }
   return {
     vertex: {
       position,
-  color: [
-    1, 0, 0, // vertex 0
-    1, 0, 0, // vertex 0
-    1, 0, 0, // vertex 0
-    1, 0, 0, // vertex 0
-    1, 0, 0, // vertex 0
-    1, 0, 0, // vertex 0
-    1, 0, 0, // vertex 0
-    1, 0, 0, // vertex 0
-  ]
+      color: [
+        1,
+        0,
+        0, // vertex 0
+        1,
+        0,
+        0, // vertex 0
+        1,
+        0,
+        0, // vertex 0
+        1,
+        0,
+        0, // vertex 0
+        1,
+        0,
+        0, // vertex 0
+        1,
+        0,
+        0, // vertex 0
+        1,
+        0,
+        0, // vertex 0
+        1,
+        0,
+        0, // vertex 0
+      ],
     },
     index,
   }
 }
+export const createCircle = (radius: number = 1, angleNum: number = 6) => {
+  let angle = [] as number[]
+  let indexArray = [] as number[]
+  for (let index = 1; index <= angleNum; index++) {
+    angle.push(index*1.0)
+    if (index === angleNum) {
+      indexArray.push(0)
+      indexArray.push(index)
+      indexArray.push(1)
+    } else {
+      indexArray.push(0)
+      indexArray.push(index)
+      indexArray.push(index + 1)
+    }
+  }
+	console.log(angle)
+  return {
+    vertex: {
+      angle,
+			color:[0,0,1]
+    },
+    index: {
+			array:[0,1,2,0,2,3]
+    },
+  }
+}
 
-	const getCursorPos = (e:MouseEvent,canvasPos:CanvasPos):Pos => {
-		return {
-		left:e.pageX-canvasPos.left,
-		top:e.pageY-canvasPos.top,
-		}
-	}
+const getCursorPos = (e: MouseEvent, canvasPos: CanvasPos): Pos => {
+  return {
+    left: e.pageX - canvasPos.left,
+    top: e.pageY - canvasPos.top,
+  }
+}
 type Forward = 'left' | 'down'
 export const getCursorPosInCanvas = (
-	e:MouseEvent,
-	canvasPos:CanvasPos
+  e: MouseEvent,
+  canvasPos: CanvasPos,
 ): Pos | 'outOfCanvas' => {
-	const cursorPos = getCursorPos(e,canvasPos)
+  const cursorPos = getCursorPos(e, canvasPos)
   const isOutsideHorizontal: boolean =
     cursorPos.left < 0 ? true : cursorPos.left > canvasPos.width ? true : false
   const isOutsideVeritcle: boolean =
@@ -228,28 +280,16 @@ export const drawRectBorder = (
 }
 
 export const createTranslateMat = (tx: number, ty: number) => {
-  return [
-		1, 0, 0, 0, 
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		tx, ty, 0, 1]
+  return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, 0, 1]
 }
 
 export const createRotateMat = (rotate: number) => {
   rotate = (rotate * Math.PI) / 180
   const cos = Math.cos(rotate)
   const sin = Math.sin(rotate)
-  return [
-		cos, sin, 0, 0,
-		-sin, cos, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1]
+  return [cos, sin, 0, 0, -sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
 }
 
 export const createScaleMat = (sx: number, sy: number) => {
-  return [
-		sx, 0, 0, 0,
-		0, sy, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1]
+  return [sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
 }

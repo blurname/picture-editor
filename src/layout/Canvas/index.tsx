@@ -7,7 +7,9 @@ import React, {
   useState,
 } from 'react'
 import { globalContext } from '../../context'
+import {circleShader} from '../../filter/shader'
 import {
+	createCircle,
   createHollowRectangle,
   drawRectBorder,
   getCursorIsInQuad,
@@ -113,18 +115,22 @@ export function Canvas(props: Props) {
     const pic2 = new ImageSpirit(canvas3dRef.current, image2)
     pic2.updateTransMat(-0.5, 0)
     images.push(pic2)
-    //const hollow = new Beam(canvas3dRef.current);
-    //const hollowRect = createHollowRectangle(0)
-    //const vertex = hollow.resource(ResourceTypes.VertexBuffers,hollowRect.vertex)
-    //const index = hollow.resource(ResourceTypes.IndexBuffer,hollowRect.index)
-    //const shader = hollow.shader(hollowRectShader)
+		const circle = new Beam(canvas3dRef.current)
+		
+		const circles = createCircle(0)
+		const vertex = circle.resource(ResourceTypes.VertexBuffers,circles.vertex)
+		const index = circle.resource(ResourceTypes.IndexBuffer,circles.index)
+		const shader = circle.shader(circleShader)
+		//images.push(circle as any)
     //console.log()
-    //hollow.draw(shader,index as any,vertex as any)
+		circle.draw(shader,index as any,vertex as any)
     //
-    const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
-    images.push(hollw)
-    const line = new MarkSpirit(canvas3dRef.current, 'line')
-    images.push(line)
+		let r = 1;
+
+    //const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
+    //images.push(hollw)
+    //const line = new MarkSpirit(canvas3dRef.current, 'line')
+    //images.push(line)
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)

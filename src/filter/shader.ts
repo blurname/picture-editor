@@ -41,29 +41,68 @@ void main(){
 	gl_FragColor = vColor;
 }
 `
+export const shapeShader = {
+  vs: shapeVS,
+  fs: shapeFS,
+  buffers: {
+    position: { type: vec4, n: 3 },
+    color: { type: vec4, n: 3 },
+  },
+}
 
 export const lineShader = {
-	vs:shapeVS,
-	fs:shapeFS,
-	buffers:{
-		position:{type:vec4,n:3},
-		color:{type:vec4,n:3},
-	},
-	uniforms:{
+  ...shapeShader,
+  mode: GLTypes.Linear,
+}
+export const lineRectShader = {
+  ...shapeShader,
+  uniforms: {
     rotateMat: { type: mat4 },
-	},
-	//mode:GLTypes.Linear
+  },
+  //mode:GLTypes.Linear
 }
 export const hollowRectShader = {
-	vs:shapeVS,
-	fs:shapeFS,
-	buffers:{
-		position:{type:vec4,n:3},
-		color:{type:vec4,n:3},
-	},
-	uniforms:{
+  ...shapeShader,
+  uniforms: {
     rotateMat: { type: mat4 },
-	}
+  },
+}
+	//gl_Position = vec4(cos(angle*pi/180.0)*radius,sin(angle*pi/180.0)*radius,0,1.0);
+const circleVS = `
+
+#define pi 3.1415926
+attribute highp float angle;
+attribute vec4 color;
+
+uniform highp float radius;
+
+varying vec4 vColor;
+void main(){
+	gl_Position = vec4(cos(angle*pi/180.0)*radius,sin(angle*pi/180.0)*radius,0.0,1.0);
+	vColor = color;
+}
+`
+const circleFS = `
+varying highp vec4 vColor;
+void main(){
+	gl_FragColor = vColor;
+}
+
+`
+export const circleShader = {
+  vs: circleVS,
+  fs: circleFS,
+  buffers: {
+		angle: { type: float },
+		//position:{type:vec4,n:3},
+    color: { type: vec4 },
+  },
+  uniforms: {
+    radius: {
+      type: float,
+    },
+  },
+	mode: GLTypes.Triangles,
 }
 
 export const basicImageShader = {

@@ -1,7 +1,6 @@
 import { Button } from 'antd'
 import React, { useContext } from 'react'
 import { globalContext } from '../../context'
-import { globalCanvas } from '../../store/globalCanvas'
 import { menu } from './menuSchema'
 
 type MarkType = {

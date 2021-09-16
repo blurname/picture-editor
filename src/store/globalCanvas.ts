@@ -1,73 +1,36 @@
-import {BeamSpirit, ImageSpirit, MarkSpirit} from "../utils/gl-uitls"
+import { BeamSpirit, ImageSpirit, MarkSpirit } from '../utils/gl-uitls'
 
-export class Canvas {
-  cmps: Cmp[]
-  selectedCmp: null | Cmp
+type Shape = 'line' | 'hollowRect'
+export class SpiritsCanvas {
+  spirits: BeamSpirit[]
+  curSpirit: ImageSpirit | null
+  canvas3d: HTMLCanvasElement
+  canvas2d: HTMLCanvasElement
   constructor() {
-    this.cmps = []
-    this.selectedCmp = null
+    this.spirits = []
+    this.curSpirit = null
   }
-  selectCmp = (cmp: Cmp): void => {
-    if (typeof this.selectCmp !== null) {
-      if (this.selectedCmp === cmp) {
-      } else {
-        this.selectedCmp = cmp
-      }
-    } else {
-      this.selectedCmp = cmp
-    }
+  addImage(imgSrc: string) {
+    const image = new Image()
+    image.src = imgSrc
+    const spirit = new ImageSpirit(this.canvas3d, image)
+    this.spirits.push(spirit)
+    console.log('add new')
   }
-  addCmp = (cmp: Cmp): void => {
-    this.cmps = [...this.cmps, cmp]
+  addMark(shape: Shape) {
+    this.spirits.push(new MarkSpirit(this.canvas3d, shape))
   }
-	updateCmps = ()=>{
-		this.cmps = this.cmps.map((cmp)=>{
-			if(cmp.id===this.selectedCmp.id){
-				return this.selectedCmp
-			}
-			else{
-				return cmp
-			}
-		})
-	}
-	updateSelectedCmp=(prop:string,value:number) => {
-		this.selectedCmp[prop] = value
-		console.log(this.selectedCmp[prop]);
-	}
-}
-export const globalCanvas = new Canvas()
 
-type Shape = 'line'|'hollowRect'
-export class SpiritsCanvas{
-	spirits:BeamSpirit[]
-	curSpirit:ImageSpirit|null
-	canvas3d:HTMLCanvasElement
-	canvas2d:HTMLCanvasElement
-	constructor(){
-		this.spirits = []
-		this.curSpirit = null
-	}
-	addImage(imgSrc:string){
-		const image = new Image();
-		image.src = imgSrc
-		const spirit = new ImageSpirit(this.canvas3d,image);
-		this.spirits.push(spirit)
-		console.log('add new')
-	}
-	addMark(shape:Shape){
-		this.spirits.push(new MarkSpirit(this.canvas3d,shape))
-		
+  setCanvas3d(canvas: HTMLCanvasElement) {
+    this.canvas3d = canvas
+  }
+	addGuidLine(beamSpirit:BeamSpirit){
 
 
 	}
-	setCanvas3d (canvas:HTMLCanvasElement) {
-		this.canvas3d = canvas
-	}
-
 }
 export const spiritCanvas = new SpiritsCanvas()
 
 export class Layout {
-	rootNodes:number[]
-
+  rootNodes: number[]
 }
