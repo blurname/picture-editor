@@ -41,6 +41,17 @@ void main(){
 	gl_FragColor = vColor;
 }
 `
+const lineVS =`
+
+attribute vec4 position;
+attribute vec4 color;
+varying highp vec4 vColor;
+
+void main(){
+	gl_Position = position;
+	vColor = color;
+}
+`
 export const shapeShader = {
   vs: shapeVS,
   fs: shapeFS,
@@ -52,7 +63,12 @@ export const shapeShader = {
 
 export const lineShader = {
   ...shapeShader,
-  mode: GLTypes.Linear,
+	vs:lineVS,
+	buffers:{
+		position:{type:vec4,n:1},
+		color:{type:vec4}
+	},
+  mode: GLTypes.Lines,
 }
 export const lineRectShader = {
   ...shapeShader,
@@ -78,7 +94,7 @@ uniform highp float radius;
 
 varying vec4 vColor;
 void main(){
-	gl_Position = vec4(cos(angle*pi/180.0)*radius,sin(angle*pi/180.0)*radius,0.0,1.0);
+	gl_Position = vec4(cos(angle*pi/180.0)*1.0,sin(angle*pi/180.0)*1.0,0.0,1.0);
 	vColor = color;
 }
 `

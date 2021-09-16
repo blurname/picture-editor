@@ -7,9 +7,9 @@ import React, {
   useState,
 } from 'react'
 import { globalContext } from '../../context'
-import {circleShader} from '../../filter/shader'
+import { circleShader } from '../../filter/shader'
 import {
-	createCircle,
+  createCircle,
   createHollowRectangle,
   drawRectBorder,
   getCursorIsInQuad,
@@ -81,6 +81,8 @@ export function Canvas(props: Props) {
       //console.log(maxZOffset)
       //images[curImage].zOffset = maxZOffset
       images[curImage].updatePosition(distance)
+      //spiritCanvas.updateGuidRect(images[curImage].getGuidRect(), images[curImage].getId())
+
       //images[curImage].render()
       setSelectNum(curImage)
       //setMaxZOffset(maxZOffset - 0.000001)
@@ -92,6 +94,7 @@ export function Canvas(props: Props) {
           canvas3dRef.current.style.cursor = 'default'
         }
       }
+      spiritCanvas.renderAllLine()
     }
   }
   const renderImages = () => {
@@ -106,26 +109,32 @@ export function Canvas(props: Props) {
     spiritCanvas.spirits = images
     const image = new Image()
     image.src = '../../../public/t3.jpg'
-    const pic1 = new ImageSpirit(canvas3dRef.current, image)
+    const pic1 = new ImageSpirit(canvas3dRef.current, image, 101)
     pic1.updateTransMat(0.5, 0)
     images.push(pic1)
 
     const image2 = new Image()
     image2.src = '../../../public/t2.jpg'
-    const pic2 = new ImageSpirit(canvas3dRef.current, image2)
+    const pic2 = new ImageSpirit(canvas3dRef.current, image2, 102)
     pic2.updateTransMat(-0.5, 0)
     images.push(pic2)
-		const circle = new Beam(canvas3dRef.current)
-		
-		const circles = createCircle(0)
-		const vertex = circle.resource(ResourceTypes.VertexBuffers,circles.vertex)
-		const index = circle.resource(ResourceTypes.IndexBuffer,circles.index)
-		const shader = circle.shader(circleShader)
-		//images.push(circle as any)
+
+    const circle = new Beam(canvas3dRef.current)
+
+    const circles = createCircle()
+    const vertex = circle.resource(ResourceTypes.VertexBuffers, circles.vertex)
+
+    const index = circle.resource(ResourceTypes.IndexBuffer, circles.index)
+    const tShader = circle.shader(circleShader)
+    const uniforms = circle.resource(ResourceTypes.Uniforms, {
+      radius: 1.0,
+    })
+    //images.push(circle as any)
     //console.log()
-		circle.draw(shader,index as any,vertex as any)
+    circle.draw(tShader, index as any, vertex as any, uniforms as any)
+    //circle.draw(shader,vertex as any)
     //
-		let r = 1;
+    let r = 1
 
     //const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
     //images.push(hollw)
@@ -134,6 +143,7 @@ export function Canvas(props: Props) {
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
+    spiritCanvas.renderAllLine()
   }, [])
 
   useEffect(() => {
@@ -148,7 +158,7 @@ export function Canvas(props: Props) {
       {selectNum}
       {cmpCount}
       <canvas
-        className="bg-gray-200"
+        className="bg-dark-400"
         ref={canvas2dRef}
         style={{
           top: canvas.top,

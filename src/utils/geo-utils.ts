@@ -20,25 +20,41 @@ export const createRectangle = (offset: number) => {
       position,
       texCoord,
     },
-    index,
+		index,
   }
 }
-export const createLine = (offset: number = 0) => {
-  const basePosition = [-1, 0, 0, 1, 0, 0]
-  const position = basePosition.map((pos) => pos * 0.3 + offset)
+export const createLine = (guidRect:Rect) => {
+	const { x,y,width,height } = guidRect
+	const position = [
+		x,y,0,
+		x,y+height,0,
+		x+width,y+height,0,
+		x+width,y,0
+	]
+
   const index = {
-    array: [0, 1],
+    array: [0, 1,
+			0,3,
+			2,1,
+			2,3
+		],
   }
   return {
     vertex: {
       position,
       color: [
         0,
-        1,
-        0, // vertex 0
         0,
-        1,
-        0, // vertex 0
+        1, // vertex 0
+        0,
+        0,
+        1, // vertex 0
+        0,
+        0,
+        1, // vertex 0
+        0,
+        0,
+        1, // vertex 0
       ],
     },
     index,
@@ -122,30 +138,33 @@ export const createHollowRectangle = (offset: number = 0) => {
     index,
   }
 }
-export const createCircle = (radius: number = 1, angleNum: number = 6) => {
+export const createCircle = (angleNum: number = 6) => {
   let angle = [] as number[]
-  let indexArray = [] as number[]
+  //let indexArray = [] as number[]
   for (let index = 1; index <= angleNum; index++) {
     angle.push(index*1.0)
-    if (index === angleNum) {
-      indexArray.push(0)
-      indexArray.push(index)
-      indexArray.push(1)
-    } else {
-      indexArray.push(0)
-      indexArray.push(index)
-      indexArray.push(index + 1)
-    }
+    //if (index === angleNum) {
+      //indexArray.push(0)
+      //indexArray.push(index)
+      //indexArray.push(1)
+    //} else {
+      //indexArray.push(0)
+      //indexArray.push(index)
+      //indexArray.push(index + 1)
+    //}
   }
 	console.log(angle)
   return {
     vertex: {
       angle,
-			color:[0,0,1]
+			color:[
+				0,0,1,
+				0,0,1,
+			]
     },
-    index: {
-			array:[0,1,2,0,2,3]
-    },
+		index: {
+			array:[0,1,2,0,2,3],
+		},
   }
 }
 
@@ -270,7 +289,8 @@ export const drawRectBorder = (
     canvas2dRef.width,
     canvas2dRef.height,
   )
-  ctx.strokeStyle = 'purple'
+  ctx.strokeStyle = 'red'
+	ctx.lineWidth=8
   ctx.strokeRect(
     glPosInCanvas.x,
     glPosInCanvas.y,

@@ -23,3 +23,6 @@ interface CanvasPos extends Pos {
   width: number
   height: number
 }
+interface GuidRect extends Rect{
+	id:number
+}

@@ -40,7 +40,7 @@ export function Img() {
   const { spiritCanvas, cmpCount, setCmpCount } = useContext(globalContext)
   const { style } = props
   const addToSpirits = (imgSrc: string) => () => {
-    spiritCanvas.addImage(imgSrc)
+    spiritCanvas.addImage(imgSrc,cmpCount)
     setCmpCount(cmpCount + 1)
   }
   return (

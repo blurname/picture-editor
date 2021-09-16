@@ -16,19 +16,23 @@ import {
   HueSaturation,
   hollowRectShader,
   lineRectShader,
+	lineShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import { mat4 } from 'gl-matrix'
 import {
   createHollowRectangle,
+  createLine,
   createLineRect,
   createRectangle,
   createRotateMat,
   createScaleMat,
   createTranslateMat,
 } from './geo-utils'
+const { VertexBuffers,IndexBuffer,Uniforms,Textures,OffscreenTarget } = ResourceTypes
 export class BeamSpirit {
   protected beam: Beam
+	protected id:number
   position: number[]
   protected prePosition: number[]
   protected vertexBuffers: VertexBuffersResource
@@ -42,11 +46,12 @@ export class BeamSpirit {
   protected shader: Shader
   protected layout: number
   protected guidRect: Rect
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement,id:number) {
     this.canvas = canvas
     this.beam = new Beam(canvas)
     this.beam.define(depthCommand)
     this.layout = 0.7
+		this.id = id
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.prePosition = this.position.map((pos) => pos)
@@ -67,6 +72,12 @@ export class BeamSpirit {
   }
   render() {}
   updateGuidRect() {}
+	getGuidRect(){
+		return this.guidRect
+	}
+	getId(){
+		return this.id
+	}
 }
 export class ImageSpirit extends BeamSpirit {
   image: HTMLImageElement
@@ -87,8 +98,8 @@ export class ImageSpirit extends BeamSpirit {
   hueSaturationShader: Shader
   vignetteShader: Shader
 
-  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement) {
-    super(canvas)
+  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement,id:number) {
+    super(canvas,id)
     const quad = createRectangle(0)
     this.image = image
 
@@ -103,17 +114,17 @@ export class ImageSpirit extends BeamSpirit {
     this.prePosition = quad.vertex.position
 
     this.vertexBuffers = this.beam.resource(
-      ResourceTypes.VertexBuffers,
+      VertexBuffers,
       quad.vertex,
     )
-    this.indexBuffer = this.beam.resource(ResourceTypes.IndexBuffer, quad.index)
-    this.textures = this.beam.resource(ResourceTypes.Textures)
+    this.indexBuffer = this.beam.resource(IndexBuffer, quad.index)
+    this.textures = this.beam.resource(Textures)
 
     this.rotateMat = createRotateMat(0)
     this.transMat = createTranslateMat(0, 0)
     this.scaleMat = createScaleMat(1, 1)
 
-    this.uniforms = this.beam.resource(ResourceTypes.Uniforms, {
+    this.uniforms = this.beam.resource(Uniforms, {
       scaleMat: this.scaleMat,
       transMat: this.transMat,
       rotateMat: this.rotateMat,
@@ -132,15 +143,16 @@ export class ImageSpirit extends BeamSpirit {
     this.textures.set('img', { image: this.image, flip: true })
     this.inputTextures = this.textures
     this.outputTextures = [
-      this.beam.resource(ResourceTypes.Textures),
-      this.beam.resource(ResourceTypes.Textures),
+      this.beam.resource(Textures),
+      this.beam.resource(Textures),
     ]
     this.targets = [
-      this.beam.resource(ResourceTypes.OffscreenTarget),
-      this.beam.resource(ResourceTypes.OffscreenTarget),
+      this.beam.resource(OffscreenTarget),
+      this.beam.resource(OffscreenTarget),
     ]
     this.outputTextures[0].set('img', this.targets[0])
     this.outputTextures[1].set('img', this.targets[1])
+		this.updateGuidRect()
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.prePosition = this.position.map((pos) => pos)
@@ -161,17 +173,9 @@ export class ImageSpirit extends BeamSpirit {
       width: this.position[6] - this.position[3],
       height: this.position[4] - this.position[1],
 		}
-
 	}
   getGuidRect() {
-		//const this.position = this.position.map((pos) => pos)
-    //const glPosInCanvas = {
-      //x: this.position[0],
-      //y: this.position[1],
-      //width: this.position[6] - this.position[3],
-      //height: this.position[4] - this.position[1],
-    //}
-    //return glPosInCanvas
+		return this.guidRect
   }
   updateZ(maxZOffset: number) {
     this.zOffset = maxZOffset
@@ -282,20 +286,20 @@ export class MarkSpirit extends BeamSpirit {
   private uColor: number[]
   private shape: 'line' | 'hollowRect'
   private buffers: Buffers
-  constructor(canvas: HTMLCanvasElement, shape: Shape) {
-    super(canvas)
+  constructor(canvas: HTMLCanvasElement, shape: Shape,id:number) {
+    super(canvas,id)
     this.uColor = [1, 0, 0]
     this.buffers = this.getBuffersByShape(shape)
 
     this.vertexBuffers = this.beam.resource(
-      ResourceTypes.VertexBuffers,
+      VertexBuffers,
       this.buffers.vertex,
     )
     this.indexBuffer = this.beam.resource(
-      ResourceTypes.IndexBuffer,
+      IndexBuffer,
       this.buffers.index,
     )
-    this.uniforms = this.beam.resource(ResourceTypes.Uniforms, {
+    this.uniforms = this.beam.resource(Uniforms, {
       uColor: this.uColor,
     })
     this.shader = this.beam.shader(this.getShaderByShape(shape))
@@ -334,4 +338,34 @@ export class MarkSpirit extends BeamSpirit {
   render() {
     this.draw()
   }
+}
+export class GuidLine {
+  protected beam: Beam
+	protected id:number
+  protected vertexBuffers: VertexBuffersResource
+  protected indexBuffer: IndexBufferResource
+	protected shader: Shader
+  protected canvas: HTMLCanvasElement
+	constructor (canvas:HTMLCanvasElement,rect:Rect,id:number) {
+		this.id = id
+		this.canvas = canvas
+		this.beam = new Beam(canvas)
+		const line = createLine(rect)
+		this.vertexBuffers = this.beam.resource(VertexBuffers,line.vertex)
+		this.indexBuffer= this.beam.resource(IndexBuffer,line.index)
+		this.shader = this.beam.shader(lineShader)
+		
+	}
+	updateRect(rect:Rect){
+		this.vertexBuffers.set('position', createLine(rect).vertex)
+		
+	}
+	render(){
+		this.beam.draw(this.shader,this.vertexBuffers as any, this.indexBuffer as any)
+	}
+	getId(){
+		return this.id
+
+	}
+	
 }
