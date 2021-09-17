@@ -1,5 +1,5 @@
 import { GLTypes, SchemaTypes } from 'beam-gl'
-const { vec4, vec2, tex2D, float, mat4 } = SchemaTypes
+const { vec4,vec3, vec2, tex2D, float, mat4 } = SchemaTypes
 
 const imageVS = `
 attribute vec4 position;
@@ -41,6 +41,15 @@ void main(){
 	gl_FragColor = vColor;
 }
 `
+export const shapeShader = {
+  vs: shapeVS,
+  fs: shapeFS,
+  buffers: {
+    position: { type: vec4, n: 3 },
+    color: { type: vec4, n: 3 },
+  },
+}
+
 const lineVS =`
 
 attribute vec4 position;
@@ -52,23 +61,22 @@ void main(){
 	vColor = color;
 }
 `
-export const shapeShader = {
-  vs: shapeVS,
-  fs: shapeFS,
-  buffers: {
-    position: { type: vec4, n: 3 },
-    color: { type: vec4, n: 3 },
-  },
+const lineFS = `
+varying highp vec4 vColor;
+void main(){
+	gl_FragColor = vColor;
 }
 
+`
+
 export const lineShader = {
-  ...shapeShader,
 	vs:lineVS,
+	fs:lineFS,
 	buffers:{
-		position:{type:vec4,n:1},
-		color:{type:vec4}
+		position:{type:vec3},
+		color:{type:vec3}
 	},
-  mode: GLTypes.Lines,
+	mode: GLTypes.Lines,
 }
 export const lineRectShader = {
   ...shapeShader,

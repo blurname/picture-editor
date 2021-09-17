@@ -26,35 +26,41 @@ export const createRectangle = (offset: number) => {
 export const createLine = (guidRect:Rect) => {
 	const { x,y,width,height } = guidRect
 	const position = [
-		x,y,0,
-		x,y+height,0,
-		x+width,y+height,0,
-		x+width,y,0
+		x,y,0.0,//0
+		x,y+height+0.3,0.0,//1
+
+		x,y+height,0.0,//2
+		x+width+0.3,y+height,0.0,//3
+
+		x+width,y,0.0,//4
+		x+width,y+width+0.3,0.0,//5
+
+		x+width+0.3,y,0.0//6
+		//x,y,
+		//x,y+height,
+		//x+width,y+height,
+		//x+width,y,
+	
 	]
 
   const index = {
     array: [0, 1,
-			0,3,
-			2,1,
-			2,3
+			2,3,
+			4,5,
+			0,6
 		],
   }
   return {
     vertex: {
       position,
       color: [
-        0,
-        0,
-        1, // vertex 0
-        0,
-        0,
-        1, // vertex 0
-        0,
-        0,
-        1, // vertex 0
-        0,
-        0,
-        1, // vertex 0
+				0.1,0.7,0.5,
+				0.1,0.7,0.5,
+				0.1,0.7,0.5,
+				0.1,0.7,0.5,
+				0.1,0.7,0.5,
+				0.1,0.7,0.5,
+				0.1,0.7,0.5,
       ],
     },
     index,

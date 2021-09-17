@@ -1,3 +1,4 @@
+import {Beam} from 'beam-gl'
 import {
   BeamSpirit,
   GuidLine,
@@ -13,6 +14,7 @@ export class SpiritsCanvas {
   canvas2d: HTMLCanvasElement
   //guidRects: GuidRect[]
   guidLines: GuidLine[]
+	beamClener:Beam
   constructor() {
     this.spirits = []
 		this.guidLines =[]
@@ -24,7 +26,6 @@ export class SpiritsCanvas {
     const spirit = new ImageSpirit(this.canvas3d, image, id)
     this.spirits.push(spirit)
 		this.guidLines.push(new GuidLine(this.canvas3d,spirit.getGuidRect(),spirit.getId()))
-    console.log('add new')
   }
   addMark(shape: Shape, id: number) {
 		const mark = new MarkSpirit(this.canvas3d, shape, id)
@@ -34,17 +35,21 @@ export class SpiritsCanvas {
 
   setCanvas3d(canvas: HTMLCanvasElement) {
     this.canvas3d = canvas
+		this.beamClener = new Beam(this.canvas3d)
   }
   updateGuidRect(rect: Rect, id: number) {
     for (let index = 0; index < this.guidLines.length; index++) {
-      if (this.guidLines[index].getId() === id)
+      if (this.guidLines[index].getId() === id){
         this.guidLines[index].updateRect(rect)
+				break;
+			}
     }
   }
   renderAllLine() {
+		//this.beamClener.clear()
     for (let index = 0; index < this.guidLines.length; index++) {
       this.guidLines[index].render()
-		console.log('renderLine')
+		console.log('renderLine:'+index)
     }
   }
 }

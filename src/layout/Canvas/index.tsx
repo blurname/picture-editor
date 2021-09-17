@@ -23,7 +23,6 @@ type Props = {}
 export function Canvas(props: Props) {
   const { spiritCanvas, selectNum, setSelectNum, adjustNum, cmpCount } =
     useContext(globalContext)
-  //let curScrollTop = 0
   let canvas: CanvasPos = {
     width: 1300,
     height: 850,
@@ -31,7 +30,6 @@ export function Canvas(props: Props) {
     top: 110,
   }
   const [images, setImages] = useState([] as BeamSpirit[])
-  let upNum = 0
 
   //const [maxZOffset, setMaxZOffset] = useState(1)
 
@@ -81,9 +79,8 @@ export function Canvas(props: Props) {
       //console.log(maxZOffset)
       //images[curImage].zOffset = maxZOffset
       images[curImage].updatePosition(distance)
-      //spiritCanvas.updateGuidRect(images[curImage].getGuidRect(), images[curImage].getId())
+			spiritCanvas.updateGuidRect(images[curImage].getGuidRect(), images[curImage].getId())
 
-      //images[curImage].render()
       setSelectNum(curImage)
       //setMaxZOffset(maxZOffset - 0.000001)
       for (let i = 0; i < images.length; i++) {
@@ -107,34 +104,35 @@ export function Canvas(props: Props) {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
-    const image = new Image()
-    image.src = '../../../public/t3.jpg'
-    const pic1 = new ImageSpirit(canvas3dRef.current, image, 101)
-    pic1.updateTransMat(0.5, 0)
-    images.push(pic1)
+		spiritCanvas.addImage('../../../public/test.jpg',1)
+    //const image = new Image()
+    //image.src = '../../../public/t3.jpg'
+    //const pic1 = new ImageSpirit(canvas3dRef.current, image, 101)
+    //pic1.updateTransMat(0.5, 0)
+    //images.push(pic1)
 
-    const image2 = new Image()
-    image2.src = '../../../public/t2.jpg'
-    const pic2 = new ImageSpirit(canvas3dRef.current, image2, 102)
-    pic2.updateTransMat(-0.5, 0)
-    images.push(pic2)
+    //const image2 = new Image()
+    //image2.src = '../../../public/t2.jpg'
+    //const pic2 = new ImageSpirit(canvas3dRef.current, image2, 102)
+    //pic2.updateTransMat(-0.5, 0)
+    //images.push(pic2)
 
-    const circle = new Beam(canvas3dRef.current)
+    //const circle = new Beam(canvas3dRef.current)
 
-    const circles = createCircle()
-    const vertex = circle.resource(ResourceTypes.VertexBuffers, circles.vertex)
+    //const circles = createCircle()
+    //const vertex = circle.resource(ResourceTypes.VertexBuffers, circles.vertex)
 
-    const index = circle.resource(ResourceTypes.IndexBuffer, circles.index)
-    const tShader = circle.shader(circleShader)
-    const uniforms = circle.resource(ResourceTypes.Uniforms, {
-      radius: 1.0,
-    })
+    //const index = circle.resource(ResourceTypes.IndexBuffer, circles.index)
+    //const tShader = circle.shader(circleShader)
+    //const uniforms = circle.resource(ResourceTypes.Uniforms, {
+    //radius: 1.0,
+    //})
     //images.push(circle as any)
     //console.log()
-    circle.draw(tShader, index as any, vertex as any, uniforms as any)
+    //circle.draw(tShader, index as any, vertex as any, uniforms as any)
     //circle.draw(shader,vertex as any)
     //
-    let r = 1
+    //let r = 1
 
     //const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
     //images.push(hollw)
@@ -143,7 +141,7 @@ export function Canvas(props: Props) {
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
-    spiritCanvas.renderAllLine()
+    //spiritCanvas.renderAllLine()
   }, [])
 
   useEffect(() => {
@@ -158,7 +156,7 @@ export function Canvas(props: Props) {
       {selectNum}
       {cmpCount}
       <canvas
-        className="bg-dark-400"
+        className="bg-gray-500"
         ref={canvas2dRef}
         style={{
           top: canvas.top,

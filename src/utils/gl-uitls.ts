@@ -64,6 +64,7 @@ export class BeamSpirit {
     })
     this.vertexBuffers.set('position', this.position)
     //this.updateTransMat(distance.left, distance.top)
+		console.log('parent updatePosition')
   }
   updateLayout(layout: number) {
     this.layout = layout
@@ -163,7 +164,9 @@ export class ImageSpirit extends BeamSpirit {
       else if (remainder === 1) return pos + distance.top
       else return this.layout
     })
+		this.updateGuidRect()
     this.vertexBuffers.set('position', this.position)
+		console.log('child updatePosition')
     //this.updateTransMat(distance.left, distance.top)
   }
 	updateGuidRect(){
@@ -357,8 +360,9 @@ export class GuidLine {
 		
 	}
 	updateRect(rect:Rect){
-		this.vertexBuffers.set('position', createLine(rect).vertex)
-		
+		const vertex =  createLine(rect).vertex
+		console.log(vertex)
+		this.vertexBuffers.set('position',vertex.position)
 	}
 	render(){
 		this.beam.draw(this.shader,this.vertexBuffers as any, this.indexBuffer as any)
