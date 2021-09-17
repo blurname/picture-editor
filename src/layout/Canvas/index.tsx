@@ -104,35 +104,20 @@ export function Canvas(props: Props) {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
-		spiritCanvas.addImage('../../../public/test.jpg',101)
-    //const image = new Image()
-    //image.src = '../../../public/t3.jpg'
-    //const pic1 = new ImageSpirit(canvas3dRef.current, image, 101)
-    //pic1.updateTransMat(0.5, 0)
-    //images.push(pic1)
+		//spiritCanvas.addImage('../../../public/test.jpg',101)
+		const circleBeam = new Beam(canvas3dRef.current)
 
-    //const image2 = new Image()
-    //image2.src = '../../../public/t2.jpg'
-    //const pic2 = new ImageSpirit(canvas3dRef.current, image2, 102)
-    //pic2.updateTransMat(-0.5, 0)
-    //images.push(pic2)
+		const circlesResource = createCircle()
+		const vertex = circleBeam.resource(ResourceTypes.VertexBuffers, circlesResource.vertex)
 
-    //const circle = new Beam(canvas3dRef.current)
-
-    //const circles = createCircle()
-    //const vertex = circle.resource(ResourceTypes.VertexBuffers, circles.vertex)
-
-    //const index = circle.resource(ResourceTypes.IndexBuffer, circles.index)
-    //const tShader = circle.shader(circleShader)
-    //const uniforms = circle.resource(ResourceTypes.Uniforms, {
-    //radius: 1.0,
-    //})
+		const index = circleBeam.resource(ResourceTypes.IndexBuffer, circlesResource.index)
+		const tShader = circleBeam.shader(circleShader)
+		const uniforms = circleBeam.resource(ResourceTypes.Uniforms, {
+		radius: 1.0,
+		})
     //images.push(circle as any)
     //console.log()
-    //circle.draw(tShader, index as any, vertex as any, uniforms as any)
-    //circle.draw(shader,vertex as any)
-    //
-    //let r = 1
+		circleBeam.draw(tShader, index as any, vertex as any, uniforms as any)
 
     //const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
     //images.push(hollw)

@@ -20,47 +20,51 @@ export const createRectangle = (offset: number) => {
       position,
       texCoord,
     },
-		index,
+    index,
   }
 }
-export const createLine = (guidRect:Rect) => {
-	const { x,y,width,height } = guidRect
-	const position = [
-		x,y,0.0,//0
-		x,y+height+0.3,0.0,//1
+export const createLine = (guidRect: Rect) => {
+  const { x, y, width, height } = guidRect
+  const position = [
+    x,
+    y,
+    0.0, //0
+    x,
+    y + height + 0.3,
+    0.0, //1
 
-		x,y+height,0.0,//2
-		x+width+0.3,y+height,0.0,//3
+    x,
+    y + height,
+    0.0, //2
+    x + width + 0.3,
+    y + height,
+    0.0, //3
 
-		x+width,y,0.0,//4
-		x+width,y+width+0.3,0.0,//5
+    x + width,
+    y,
+    0.0, //4
+    x + width,
+    y + width + 0.3,
+    0.0, //5
 
-		x+width+0.3,y,0.0//6
-		//x,y,
-		//x,y+height,
-		//x+width,y+height,
-		//x+width,y,
-	
-	]
+    x + width + 0.3,
+    y,
+    0.0, //6
+    //x,y,
+    //x,y+height,
+    //x+width,y+height,
+    //x+width,y,
+  ]
 
   const index = {
-    array: [0, 1,
-			2,3,
-			4,5,
-			0,6
-		],
+    array: [0, 1, 2, 3, 4, 5, 0, 6],
   }
   return {
     vertex: {
       position,
       color: [
-				0.1,0.7,0.5,
-				0.1,0.7,0.5,
-				0.1,0.7,0.5,
-				0.1,0.7,0.5,
-				0.1,0.7,0.5,
-				0.1,0.7,0.5,
-				0.1,0.7,0.5,
+        0.1, 0.7, 0.5, 0.1, 0.7, 0.5, 0.1, 0.7, 0.5, 0.1, 0.7, 0.5, 0.1, 0.7,
+        0.5, 0.1, 0.7, 0.5, 0.1, 0.7, 0.5,
       ],
     },
     index,
@@ -144,33 +148,47 @@ export const createHollowRectangle = (offset: number = 0) => {
     index,
   }
 }
-export const createCircle = (angleNum: number = 6) => {
-  let angle = [] as number[]
-  //let indexArray = [] as number[]
-  for (let index = 1; index <= angleNum; index++) {
-    angle.push(index*1.0)
-    //if (index === angleNum) {
-      //indexArray.push(0)
-      //indexArray.push(index)
-      //indexArray.push(1)
-    //} else {
-      //indexArray.push(0)
-      //indexArray.push(index)
-      //indexArray.push(index + 1)
-    //}
+export const createCircle = (angleNum: number = 100) => {
+  let position = [] as number[]
+  let indexArray = [] as number[]
+  let color = [] as number[]
+  //position.push(-1.0)
+  const angle = 360 / angleNum
+  for (let index = 0; index < angleNum; index++) {
+    position.push(index * angle)
   }
-	console.log(angle)
+  console.log(position)
+  for (let index = 0; index < angleNum; index += 1) {
+    //if (index === angleNum) {
+    //indexArray.push(0)
+    //indexArray.push(index)
+    //indexArray.push(1)
+    //} else {
+    //indexArray.push(0)
+    //indexArray.push(index)
+    //indexArray.push(index + 1)
+    //}
+    if (index === angleNum - 1) {
+      indexArray.push(index)
+      indexArray.push(0)
+    } else {
+      indexArray.push(index)
+      indexArray.push(index + 1)
+    }
+    color.push(0.5)
+    color.push(0.2)
+    color.push(0.7)
+  }
   return {
     vertex: {
-      angle,
-			color:[
-				0,0,1,
-				0,0,1,
-			]
+      position,
+      color: color,
     },
-		index: {
-			array:[0,1,2,0,2,3],
-		},
+    index: {
+      //array:[0,1,2,0,2,3],
+      array: indexArray,
+      //array:[0,1,2,0,2,3,0,3,4],
+    },
   }
 }
 
@@ -296,7 +314,7 @@ export const drawRectBorder = (
     canvas2dRef.height,
   )
   ctx.strokeStyle = 'purple'
-	ctx.lineWidth=8
+  ctx.lineWidth = 8
   ctx.strokeRect(
     glPosInCanvas.x,
     glPosInCanvas.y,

@@ -1,5 +1,5 @@
 import { GLTypes, SchemaTypes } from 'beam-gl'
-const { vec4,vec3, vec2, tex2D, float, mat4 } = SchemaTypes
+const { vec4, vec3, vec2, tex2D, float, mat4 } = SchemaTypes
 
 const imageVS = `
 attribute vec4 position;
@@ -50,7 +50,7 @@ export const shapeShader = {
   },
 }
 
-const lineVS =`
+const lineVS = `
 
 attribute vec4 position;
 attribute vec4 color;
@@ -70,13 +70,13 @@ void main(){
 `
 
 export const lineShader = {
-	vs:lineVS,
-	fs:lineFS,
-	buffers:{
-		position:{type:vec3},
-		color:{type:vec3}
-	},
-	mode: GLTypes.Lines,
+  vs: lineVS,
+  fs: lineFS,
+  buffers: {
+    position: { type: vec3 },
+    color: { type: vec3 },
+  },
+  mode: GLTypes.Lines,
 }
 export const lineRectShader = {
   ...shapeShader,
@@ -91,19 +91,28 @@ export const hollowRectShader = {
     rotateMat: { type: mat4 },
   },
 }
-	//gl_Position = vec4(cos(angle*pi/180.0)*radius,sin(angle*pi/180.0)*radius,0,1.0);
+//gl_Position = vec4(cos(angle*pi/180.0)*radius,sin(angle*pi/180.0)*radius,0,1.0);
+//gl_Position = vec4(angle*1.0,angle*1.0,0.0,1.0);
+	//gl_Position = vec4(position.x,position.x*position.x,0.0,1.0);
 const circleVS = `
 
 #define pi 3.1415926
-attribute highp float angle;
-attribute vec4 color;
+attribute highp vec4 position;
+attribute highp vec4 color;
 
 uniform highp float radius;
 
 varying vec4 vColor;
 void main(){
-	gl_Position = vec4(cos(angle*pi/180.0)*1.0,sin(angle*pi/180.0)*1.0,0.0,1.0);
-	vColor = color;
+	//if(position.x==-1.0){
+		//gl_Position = vec4(0.0,0.0,0.0,1.0);
+	//}
+	//else{
+		float x = cos(position.x*3.1415926/180.0)*radius;
+		float y = sin(position.x*3.1415926/180.0)*radius;
+		gl_Position = vec4(x*0.5,y*0.5,0.0,1.0);
+		vColor = color;
+	//}
 }
 `
 const circleFS = `
@@ -117,16 +126,16 @@ export const circleShader = {
   vs: circleVS,
   fs: circleFS,
   buffers: {
-		angle: { type: float },
-		//position:{type:vec4,n:3},
-    color: { type: vec4 },
+    position: { type: float },
+    //position:{type:vec4,n:3},
+    color: { type: vec3},
   },
   uniforms: {
     radius: {
       type: float,
     },
   },
-	mode: GLTypes.Triangles,
+  mode: GLTypes.Lines,
 }
 
 export const basicImageShader = {

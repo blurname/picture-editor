@@ -26,3 +26,4 @@ interface CanvasPos extends Pos {
 interface GuidRect extends Rect{
 	id:number
 }
+type Shape = 'line' | 'hollowRect'|'circle'

@@ -17,10 +17,12 @@ import {
   hollowRectShader,
   lineRectShader,
   lineShader,
+  circleShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import { mat4 } from 'gl-matrix'
 import {
+  createCircle,
   createHollowRectangle,
   createLine,
   createLineRect,
@@ -273,7 +275,6 @@ export class ImageSpirit extends BeamSpirit {
   }
 }
 
-type Shape = 'line' | 'hollowRect'
 type Buffers = {
   vertex: {
     position: number[]
@@ -285,40 +286,46 @@ type Buffers = {
 }
 export class MarkSpirit extends BeamSpirit {
   private uColor: number[]
-  private shape: 'line' | 'hollowRect'
+  private shape: Shape
   private buffers: Buffers
   constructor(canvas: HTMLCanvasElement, shape: Shape, id: number) {
     super(canvas, id)
     this.uColor = [1, 0, 0]
     this.buffers = this.getBuffersByShape(shape)
+    this.shape = shape
 
     this.vertexBuffers = this.beam.resource(VertexBuffers, this.buffers.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, this.buffers.index)
     this.uniforms = this.beam.resource(Uniforms, {
       uColor: this.uColor,
     })
-    this.shader = this.beam.shader(this.getShaderByShape(shape))
+    this.shader = this.getShaderByShape(shape)
 
     this.position = this.buffers.vertex.position
-		this.updateGuidRect()
+    this.updateGuidRect()
   }
   getBuffersByShape(shape: Shape): Buffers {
     if (shape === 'line') {
       return createLineRect()
     } else if (shape === 'hollowRect') {
       return createHollowRectangle()
+    } else if (shape === 'circle') {
+      return createCircle()
     }
   }
   getShaderByShape(shape: Shape) {
     if (shape === 'line') {
-      return lineRectShader
+      return this.beam.shader(lineRectShader)
     } else if (shape === 'hollowRect') {
-      return hollowRectShader
+      return this.beam.shader(hollowRectShader)
+    } else if (shape === 'circle') {
+      return this.beam.shader(circleShader)
     }
   }
   updateColor(color: number[]) {
     this.uColor = color
-    this.uniforms.set('uColor', color)
+    //this.uniforms.set('uColor', color)
+    this.vertexBuffers.set('color', color)
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.prePosition = this.position.map((pos) => pos)
@@ -331,15 +338,17 @@ export class MarkSpirit extends BeamSpirit {
     })
     this.vertexBuffers.set('position', this.position)
     //this.updateTransMat(distance.left, distance.top)
-		this.updateGuidRect()
+    this.updateGuidRect()
     console.log('parent updatePosition')
   }
   updateGuidRect() {
-    this.guidRect = {
-      x: this.position[0],
-      y: this.position[1],
-      width: this.position[6] - this.position[3],
-      height: this.position[4] - this.position[1],
+    if (this.shape !== 'circle') {
+      this.guidRect = {
+        x: this.position[0],
+        y: this.position[1],
+        width: this.position[6] - this.position[3],
+        height: this.position[4] - this.position[1],
+      }
     }
   }
   getGuidRect() {
