@@ -104,7 +104,7 @@ export function Canvas(props: Props) {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
-		spiritCanvas.addImage('../../../public/test.jpg',1)
+		spiritCanvas.addImage('../../../public/test.jpg',101)
     //const image = new Image()
     //image.src = '../../../public/t3.jpg'
     //const pic1 = new ImageSpirit(canvas3dRef.current, image, 101)

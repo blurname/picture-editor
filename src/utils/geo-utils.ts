@@ -78,16 +78,16 @@ export const createLineRect = (offset: number = 0) => {
       color: [
         0,
         1,
-        0, // vertex 0
-        0,
+        1, // vertex 0
+        0.5,
         1,
-        0, // vertex 0
-        0,
+        0.5, // vertex 0
+        0.4,
         1,
-        0, // vertex 0
+        0.6, // vertex 0
+        0.7,
         0,
-        1,
-        0, // vertex 0
+        1, // vertex 0
       ],
     },
     index,
@@ -95,7 +95,7 @@ export const createLineRect = (offset: number = 0) => {
 }
 export const createHollowRectangle = (offset: number = 0) => {
   const basePosition = [
-    -3, -3, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0, -0.5, -0.5, 0, -0.5, 0.5, 0, 0.5,
+    -1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0, -0.5, -0.5, 0, -0.5, 0.5, 0, 0.5,
     0.5, 0, 0.5, -0.5, 0,
   ]
   const position = basePosition.map((pos) => pos * 0.3 + offset)
@@ -117,27 +117,27 @@ export const createHollowRectangle = (offset: number = 0) => {
       color: [
         1,
         0,
+        1, // vertex 0
+        1,
+        1,
         0, // vertex 0
         1,
         0,
+        1, // vertex 0
+        1,
+        0,
+        1, // vertex 0
+        1,
+        1,
         0, // vertex 0
         1,
         0,
+        1, // vertex 0
+        1,
+        1,
         0, // vertex 0
         1,
-        0,
-        0, // vertex 0
         1,
-        0,
-        0, // vertex 0
-        1,
-        0,
-        0, // vertex 0
-        1,
-        0,
-        0, // vertex 0
-        1,
-        0,
         0, // vertex 0
       ],
     },
@@ -295,7 +295,7 @@ export const drawRectBorder = (
     canvas2dRef.width,
     canvas2dRef.height,
   )
-  ctx.strokeStyle = 'red'
+  ctx.strokeStyle = 'purple'
 	ctx.lineWidth=8
   ctx.strokeRect(
     glPosInCanvas.x,

@@ -16,7 +16,7 @@ import {
   HueSaturation,
   hollowRectShader,
   lineRectShader,
-	lineShader,
+  lineShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import { mat4 } from 'gl-matrix'
@@ -29,10 +29,11 @@ import {
   createScaleMat,
   createTranslateMat,
 } from './geo-utils'
-const { VertexBuffers,IndexBuffer,Uniforms,Textures,OffscreenTarget } = ResourceTypes
+const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
+  ResourceTypes
 export class BeamSpirit {
   protected beam: Beam
-	protected id:number
+  protected id: number
   position: number[]
   protected prePosition: number[]
   protected vertexBuffers: VertexBuffersResource
@@ -46,12 +47,12 @@ export class BeamSpirit {
   protected shader: Shader
   protected layout: number
   protected guidRect: Rect
-  constructor(canvas: HTMLCanvasElement,id:number) {
+  constructor(canvas: HTMLCanvasElement, id: number) {
     this.canvas = canvas
     this.beam = new Beam(canvas)
     this.beam.define(depthCommand)
     this.layout = 0.7
-		this.id = id
+    this.id = id
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.prePosition = this.position.map((pos) => pos)
@@ -64,7 +65,7 @@ export class BeamSpirit {
     })
     this.vertexBuffers.set('position', this.position)
     //this.updateTransMat(distance.left, distance.top)
-		console.log('parent updatePosition')
+    console.log('parent updatePosition')
   }
   updateLayout(layout: number) {
     this.layout = layout
@@ -73,12 +74,12 @@ export class BeamSpirit {
   }
   render() {}
   updateGuidRect() {}
-	getGuidRect(){
-		return this.guidRect
-	}
-	getId(){
-		return this.id
-	}
+  getGuidRect() {
+    return this.guidRect
+  }
+  getId() {
+    return this.id
+  }
 }
 export class ImageSpirit extends BeamSpirit {
   image: HTMLImageElement
@@ -99,8 +100,8 @@ export class ImageSpirit extends BeamSpirit {
   hueSaturationShader: Shader
   vignetteShader: Shader
 
-  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement,id:number) {
-    super(canvas,id)
+  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number) {
+    super(canvas, id)
     const quad = createRectangle(0)
     this.image = image
 
@@ -114,10 +115,7 @@ export class ImageSpirit extends BeamSpirit {
     this.position = quad.vertex.position
     this.prePosition = quad.vertex.position
 
-    this.vertexBuffers = this.beam.resource(
-      VertexBuffers,
-      quad.vertex,
-    )
+    this.vertexBuffers = this.beam.resource(VertexBuffers, quad.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, quad.index)
     this.textures = this.beam.resource(Textures)
 
@@ -153,7 +151,7 @@ export class ImageSpirit extends BeamSpirit {
     ]
     this.outputTextures[0].set('img', this.targets[0])
     this.outputTextures[1].set('img', this.targets[1])
-		this.updateGuidRect()
+    this.updateGuidRect()
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.prePosition = this.position.map((pos) => pos)
@@ -164,21 +162,21 @@ export class ImageSpirit extends BeamSpirit {
       else if (remainder === 1) return pos + distance.top
       else return this.layout
     })
-		this.updateGuidRect()
+    this.updateGuidRect()
     this.vertexBuffers.set('position', this.position)
-		console.log('child updatePosition')
+    console.log('child updatePosition')
     //this.updateTransMat(distance.left, distance.top)
   }
-	updateGuidRect(){
-		this.guidRect = {
+  updateGuidRect() {
+    this.guidRect = {
       x: this.position[0],
       y: this.position[1],
       width: this.position[6] - this.position[3],
       height: this.position[4] - this.position[1],
-		}
-	}
+    }
+  }
   getGuidRect() {
-		return this.guidRect
+    return this.guidRect
   }
   updateZ(maxZOffset: number) {
     this.zOffset = maxZOffset
@@ -289,25 +287,20 @@ export class MarkSpirit extends BeamSpirit {
   private uColor: number[]
   private shape: 'line' | 'hollowRect'
   private buffers: Buffers
-  constructor(canvas: HTMLCanvasElement, shape: Shape,id:number) {
-    super(canvas,id)
+  constructor(canvas: HTMLCanvasElement, shape: Shape, id: number) {
+    super(canvas, id)
     this.uColor = [1, 0, 0]
     this.buffers = this.getBuffersByShape(shape)
 
-    this.vertexBuffers = this.beam.resource(
-      VertexBuffers,
-      this.buffers.vertex,
-    )
-    this.indexBuffer = this.beam.resource(
-      IndexBuffer,
-      this.buffers.index,
-    )
+    this.vertexBuffers = this.beam.resource(VertexBuffers, this.buffers.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, this.buffers.index)
     this.uniforms = this.beam.resource(Uniforms, {
       uColor: this.uColor,
     })
     this.shader = this.beam.shader(this.getShaderByShape(shape))
 
     this.position = this.buffers.vertex.position
+		this.updateGuidRect()
   }
   getBuffersByShape(shape: Shape): Buffers {
     if (shape === 'line') {
@@ -327,6 +320,31 @@ export class MarkSpirit extends BeamSpirit {
     this.uColor = color
     this.uniforms.set('uColor', color)
   }
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    this.prePosition = this.position.map((pos) => pos)
+    this.position = this.position.map((pos, index) => {
+      const remainder = index % 3
+      if (remainder === 0) return pos + distance.left
+      // changing y to be negtive since the canvs2d's y positive axis is downward
+      else if (remainder === 1) return pos + distance.top
+      else return this.layout
+    })
+    this.vertexBuffers.set('position', this.position)
+    //this.updateTransMat(distance.left, distance.top)
+		this.updateGuidRect()
+    console.log('parent updatePosition')
+  }
+  updateGuidRect() {
+    this.guidRect = {
+      x: this.position[0],
+      y: this.position[1],
+      width: this.position[6] - this.position[3],
+      height: this.position[4] - this.position[1],
+    }
+  }
+  getGuidRect() {
+    return this.guidRect
+  }
   private draw() {
     this.beam
       //.depth()
@@ -344,32 +362,33 @@ export class MarkSpirit extends BeamSpirit {
 }
 export class GuidLine {
   protected beam: Beam
-	protected id:number
+  protected id: number
   protected vertexBuffers: VertexBuffersResource
   protected indexBuffer: IndexBufferResource
-	protected shader: Shader
+  protected shader: Shader
   protected canvas: HTMLCanvasElement
-	constructor (canvas:HTMLCanvasElement,rect:Rect,id:number) {
-		this.id = id
-		this.canvas = canvas
-		this.beam = new Beam(canvas)
-		const line = createLine(rect)
-		this.vertexBuffers = this.beam.resource(VertexBuffers,line.vertex)
-		this.indexBuffer= this.beam.resource(IndexBuffer,line.index)
-		this.shader = this.beam.shader(lineShader)
-		
-	}
-	updateRect(rect:Rect){
-		const vertex =  createLine(rect).vertex
-		console.log(vertex)
-		this.vertexBuffers.set('position',vertex.position)
-	}
-	render(){
-		this.beam.draw(this.shader,this.vertexBuffers as any, this.indexBuffer as any)
-	}
-	getId(){
-		return this.id
-
-	}
-	
+  constructor(canvas: HTMLCanvasElement, rect: Rect, id: number) {
+    this.id = id
+    this.canvas = canvas
+    this.beam = new Beam(canvas)
+    const line = createLine(rect)
+    this.vertexBuffers = this.beam.resource(VertexBuffers, line.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, line.index)
+    this.shader = this.beam.shader(lineShader)
+  }
+  updateRect(rect: Rect) {
+    const vertex = createLine(rect).vertex
+    console.log(vertex)
+    this.vertexBuffers.set('position', vertex.position)
+  }
+  render() {
+    this.beam.draw(
+      this.shader,
+      this.vertexBuffers as any,
+      this.indexBuffer as any,
+    )
+  }
+  getId() {
+    return this.id
+  }
 }
