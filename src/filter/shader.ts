@@ -93,7 +93,7 @@ export const hollowRectShader = {
 }
 //gl_Position = vec4(cos(angle*pi/180.0)*radius,sin(angle*pi/180.0)*radius,0,1.0);
 //gl_Position = vec4(angle*1.0,angle*1.0,0.0,1.0);
-	//gl_Position = vec4(position.x,position.x*position.x,0.0,1.0);
+//gl_Position = vec4(position.x,position.x*position.x,0.0,1.0);
 const circleVS = `
 
 #define pi 3.1415926
@@ -101,6 +101,8 @@ attribute highp vec4 position;
 attribute highp vec4 color;
 
 uniform highp float radius;
+uniform float centerX;
+uniform float centerY;
 
 varying vec4 vColor;
 void main(){
@@ -110,7 +112,7 @@ void main(){
 	//else{
 		float x = cos(position.x*3.1415926/180.0)*radius;
 		float y = sin(position.x*3.1415926/180.0)*radius;
-		gl_Position = vec4(x*0.5,y*0.5,0.0,1.0);
+		gl_Position = vec4(x+centerX,y+centerY,0.0,1.0);
 		vColor = color;
 	//}
 }
@@ -127,13 +129,12 @@ export const circleShader = {
   fs: circleFS,
   buffers: {
     position: { type: float },
-    //position:{type:vec4,n:3},
-    color: { type: vec3},
+    color: { type: vec3 },
   },
   uniforms: {
-    radius: {
-      type: float,
-    },
+    radius: { type: float },
+    centerX: { type: float },
+    centerY: { type: float },
   },
   mode: GLTypes.Lines,
 }

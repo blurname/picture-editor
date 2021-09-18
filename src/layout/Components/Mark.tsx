@@ -16,13 +16,14 @@ const marks: MarkType[] = [
     id: 2,
     value: 'hollowRect',
   },
+  { id: 3,
+	value: 'circle' },
 ]
-type Shape = 'line' | 'hollowRect'
 export function Mark() {
   const { props } = menu.children.filter((child) => child.desc === 'mark')[0]
   const { spiritCanvas, cmpCount, setCmpCount } = useContext(globalContext)
   const addMark = (shape: Shape) => () => {
-    spiritCanvas.addMark(shape,cmpCount)
+    spiritCanvas.addMark(shape, cmpCount)
     setCmpCount(cmpCount + 1)
   }
   return (

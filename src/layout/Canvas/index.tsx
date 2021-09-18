@@ -16,7 +16,7 @@ import {
   getCursorMovDistance,
   getCursorPosInCanvas,
 } from '../../utils/geo-utils'
-import { BeamSpirit, ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
+import { BeamSpirit, CircleSpirit, ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
 
 type Props = {}
 
@@ -105,19 +105,22 @@ export function Canvas(props: Props) {
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
 		//spiritCanvas.addImage('../../../public/test.jpg',101)
-		const circleBeam = new Beam(canvas3dRef.current)
+		//const circleBeam = new Beam(canvas3dRef.current)
 
-		const circlesResource = createCircle()
-		const vertex = circleBeam.resource(ResourceTypes.VertexBuffers, circlesResource.vertex)
+		//const circlesResource = createCircle()
+		//const vertex = circleBeam.resource(ResourceTypes.VertexBuffers, circlesResource.vertex)
 
-		const index = circleBeam.resource(ResourceTypes.IndexBuffer, circlesResource.index)
-		const tShader = circleBeam.shader(circleShader)
-		const uniforms = circleBeam.resource(ResourceTypes.Uniforms, {
-		radius: 1.0,
-		})
+		//const index = circleBeam.resource(ResourceTypes.IndexBuffer, circlesResource.index)
+		//const tShader = circleBeam.shader(circleShader)
+		//const uniforms = circleBeam.resource(ResourceTypes.Uniforms, {
+		//radius: 1.0,
+		//})
     //images.push(circle as any)
     //console.log()
-		circleBeam.draw(tShader, index as any, vertex as any, uniforms as any)
+		//circleBeam.draw(tShader, index as any, vertex as any, uniforms as any)
+		const circle = new CircleSpirit(canvas3dRef.current,101) 
+		circle.updatePosition({x:-0.5,y:-0.2})
+		circle.render()
 
     //const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
     //images.push(hollw)
@@ -141,7 +144,7 @@ export function Canvas(props: Props) {
       {selectNum}
       {cmpCount}
       <canvas
-        className="bg-gray-500"
+        className="bg-gray-100"
         ref={canvas2dRef}
         style={{
           top: canvas.top,

@@ -56,19 +56,19 @@ export class BeamSpirit {
     this.layout = 0.7
     this.id = id
   }
-  updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    this.prePosition = this.position.map((pos) => pos)
-    this.position = this.position.map((pos, index) => {
-      const remainder = index % 3
-      if (remainder === 0) return pos + distance.left
-      // changing y to be negtive since the canvs2d's y positive axis is downward
-      else if (remainder === 1) return pos + distance.top
-      else return this.layout
-    })
-    this.vertexBuffers.set('position', this.position)
-    //this.updateTransMat(distance.left, distance.top)
-    console.log('parent updatePosition')
-  }
+  //updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    //this.prePosition = this.position.map((pos) => pos)
+    //this.position = this.position.map((pos, index) => {
+      //const remainder = index % 3
+      //if (remainder === 0) return pos + distance.left
+      //// changing y to be negtive since the canvs2d's y positive axis is downward
+      //else if (remainder === 1) return pos + distance.top
+      //else return this.layout
+    //})
+    //this.vertexBuffers.set('position', this.position)
+    ////this.updateTransMat(distance.left, distance.top)
+    //console.log('parent updatePosition')
+  //}
   updateLayout(layout: number) {
     this.layout = layout
     console.log(this.layout)
@@ -155,20 +155,20 @@ export class ImageSpirit extends BeamSpirit {
     this.outputTextures[1].set('img', this.targets[1])
     this.updateGuidRect()
   }
-  updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    this.prePosition = this.position.map((pos) => pos)
-    this.position = this.position.map((pos, index) => {
-      const remainder = index % 3
-      if (remainder === 0) return pos + distance.left
-      // changing y to be negtive since the canvs2d's y positive axis is downward
-      else if (remainder === 1) return pos + distance.top
-      else return this.layout
-    })
-    this.updateGuidRect()
-    this.vertexBuffers.set('position', this.position)
-    console.log('child updatePosition')
-    //this.updateTransMat(distance.left, distance.top)
-  }
+  //updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    //this.prePosition = this.position.map((pos) => pos)
+    //this.position = this.position.map((pos, index) => {
+      //const remainder = index % 3
+      //if (remainder === 0) return pos + distance.left
+      //// changing y to be negtive since the canvs2d's y positive axis is downward
+      //else if (remainder === 1) return pos + distance.top
+      //else return this.layout
+    //})
+    //this.updateGuidRect()
+    //this.vertexBuffers.set('position', this.position)
+    //console.log('child updatePosition')
+    ////this.updateTransMat(distance.left, distance.top)
+  //}
   updateGuidRect() {
     this.guidRect = {
       x: this.position[0],
@@ -368,6 +368,50 @@ export class MarkSpirit extends BeamSpirit {
   render() {
     this.draw()
   }
+}
+type CircleCenter = {
+	x:number,
+	y:number,
+}
+export class CircleSpirit extends BeamSpirit{
+	protected radius:number
+	protected uColor:number[]
+	protected center:CircleCenter
+	constructor (canvas:HTMLCanvasElement,id:number) {
+		super(canvas,id)
+		this.radius = 0.1
+		const circle = createCircle()
+		this.center = {x:0.0,y:0.0}
+		this.vertexBuffers = this.beam.resource(VertexBuffers,circle.vertex)
+		this.indexBuffer = this.beam.resource(IndexBuffer,circle.index)
+		this.shader = this.beam.shader(circleShader)
+		this.uniforms = this.beam.resource(Uniforms,{
+			radius:this.radius,
+			centerX:this.center.x,
+			centerY:this.center.y,
+		})
+		this.updateGuidRect()
+	}
+	getGuidRect(){
+		return this.guidRect
+	}
+	updatePosition(center:CircleCenter){
+		this.center.x = center.x
+		this.center.y = center.y
+		this.uniforms.set('centerX', this.center.x)
+		this.uniforms.set('centerY', this.center.y)
+	}
+	updateGuidRect(){
+		this.guidRect = {
+			x:this.center.x - this.radius,
+			y:this.center.y - this.radius,
+			width:this.radius*2,
+			height:this.radius*2,
+		}
+	}
+	render(){
+		this.beam.draw(this.shader,this.vertexBuffers as any,this.indexBuffer as any,this.uniforms as any)
+	}
 }
 export class GuidLine {
   protected beam: Beam

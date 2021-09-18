@@ -79,20 +79,7 @@ export const createLineRect = (offset: number = 0) => {
   return {
     vertex: {
       position,
-      color: [
-        0,
-        1,
-        1, // vertex 0
-        0.5,
-        1,
-        0.5, // vertex 0
-        0.4,
-        1,
-        0.6, // vertex 0
-        0.7,
-        0,
-        1, // vertex 0
-      ],
+      color: [0, 1, 1, 0.5, 1, 0.5, 0.4, 1, 0.6, 0.7, 0, 1],
     },
     index,
   }
@@ -119,30 +106,7 @@ export const createHollowRectangle = (offset: number = 0) => {
     vertex: {
       position,
       color: [
-        1,
-        0,
-        1, // vertex 0
-        1,
-        1,
-        0, // vertex 0
-        1,
-        0,
-        1, // vertex 0
-        1,
-        0,
-        1, // vertex 0
-        1,
-        1,
-        0, // vertex 0
-        1,
-        0,
-        1, // vertex 0
-        1,
-        1,
-        0, // vertex 0
-        1,
-        1,
-        0, // vertex 0
+        1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0,
       ],
     },
     index,
@@ -157,7 +121,6 @@ export const createCircle = (angleNum: number = 100) => {
   for (let index = 0; index < angleNum; index++) {
     position.push(index * angle)
   }
-  console.log(position)
   for (let index = 0; index < angleNum; index += 1) {
     //if (index === angleNum) {
     //indexArray.push(0)
