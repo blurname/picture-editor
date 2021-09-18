@@ -4,13 +4,6 @@ import { mat4 } from 'gl-matrix'
 export const createRectangle = (offset: number) => {
   const basePosition = [-1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0]
   const position = basePosition.map((pos) => pos * 0.3 + offset)
-  // const position = pos.map((item) => {
-  // 	if(item%3 ==2){
-  // 		return item+offset
-  // 	}else {
-  // 		return item
-  // 	}
-  // })
   const texCoord = [0, 0, 0, 1, 1, 1, 1, 0]
   const index = {
     array: [0, 1, 2, 0, 2, 3],
@@ -71,8 +64,11 @@ export const createLine = (guidRect: Rect) => {
   }
 }
 export const createLineRect = (offset: number = 0) => {
-  const basePosition = [-1, 0, 0, -1, 0.05, 0, 1, 0.05, 0, 1, 0, 0]
-  const position = basePosition.map((pos) => pos * 0.3 + offset)
+  const basePosition = [-1, 0, 0, 
+		-1, 0.1, 0,
+	1, 0.1, 0,
+	1, 0, 0]
+  const position = basePosition.map((pos) => pos*0.3 + offset)
   const index = {
     array: [0, 1, 2, 0, 2, 3],
   }
@@ -122,15 +118,6 @@ export const createCircle = (angleNum: number = 100) => {
     position.push(index * angle)
   }
   for (let index = 0; index < angleNum; index += 1) {
-    //if (index === angleNum) {
-    //indexArray.push(0)
-    //indexArray.push(index)
-    //indexArray.push(1)
-    //} else {
-    //indexArray.push(0)
-    //indexArray.push(index)
-    //indexArray.push(index + 1)
-    //}
     if (index === angleNum - 1) {
       indexArray.push(index)
       indexArray.push(0)
@@ -212,14 +199,13 @@ export const getCursorMovDistance = (
 type Point = { x: number; y: number }
 export const getCursorIsInQuad = (
   cursorPos: Point,
-  quad: number[],
-): 'fir' | 'sec' | 'out' => {
+guidRect:Rect): 'fir' | 'sec' | 'out' => {
   // leftdown->leftup->rightup->rightdown
   // a->b->c->d
-  const a: Point = { x: quad[0], y: quad[1] }
-  const b: Point = { x: quad[3], y: quad[4] }
-  const c: Point = { x: quad[6], y: quad[7] }
-  const d: Point = { x: quad[9], y: quad[10] }
+  const a: Point = { x: guidRect.x, y: guidRect.y }
+  const b: Point = { x: guidRect.x, y: guidRect.y+guidRect.height }
+  const c: Point = { x: guidRect.x+guidRect.width, y: guidRect.y+guidRect.height}
+  const d: Point = { x: guidRect.x+guidRect.width, y: guidRect.y }
 
   const firstTriangle = getIsInTriangle(cursorPos, a, b, c)
   if (firstTriangle) {
@@ -252,8 +238,26 @@ const getIsInTriangle = (p: Point, a: Point, b: Point, c: Point) => {
 
 export const drawRectBorder = (
   canvas2dRef: HTMLCanvasElement,
-  position: number[],
+	//position: number[],
+	guidRect:Rect
 ) => {
+	const position:number[] = []
+	const a: Point = { x: guidRect.x, y: guidRect.y }
+	const b: Point = { x: guidRect.x, y: guidRect.y+guidRect.height }
+	const c: Point = { x: guidRect.x+guidRect.width, y: guidRect.y+guidRect.height}
+	const d: Point = { x: guidRect.x+guidRect.width, y: guidRect.y }
+	position.push(a.x)
+	position.push(a.y)
+	position.push(0.0)
+	position.push(b.x)
+	position.push(b.y)
+	position.push(0.0)
+	position.push(c.x)
+	position.push(c.y)
+	position.push(0.0)
+	position.push(d.x)
+	position.push(d.y)
+	position.push(0.0)
   const webglPosInCanvas = position.map((pos, index) => {
     const remainder = index % 3
     if (remainder === 0) return (pos * canvas2dRef.width) / 2

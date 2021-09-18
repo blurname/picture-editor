@@ -56,8 +56,8 @@ export class BeamSpirit {
     this.layout = 0.7
     this.id = id
   }
-  //updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    //this.prePosition = this.position.map((pos) => pos)
+	updatePosition(distance: Pos = { left: 0, top: 0 }) {}
+		//this.prePosition = this.position.map((pos) => pos)
     //this.position = this.position.map((pos, index) => {
       //const remainder = index % 3
       //if (remainder === 0) return pos + distance.left
@@ -155,20 +155,20 @@ export class ImageSpirit extends BeamSpirit {
     this.outputTextures[1].set('img', this.targets[1])
     this.updateGuidRect()
   }
-  //updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    //this.prePosition = this.position.map((pos) => pos)
-    //this.position = this.position.map((pos, index) => {
-      //const remainder = index % 3
-      //if (remainder === 0) return pos + distance.left
-      //// changing y to be negtive since the canvs2d's y positive axis is downward
-      //else if (remainder === 1) return pos + distance.top
-      //else return this.layout
-    //})
-    //this.updateGuidRect()
-    //this.vertexBuffers.set('position', this.position)
-    //console.log('child updatePosition')
-    ////this.updateTransMat(distance.left, distance.top)
-  //}
+	updatePosition(distance: Pos = { left: 0, top: 0 }) {
+		this.prePosition = this.position.map((pos) => pos)
+		this.position = this.position.map((pos, index) => {
+			const remainder = index % 3
+			if (remainder === 0) return pos + distance.left
+			// changing y to be negtive since the canvs2d's y positive axis is downward
+			else if (remainder === 1) return pos + distance.top
+			else return this.layout
+		})
+		this.updateGuidRect()
+		this.vertexBuffers.set('position', this.position)
+		console.log('child updatePosition')
+		//this.updateTransMat(distance.left, distance.top)
+	}
   updateGuidRect() {
     this.guidRect = {
       x: this.position[0],
@@ -395,11 +395,12 @@ export class CircleSpirit extends BeamSpirit{
 	getGuidRect(){
 		return this.guidRect
 	}
-	updatePosition(center:CircleCenter){
-		this.center.x = center.x
-		this.center.y = center.y
+	updatePosition(distance: Pos = { left: 0, top: 0 }){
+		this.center.x += distance.left
+		this.center.y += distance.top
 		this.uniforms.set('centerX', this.center.x)
 		this.uniforms.set('centerY', this.center.y)
+		this.updateGuidRect()
 	}
 	updateGuidRect(){
 		this.guidRect = {

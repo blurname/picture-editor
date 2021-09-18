@@ -57,12 +57,16 @@ export function Canvas(props: Props) {
     for (let i = 0; i < images.length; i++) {
       const result = getCursorIsInQuad(
         { x: cursorPos.left, y: cursorPos.top },
-        images[i].position,
+				images[i].getGuidRect()
       )
+				console.log(images[i].getGuidRect())
+			console.log(result)
+
       if (result !== 'out') {
         preCursor = e
         curImage = i
-        drawRectBorder(canvas2dRef.current, images[i].position)
+        //drawRectBorder(canvas2dRef.current, images[i].position)
+        drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
         canvas3dRef.current.style.cursor = 'move'
         isChecked = true
         break
@@ -87,7 +91,7 @@ export function Canvas(props: Props) {
         images[i].render()
         if (curImage === i) {
           preCursor = e
-          drawRectBorder(canvas2dRef.current, images[i].position)
+          drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
           canvas3dRef.current.style.cursor = 'default'
         }
       }
@@ -104,6 +108,7 @@ export function Canvas(props: Props) {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
+		spiritCanvas.addMark('line', 101)
 		//spiritCanvas.addImage('../../../public/test.jpg',101)
 		//const circleBeam = new Beam(canvas3dRef.current)
 
@@ -118,9 +123,9 @@ export function Canvas(props: Props) {
     //images.push(circle as any)
     //console.log()
 		//circleBeam.draw(tShader, index as any, vertex as any, uniforms as any)
-		const circle = new CircleSpirit(canvas3dRef.current,101) 
-		circle.updatePosition({x:-0.5,y:-0.2})
-		circle.render()
+		//const circle = new CircleSpirit(canvas3dRef.current,101) 
+		//circle.updatePosition({left:-0.5,top:-0.2})
+		//circle.render()
 
     //const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
     //images.push(hollw)
