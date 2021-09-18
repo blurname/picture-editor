@@ -34,6 +34,9 @@ import {
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
 export class BeamSpirit {
+  updateRotateMat(value: number) {
+    throw new Error('Method not implemented.')
+  }
   protected beam: Beam
   protected id: number
   position: number[]
@@ -56,18 +59,18 @@ export class BeamSpirit {
     this.layout = 0.7
     this.id = id
   }
-	updatePosition(distance: Pos = { left: 0, top: 0 }) {}
-		//this.prePosition = this.position.map((pos) => pos)
-    //this.position = this.position.map((pos, index) => {
-      //const remainder = index % 3
-      //if (remainder === 0) return pos + distance.left
-      //// changing y to be negtive since the canvs2d's y positive axis is downward
-      //else if (remainder === 1) return pos + distance.top
-      //else return this.layout
-    //})
-    //this.vertexBuffers.set('position', this.position)
-    ////this.updateTransMat(distance.left, distance.top)
-    //console.log('parent updatePosition')
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {}
+  //this.prePosition = this.position.map((pos) => pos)
+  //this.position = this.position.map((pos, index) => {
+  //const remainder = index % 3
+  //if (remainder === 0) return pos + distance.left
+  //// changing y to be negtive since the canvs2d's y positive axis is downward
+  //else if (remainder === 1) return pos + distance.top
+  //else return this.layout
+  //})
+  //this.vertexBuffers.set('position', this.position)
+  ////this.updateTransMat(distance.left, distance.top)
+  //console.log('parent updatePosition')
   //}
   updateLayout(layout: number) {
     this.layout = layout
@@ -155,20 +158,20 @@ export class ImageSpirit extends BeamSpirit {
     this.outputTextures[1].set('img', this.targets[1])
     this.updateGuidRect()
   }
-	updatePosition(distance: Pos = { left: 0, top: 0 }) {
-		this.prePosition = this.position.map((pos) => pos)
-		this.position = this.position.map((pos, index) => {
-			const remainder = index % 3
-			if (remainder === 0) return pos + distance.left
-			// changing y to be negtive since the canvs2d's y positive axis is downward
-			else if (remainder === 1) return pos + distance.top
-			else return this.layout
-		})
-		this.updateGuidRect()
-		this.vertexBuffers.set('position', this.position)
-		console.log('child updatePosition')
-		//this.updateTransMat(distance.left, distance.top)
-	}
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    this.prePosition = this.position.map((pos) => pos)
+    this.position = this.position.map((pos, index) => {
+      const remainder = index % 3
+      if (remainder === 0) return pos + distance.left
+      // changing y to be negtive since the canvs2d's y positive axis is downward
+      else if (remainder === 1) return pos + distance.top
+      else return this.layout
+    })
+    this.updateGuidRect()
+    this.vertexBuffers.set('position', this.position)
+    console.log('child updatePosition')
+    //this.updateTransMat(distance.left, distance.top)
+  }
   updateGuidRect() {
     this.guidRect = {
       x: this.position[0],
@@ -284,48 +287,45 @@ type Buffers = {
     array: number[]
   }
 }
+type RectLikeShape = Exclude<Shape, 'circle'>
 export class MarkSpirit extends BeamSpirit {
   private uColor: number[]
-  private shape: Shape
+  private shape: RectLikeShape
   private buffers: Buffers
-  constructor(canvas: HTMLCanvasElement, shape: Shape, id: number) {
+  constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number) {
     super(canvas, id)
-    this.uColor = [1, 0, 0]
-    this.buffers = this.getBuffersByShape(shape)
+    this.uColor = [1.0, 1.0, 1.0,1.0]
     this.shape = shape
 
+    this.buffers = this.getBuffersByShape()
     this.vertexBuffers = this.beam.resource(VertexBuffers, this.buffers.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, this.buffers.index)
     this.uniforms = this.beam.resource(Uniforms, {
       uColor: this.uColor,
     })
-    this.shader = this.getShaderByShape(shape)
+    this.shader = this.getShaderByShape()
 
     this.position = this.buffers.vertex.position
     this.updateGuidRect()
   }
-  getBuffersByShape(shape: Shape): Buffers {
-    if (shape === 'line') {
+  getBuffersByShape(): Buffers {
+    if (this.shape === 'line') {
       return createLineRect()
-    } else if (shape === 'hollowRect') {
+    } else if (this.shape === 'hollowRect') {
       return createHollowRectangle()
-    } else if (shape === 'circle') {
-      return createCircle()
     }
   }
-  getShaderByShape(shape: Shape) {
-    if (shape === 'line') {
+  getShaderByShape() {
+    if (this.shape === 'line') {
       return this.beam.shader(lineRectShader)
-    } else if (shape === 'hollowRect') {
+    } else if (this.shape === 'hollowRect') {
       return this.beam.shader(hollowRectShader)
-    } else if (shape === 'circle') {
-      return this.beam.shader(circleShader)
     }
   }
   updateColor(color: number[]) {
     this.uColor = color
     //this.uniforms.set('uColor', color)
-    this.vertexBuffers.set('color', color)
+    this.uniforms.set('uColor', color)
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.prePosition = this.position.map((pos) => pos)
@@ -342,21 +342,19 @@ export class MarkSpirit extends BeamSpirit {
     console.log('parent updatePosition')
   }
   updateGuidRect() {
-    if (this.shape !== 'circle') {
       this.guidRect = {
         x: this.position[0],
         y: this.position[1],
         width: this.position[6] - this.position[3],
         height: this.position[4] - this.position[1],
       }
-    }
   }
   getGuidRect() {
     return this.guidRect
   }
   private draw() {
     this.beam
-      //.depth()
+			.depth()
       .draw(
         this.shader,
         this.vertexBuffers as any,
@@ -370,49 +368,59 @@ export class MarkSpirit extends BeamSpirit {
   }
 }
 type CircleCenter = {
-	x:number,
-	y:number,
+  x: number
+  y: number
 }
-export class CircleSpirit extends BeamSpirit{
-	protected radius:number
-	protected uColor:number[]
-	protected center:CircleCenter
-	constructor (canvas:HTMLCanvasElement,id:number) {
-		super(canvas,id)
-		this.radius = 0.1
-		const circle = createCircle()
-		this.center = {x:0.0,y:0.0}
-		this.vertexBuffers = this.beam.resource(VertexBuffers,circle.vertex)
-		this.indexBuffer = this.beam.resource(IndexBuffer,circle.index)
-		this.shader = this.beam.shader(circleShader)
-		this.uniforms = this.beam.resource(Uniforms,{
-			radius:this.radius,
-			centerX:this.center.x,
-			centerY:this.center.y,
-		})
-		this.updateGuidRect()
-	}
-	getGuidRect(){
-		return this.guidRect
-	}
-	updatePosition(distance: Pos = { left: 0, top: 0 }){
-		this.center.x += distance.left
-		this.center.y += distance.top
-		this.uniforms.set('centerX', this.center.x)
-		this.uniforms.set('centerY', this.center.y)
-		this.updateGuidRect()
-	}
-	updateGuidRect(){
-		this.guidRect = {
-			x:this.center.x - this.radius,
-			y:this.center.y - this.radius,
-			width:this.radius*2,
-			height:this.radius*2,
-		}
-	}
-	render(){
-		this.beam.draw(this.shader,this.vertexBuffers as any,this.indexBuffer as any,this.uniforms as any)
-	}
+export class CircleSpirit extends BeamSpirit {
+  protected radius: number
+  protected uColor: number[]
+  protected center: CircleCenter
+  constructor(canvas: HTMLCanvasElement, id: number) {
+    super(canvas, id)
+    this.radius = 0.1
+    const circle = createCircle()
+    this.center = { x: 0.0, y: 0.0 }
+    this.vertexBuffers = this.beam.resource(VertexBuffers, circle.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, circle.index)
+    this.shader = this.beam.shader(circleShader)
+    this.uniforms = this.beam.resource(Uniforms, {
+      radius: this.radius,
+      centerX: this.center.x,
+      centerY: this.center.y,
+    })
+    this.updateGuidRect()
+  }
+  getGuidRect() {
+    return this.guidRect
+  }
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    this.center.x += distance.left
+    this.center.y += distance.top
+    this.uniforms.set('centerX', this.center.x)
+    this.uniforms.set('centerY', this.center.y)
+    this.updateGuidRect()
+  }
+  updateGuidRect() {
+    this.guidRect = {
+      x: this.center.x - this.radius,
+      y: this.center.y - this.radius,
+      width: this.radius * 2,
+      height: this.radius * 2,
+    }
+  }
+  updateColor(color: number[]) {
+    this.uColor = color
+    //this.uniforms.set('uColor', color)
+    this.uniforms.set('uColor', color)
+  }
+  render() {
+    this.beam.draw(
+      this.shader,
+      this.vertexBuffers as any,
+      this.indexBuffer as any,
+      this.uniforms as any,
+    )
+  }
 }
 export class GuidLine {
   protected beam: Beam

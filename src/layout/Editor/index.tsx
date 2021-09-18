@@ -1,46 +1,53 @@
 import { Collapse, Input, Slider } from 'antd'
 import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
-import React, {
-  ChangeEvent,
-  FormEvent,
-  FormEventHandler,
-  useContext,
-} from 'react'
+import React, { ChangeEvent, useContext } from 'react'
 import { globalContext } from '../../context'
+import { ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
 import { editorSchema } from './editorSchema'
 export function Editor() {
   const { spiritCanvas, adjustNum, setAdjustNum, selectNum } =
     useContext(globalContext)
   const shaping = editorSchema.children[0]
   const filters = editorSchema.children[1]
+  const onColorChange = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.value)
+    const hex: string = e.target.value
+    const r = parseInt('0x'+hex.slice(1, 3))/255.0
+    const g = parseInt('0x'+hex.slice(3, 5))/255.0
+    const b = parseInt('0x'+hex.slice(5))   /255.0
+    const mark = spiritCanvas.spirits[selectNum] as MarkSpirit
+		mark.updateColor([r,g,b,1.0])
+    setAdjustNum(adjustNum + 1)
+  }
 
   const onChangeInput =
     (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
       const value = parseFloat(e.target.value)
       console.log(`desc:${desc},value:${e.target.value}`)
       console.log(adjustNum)
+      const chosenImage = spiritCanvas.spirits[selectNum]
 
       // can functional optimze
       if (desc === 'rotate') {
-        spiritCanvas.spirits[selectNum].updateRotateMat(value)
+        chosenImage.updateRotateMat(value)
       } else if (desc === 'translateX') {
-        spiritCanvas.spirits[selectNum].updateTransMat(value, 0)
+        chosenImage.updateTransMat(value, 0)
       } else if (desc === 'translateY') {
-        spiritCanvas.spirits[selectNum].updateTransMat(0, value)
+        chosenImage.updateTransMat(0, value)
       } else if (desc === 'scaleX') {
-        spiritCanvas.spirits[selectNum].updateScaleMat(value, 0)
+        chosenImage.updateScaleMat(value, 0)
       } else if (desc === 'scaleY') {
-        spiritCanvas.spirits[selectNum].updateScaleMat(0, value)
+        chosenImage.updateScaleMat(0, value)
       } else if (desc === 'Hue') {
-        spiritCanvas.spirits[selectNum].updateHue(value)
+        chosenImage.updateHue(value)
       } else if (desc === 'Saturation') {
-        spiritCanvas.spirits[selectNum].updateSaturation(value)
+        chosenImage.updateSaturation(value)
       } else if (desc === 'Contrast') {
-        spiritCanvas.spirits[selectNum].updateContrast(value)
+        chosenImage.updateContrast(value)
       } else if (desc === 'Brightness') {
-        spiritCanvas.spirits[selectNum].updateBrightness(value)
+        chosenImage.updateBrightness(value)
       } else if (desc === 'Vignette') {
-        spiritCanvas.spirits[selectNum].updateVignette(value)
+        chosenImage.updateVignette(value)
       }
       setAdjustNum(adjustNum + 1)
     }
@@ -53,7 +60,8 @@ export function Editor() {
     <div className="w-2/12 bg-blue-100 object-right">
       Editor
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
-      <Collapse className="w-12/12" defaultActiveKey={[1,2]}>
+      <Collapse className="w-12/12" defaultActiveKey={[1, 2]}>
+        <input type="color" value="#ffffff" onChange={onColorChange} />
         <CollapsePanel header="shaping" key="1">
           <div>
             {shaping.children.map((cur, index) => {
@@ -87,7 +95,7 @@ export function Editor() {
             })}
           </div>
         </CollapsePanel>
-				<CollapsePanel header="filters" key="2">
+        <CollapsePanel header="filters" key="2">
           <div>
             {filters.children.map((cur, index) => {
               return (

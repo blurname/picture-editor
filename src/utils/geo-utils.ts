@@ -68,7 +68,7 @@ export const createLineRect = (offset: number = 0) => {
 		-1, 0.1, 0,
 	1, 0.1, 0,
 	1, 0, 0]
-  const position = basePosition.map((pos) => pos*0.3 + offset)
+  const position = basePosition.map((pos) => pos*0.1 + offset)
   const index = {
     array: [0, 1, 2, 0, 2, 3],
   }

@@ -37,8 +37,14 @@ void main(){
 const shapeFS = `
 
 varying highp vec4 vColor;
+uniform highp vec4 uColor;
 void main(){
-	gl_FragColor = vColor;
+	if(uColor.r==1.0 && uColor.g ==1.0 && uColor.g==1.0){
+		gl_FragColor = vColor;
+	}else{
+		gl_FragColor = vec4(uColor.r,uColor.g,uColor.b,1.0);
+	}
+
 }
 `
 export const shapeShader = {
@@ -66,7 +72,6 @@ varying highp vec4 vColor;
 void main(){
 	gl_FragColor = vColor;
 }
-
 `
 
 export const lineShader = {
@@ -82,18 +87,16 @@ export const lineRectShader = {
   ...shapeShader,
   uniforms: {
     rotateMat: { type: mat4 },
+    uColor: { type: vec4, n: 3 },
   },
-  //mode:GLTypes.Linear
 }
 export const hollowRectShader = {
   ...shapeShader,
   uniforms: {
     rotateMat: { type: mat4 },
+    uColor: { type: vec4 },
   },
 }
-//gl_Position = vec4(cos(angle*pi/180.0)*radius,sin(angle*pi/180.0)*radius,0,1.0);
-//gl_Position = vec4(angle*1.0,angle*1.0,0.0,1.0);
-//gl_Position = vec4(position.x,position.x*position.x,0.0,1.0);
 const circleVS = `
 
 #define pi 3.1415926
@@ -106,21 +109,20 @@ uniform float centerY;
 
 varying vec4 vColor;
 void main(){
-	//if(position.x==-1.0){
-		//gl_Position = vec4(0.0,0.0,0.0,1.0);
-	//}
-	//else{
 		float x = cos(position.x*3.1415926/180.0)*radius;
 		float y = sin(position.x*3.1415926/180.0)*radius;
 		gl_Position = vec4(x+centerX,y+centerY,0.0,1.0);
-		vColor = color;
-	//}
 }
 `
 const circleFS = `
 varying highp vec4 vColor;
+uniform highp vec4 uColor;
 void main(){
-	gl_FragColor = vColor;
+	if(uColor.r==1.0 && uColor.g ==1.0 && uColor.g==1.0){
+		gl_FragColor = vColor;
+	}else{
+		gl_FragColor = vec4(uColor.r,uColor.g,uColor.b,1.0);
+	}
 }
 
 `
@@ -135,6 +137,7 @@ export const circleShader = {
     radius: { type: float },
     centerX: { type: float },
     centerY: { type: float },
+    uColor: { type: vec4 },
   },
   mode: GLTypes.Lines,
 }
