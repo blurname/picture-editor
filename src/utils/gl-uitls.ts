@@ -428,16 +428,14 @@ export class CircleSpirit extends BeamSpirit {
     this.center = { x: 0.0, y: 0.0 }
     this.vertexBuffers = this.beam.resource(VertexBuffers, circle.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, circle.index)
-    this.shader = this.beam.shader(circleShader)
     this.uniforms = this.beam.resource(Uniforms, {
-      radius: this.radius,
-      centerX: this.center.x,
-      centerY: this.center.y,
+			radius: this.radius,
+			centerX: this.center.x,
+			centerY: this.center.y,
+			uColor:[1,0,0,1.0]
     })
+    this.shader = this.beam.shader(circleShader)
     this.updateGuidRect()
-  }
-  getGuidRect() {
-    return this.guidRect
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.center.x += distance.left
@@ -446,6 +444,13 @@ export class CircleSpirit extends BeamSpirit {
     this.uniforms.set('centerY', this.center.y)
     this.updateGuidRect()
   }
+	updateScaleMat(scale:number){
+		this.updateRadius(scale)
+	}
+	updateRadius(radius:number){
+		this.radius = radius
+		this.uniforms.set('radius',this.radius)
+	}
   updateGuidRect() {
     this.guidRect = {
       x: this.center.x - this.radius,

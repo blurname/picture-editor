@@ -123,8 +123,8 @@ attribute highp vec4 position;
 attribute highp vec4 color;
 
 uniform highp float radius;
-uniform float centerX;
-uniform float centerY;
+uniform highp float centerX;
+uniform highp float centerY;
 
 varying vec4 vColor;
 void main(){
@@ -150,13 +150,13 @@ export const circleShader = {
   fs: circleFS,
   buffers: {
     position: { type: float },
-    color: { type: vec3 },
+    color: { type: vec4,n:3 },
   },
   uniforms: {
     radius: { type: float },
-    centerX: { type: float },
-    centerY: { type: float },
-    uColor: { type: vec4 },
+		centerX: { type: float },
+		centerY: { type: float },
+		uColor: { type: vec4 },
   },
   mode: GLTypes.Lines,
 }
