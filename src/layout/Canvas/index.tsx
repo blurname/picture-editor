@@ -16,7 +16,12 @@ import {
   getCursorMovDistance,
   getCursorPosInCanvas,
 } from '../../utils/geo-utils'
-import { BeamSpirit, CircleSpirit, ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
+import {
+  BeamSpirit,
+  CircleSpirit,
+  ImageSpirit,
+  MarkSpirit,
+} from '../../utils/gl-uitls'
 
 type Props = {}
 
@@ -55,12 +60,13 @@ export function Canvas(props: Props) {
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     let isChecked: boolean = false
     for (let i = 0; i < images.length; i++) {
+		if(images[i]!==null){
       const result = getCursorIsInQuad(
         { x: cursorPos.left, y: cursorPos.top },
-				images[i].getGuidRect()
+        images[i].getGuidRect(),
       )
-				console.log(images[i].getGuidRect())
-			console.log(result)
+      //console.log(images[i].getGuidRect())
+      console.log(result)
 
       if (result !== 'out') {
         preCursor = e
@@ -74,7 +80,7 @@ export function Canvas(props: Props) {
     }
     if (isChecked === false) {
       preCursor = undefined
-    }
+    }}
   }
   const handleOnMouseUp = (e: MouseEvent) => {
     e.preventDefault()
@@ -83,16 +89,21 @@ export function Canvas(props: Props) {
       //console.log(maxZOffset)
       //images[curImage].zOffset = maxZOffset
       images[curImage].updatePosition(distance)
-			spiritCanvas.updateGuidRect(images[curImage].getGuidRect(), images[curImage].getId())
+      spiritCanvas.updateGuidRect(
+        images[curImage].getGuidRect(),
+        images[curImage].getId(),
+      )
 
       setSelectNum(curImage)
       //setMaxZOffset(maxZOffset - 0.000001)
       for (let i = 0; i < images.length; i++) {
-        images[i].render()
-        if (curImage === i) {
-          preCursor = e
-          drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
-          canvas3dRef.current.style.cursor = 'default'
+        if (images[i] !== null) {
+          images[i].render()
+          if (curImage === i) {
+            preCursor = e
+            drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
+            canvas3dRef.current.style.cursor = 'default'
+          }
         }
       }
       spiritCanvas.renderAllLine()
@@ -100,7 +111,7 @@ export function Canvas(props: Props) {
   }
   const renderImages = () => {
     for (const image of images) {
-      image.render()
+      if (image !== null) image.render()
     }
   }
 
@@ -108,24 +119,24 @@ export function Canvas(props: Props) {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
-		spiritCanvas.addMark('line', 101)
-		//spiritCanvas.addImage('../../../public/test.jpg',101)
-		//const circleBeam = new Beam(canvas3dRef.current)
+    //spiritCanvas.addMark('line', 101)
+    //spiritCanvas.addImage('../../../public/test.jpg',101)
+    //const circleBeam = new Beam(canvas3dRef.current)
 
-		//const circlesResource = createCircle()
-		//const vertex = circleBeam.resource(ResourceTypes.VertexBuffers, circlesResource.vertex)
+    //const circlesResource = createCircle()
+    //const vertex = circleBeam.resource(ResourceTypes.VertexBuffers, circlesResource.vertex)
 
-		//const index = circleBeam.resource(ResourceTypes.IndexBuffer, circlesResource.index)
-		//const tShader = circleBeam.shader(circleShader)
-		//const uniforms = circleBeam.resource(ResourceTypes.Uniforms, {
-		//radius: 1.0,
-		//})
+    //const index = circleBeam.resource(ResourceTypes.IndexBuffer, circlesResource.index)
+    //const tShader = circleBeam.shader(circleShader)
+    //const uniforms = circleBeam.resource(ResourceTypes.Uniforms, {
+    //radius: 1.0,
+    //})
     //images.push(circle as any)
     //console.log()
-		//circleBeam.draw(tShader, index as any, vertex as any, uniforms as any)
-		//const circle = new CircleSpirit(canvas3dRef.current,101) 
-		//circle.updatePosition({left:-0.5,top:-0.2})
-		//circle.render()
+    //circleBeam.draw(tShader, index as any, vertex as any, uniforms as any)
+    //const circle = new CircleSpirit(canvas3dRef.current,101)
+    //circle.updatePosition({left:-0.5,top:-0.2})
+    //circle.render()
 
     //const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
     //images.push(hollw)

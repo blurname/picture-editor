@@ -37,7 +37,7 @@ export const createLine = (guidRect: Rect) => {
     y,
     0.0, //4
     x + width,
-    y + width + 0.3,
+    y + height + 0.3,
     0.0, //5
 
     x + width + 0.3,

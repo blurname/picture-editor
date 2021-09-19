@@ -74,7 +74,7 @@ export class BeamSpirit {
   //}
   updateLayout(layout: number) {
     this.layout = layout
-    console.log(this.layout)
+    //console.log(this.layout)
     this.uniforms.set('layout', this.layout)
   }
   render() {}

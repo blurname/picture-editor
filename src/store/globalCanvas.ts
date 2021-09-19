@@ -21,6 +21,7 @@ export class SpiritsCanvas {
     this.curSpirit = null
   }
   addImage(imgSrc: string, id: number) {
+    console.log('addImage:', id)
     const image = new Image()
     image.src = imgSrc
     const spirit = new ImageSpirit(this.canvas3d, image, id)
@@ -30,7 +31,7 @@ export class SpiritsCanvas {
     )
   }
   addMark(shape: Shape, id: number) {
-    let mark
+    let mark: BeamSpirit
     if (shape === 'circle') {
       mark = new CircleSpirit(this.canvas3d, id)
     } else {
@@ -48,18 +49,34 @@ export class SpiritsCanvas {
   }
   updateGuidRect(rect: Rect, id: number) {
     for (let index = 0; index < this.guidLines.length; index++) {
-      if (this.guidLines[index].getId() === id) {
-        this.guidLines[index].updateRect(rect)
-        break
+      if (this.guidLines[index] !== null) {
+        if (this.guidLines[index].getId() === id) {
+          this.guidLines[index].updateRect(rect)
+          break
+        }
       }
     }
   }
   renderAllLine() {
     //this.beamClener.clear()
     for (let index = 0; index < this.guidLines.length; index++) {
-      this.guidLines[index].render()
-      console.log('renderLine:' + index)
+      if (this.guidLines[index] !== null) this.guidLines[index].render()
+      //console.log('renderLine:' + index)
     }
   }
+  deleteElement(id: number) {
+    for (let index = 0; index < this.spirits.length; index++) {
+			if(this.spirits[index]!==null){
+
+      const element = this.spirits[index]
+      console.log(element.getId())
+      if (element.getId() === id) {
+        this.spirits[index] = null
+        this.guidLines[index] = null
+        console.log('deleted')
+      }
+    }
+  }
+}
 }
 export const spiritCanvas = new SpiritsCanvas()

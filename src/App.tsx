@@ -14,7 +14,7 @@ function App() {
 
   const canvasParent = useRef(null as HTMLDivElement)
   useEffect(() => {
-    console.log(canvasParent.current)
+    //console.log(canvasParent.current)
   }, [])
   return (
     <div className="App h-max">

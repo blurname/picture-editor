@@ -1,11 +1,11 @@
-import { Collapse, Input, Slider } from 'antd'
+import { Button, Collapse, Input, Slider } from 'antd'
 import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
 import React, { ChangeEvent, useContext } from 'react'
 import { globalContext } from '../../context'
 import { ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
 import { editorSchema } from './editorSchema'
 export function Editor() {
-  const { spiritCanvas, adjustNum, setAdjustNum, selectNum } =
+  const { spiritCanvas, adjustNum, setAdjustNum, selectNum, } =
     useContext(globalContext)
   const shaping = editorSchema.children[0]
   const filters = editorSchema.children[1]
@@ -19,12 +19,16 @@ export function Editor() {
 		mark.updateColor([r,g,b,1.0])
     setAdjustNum(adjustNum + 1)
   }
+	const onDeleteClik = () => {
+		spiritCanvas.deleteElement(selectNum)
+      setAdjustNum(adjustNum + 1)
+	}
 
   const onChangeInput =
     (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
       const value = parseFloat(e.target.value)
-      console.log(`desc:${desc},value:${e.target.value}`)
-      console.log(adjustNum)
+      //console.log(`desc:${desc},value:${e.target.value}`)
+      //console.log(adjustNum)
       const chosenImage = spiritCanvas.spirits[selectNum]
 
       // can functional optimze
@@ -55,13 +59,14 @@ export function Editor() {
     spiritCanvas.spirits[selectNum].updateLayout(1 - value)
     setAdjustNum(adjustNum + 1)
   }
-
+	
   return (
     <div className="w-2/12 bg-blue-100 object-right">
       Editor
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
+				<Button onClick={onDeleteClik}>delete element</Button>
       <Collapse className="w-12/12" defaultActiveKey={[1, 2]}>
-        <input type="color" value="#ffffff" onChange={onColorChange} />
+        <input type="color" onChange={onColorChange} />
         <CollapsePanel header="shaping" key="1">
           <div>
             {shaping.children.map((cur, index) => {
