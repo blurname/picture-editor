@@ -1,9 +1,13 @@
 import { MouseEvent, MutableRefObject } from 'react'
 import { mat4 } from 'gl-matrix'
 
-export const createRectangle = (offset: number) => {
-  const basePosition = [-1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0]
-  const position = basePosition.map((pos) => pos * 0.3 + offset)
+export const createRectangle = (aspectRatio: number) => {
+  const basePosition = [
+		-1, -1*aspectRatio, 0,
+		-1, 1 *aspectRatio, 0,
+		1, 1 *aspectRatio, 0,
+		1, -1 *aspectRatio, 0]
+  const position = basePosition.map((pos) => pos * 0.3 )
   const texCoord = [0, 0, 0, 1, 1, 1, 1, 0]
   const index = {
     array: [0, 1, 2, 0, 2, 3],
@@ -184,7 +188,6 @@ const normalize2 = (
     }
   }
 }
-type Exclude<T, U> = T extends U ? false : U
 
 export const getCursorMovDistance = (
   pre: MouseEvent,
@@ -294,11 +297,22 @@ export const createTranslateMat = (tx: number, ty: number) => {
   return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, 0, 1]
 }
 
-export const createRotateMat = (rotate: number) => {
+export const createRotateMat = (rotate: number,origin:Pos={left:0,top:0}) => {
   rotate = (rotate * Math.PI) / 180
   const cos = Math.cos(rotate)
   const sin = Math.sin(rotate)
-  return [cos, sin, 0, 0, -sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+	const x0 = origin.left
+	const y0 = origin.top
+  //return [
+		//cos, sin, 0, 0, 
+		//-sin, cos, 0, 0,
+		//0, 0, 1, 0,
+		//0, 0, 0, 1]
+  return [
+		cos, sin, 0, 0, 
+		-sin, cos, 0, 0,
+		0, 0, 1, 0,
+		(-x0*(cos-1)+y0*sin), (-x0*sin+y0*(1-cos)), 0, 1]
 }
 
 export const createScaleMat = (sx: number, sy: number) => {

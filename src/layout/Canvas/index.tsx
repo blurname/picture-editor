@@ -30,7 +30,7 @@ export function Canvas(props: Props) {
     useContext(globalContext)
   let canvas: CanvasPos = {
     width: 1300,
-    height: 850,
+    height: 1300,
     left: 320,
     top: 110,
   }
@@ -60,27 +60,28 @@ export function Canvas(props: Props) {
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     let isChecked: boolean = false
     for (let i = 0; i < images.length; i++) {
-		if(images[i]!==null){
-      const result = getCursorIsInQuad(
-        { x: cursorPos.left, y: cursorPos.top },
-        images[i].getGuidRect(),
-      )
-      //console.log(images[i].getGuidRect())
-      console.log(result)
+      if (images[i] !== null) {
+        const result = getCursorIsInQuad(
+          { x: cursorPos.left, y: cursorPos.top },
+          images[i].getGuidRect(),
+        )
+        //console.log(images[i].getGuidRect())
+        console.log(result)
 
-      if (result !== 'out') {
-        preCursor = e
-        curImage = i
-        //drawRectBorder(canvas2dRef.current, images[i].position)
-        drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
-        canvas3dRef.current.style.cursor = 'move'
-        isChecked = true
-        break
+        if (result !== 'out') {
+          preCursor = e
+          curImage = i
+          //drawRectBorder(canvas2dRef.current, images[i].position)
+          drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
+          canvas3dRef.current.style.cursor = 'move'
+          isChecked = true
+          break
+        }
+      }
+      if (isChecked === false) {
+        preCursor = undefined
       }
     }
-    if (isChecked === false) {
-      preCursor = undefined
-    }}
   }
   const handleOnMouseUp = (e: MouseEvent) => {
     e.preventDefault()
@@ -155,10 +156,8 @@ export function Canvas(props: Props) {
   return (
     <div
       //style={{cursor:}}
-      className="bg-orange-500 w-12/12 h-12/12"
+			className="w-12/12 h-12/12"
     >
-      {selectNum}
-      {cmpCount}
       <canvas
         className="bg-gray-100"
         ref={canvas2dRef}

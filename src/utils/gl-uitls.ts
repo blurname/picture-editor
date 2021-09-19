@@ -52,6 +52,8 @@ export class BeamSpirit {
   protected shader: Shader
   protected layout: number
   protected guidRect: Rect
+	protected pos:Pos
+	protected scale:number
   constructor(canvas: HTMLCanvasElement, id: number) {
     this.canvas = canvas
     this.beam = new Beam(canvas)
@@ -104,10 +106,11 @@ export class ImageSpirit extends BeamSpirit {
   brightnessContrastShader: Shader
   hueSaturationShader: Shader
   vignetteShader: Shader
+	rotate:number
 
-  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number) {
+  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number,aspectRatio:number) {
     super(canvas, id)
-    const quad = createRectangle(0)
+    const quad = createRectangle(aspectRatio)
     this.image = image
 
     this.beam.define(Offscreen2DCommand)
@@ -157,8 +160,10 @@ export class ImageSpirit extends BeamSpirit {
     this.outputTextures[0].set('img', this.targets[0])
     this.outputTextures[1].set('img', this.targets[1])
     this.updateGuidRect()
+		this.rotate = 0
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
+		this.pos = distance
     this.prePosition = this.position.map((pos) => pos)
     this.position = this.position.map((pos, index) => {
       const remainder = index % 3
@@ -168,6 +173,7 @@ export class ImageSpirit extends BeamSpirit {
       else return this.layout
     })
     this.updateGuidRect()
+		this.updateRotateMat(this.rotate)
     this.vertexBuffers.set('position', this.position)
     console.log('child updatePosition')
     //this.updateTransMat(distance.left, distance.top)
@@ -191,7 +197,9 @@ export class ImageSpirit extends BeamSpirit {
     this.uniforms.set('scaleMat', this.scaleMat)
   }
   updateRotateMat(rotate: number) {
-    this.rotateMat = createRotateMat(rotate)
+		const origin:Pos = {left:this.guidRect.x+this.guidRect.width/2,top:this.guidRect.y+this.guidRect.height/2}
+		this.rotate = rotate
+    this.rotateMat = createRotateMat(rotate,origin)
     this.uniforms.set('rotateMat', this.rotateMat)
   }
   updateTransMat(tx: number, ty: number) {
@@ -339,6 +347,7 @@ export class MarkSpirit extends BeamSpirit {
     this.vertexBuffers.set('position', this.position)
     //this.updateTransMat(distance.left, distance.top)
     this.updateGuidRect()
+		this.updateRotateMat()
     console.log('parent updatePosition')
   }
   updateGuidRect() {

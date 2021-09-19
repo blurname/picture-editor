@@ -5,37 +5,45 @@ export const editorSchema = {
       desc: 'shaping',
       children: [
         {
-          desc: 'translateX',
+          desc: 'rotate',
           props: {
-            value: 0.0,
-            range: { min: -1, max: 1 },
-            step: 0.01,
+            value: 0,
+            range: { min: -180, max: 180 },
+            step: 1,
           },
         },
-        {
-          desc: 'translateY',
-          props: {
-            value: 0.0,
-            range: { min: -1, max: 1 },
-            step: 0.01,
-          },
-        },
-        {
-          desc: 'scaleX',
-          props: {
-            value: 0.0,
-            range: { min: -1, max: 1 },
-            step: 0.01,
-          },
-        },
-        {
-          desc: 'scaleY',
-          props: {
-            value: 0.0,
-            range: { min: -1, max: 1 },
-            step: 0.01,
-          },
-        },
+				//{
+          //desc: 'translateX',
+          //props: {
+            //value: 0.0,
+            //range: { min: -1, max: 1 },
+            //step: 0.01,
+          //},
+        //},
+        //{
+          //desc: 'translateY',
+          //props: {
+            //value: 0.0,
+            //range: { min: -1, max: 1 },
+            //step: 0.01,
+          //},
+        //},
+        //{
+          //desc: 'scaleX',
+          //props: {
+            //value: 0.0,
+            //range: { min: -1, max: 1 },
+            //step: 0.01,
+          //},
+        //},
+        //{
+          //desc: 'scaleY',
+          //props: {
+            //value: 0.0,
+            //range: { min: -1, max: 1 },
+            //step: 0.01,
+          //},
+        //},
         {
           desc: 'layout',
           props: {

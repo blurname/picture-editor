@@ -24,7 +24,10 @@ export class SpiritsCanvas {
     console.log('addImage:', id)
     const image = new Image()
     image.src = imgSrc
-    const spirit = new ImageSpirit(this.canvas3d, image, id)
+		console.log('image.height:', image.height)
+		console.log('image.width:', image.width)
+		const aspectRatio = image.height/image.width
+    const spirit = new ImageSpirit(this.canvas3d, image, id,aspectRatio)
     this.spirits.push(spirit)
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
@@ -66,17 +69,16 @@ export class SpiritsCanvas {
   }
   deleteElement(id: number) {
     for (let index = 0; index < this.spirits.length; index++) {
-			if(this.spirits[index]!==null){
-
-      const element = this.spirits[index]
-      console.log(element.getId())
-      if (element.getId() === id) {
-        this.spirits[index] = null
-        this.guidLines[index] = null
-        console.log('deleted')
+      if (this.spirits[index] !== null) {
+        const element = this.spirits[index]
+        console.log(element.getId())
+        if (element.getId() === id) {
+          this.spirits[index] = null
+          this.guidLines[index] = null
+          console.log('deleted')
+        }
       }
     }
   }
-}
 }
 export const spiritCanvas = new SpiritsCanvas()

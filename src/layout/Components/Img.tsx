@@ -26,12 +26,16 @@ const imgs: ImgType[] = [
   {
     id: 4,
     style: { width: 40, height: 180 },
-    value: '../../../../public/test.jpg',
+    value: '../../../../public/t1.jpeg',
   },
   {
     id: 5,
     style: { width: 50, height: 190 },
-    value: '../../../../public/test.jpg',
+    value: '../../../../public/t4.jpeg',
+  },{
+    id: 5,
+    style: { width: 50, height: 190 },
+    value: '../../../../public/t5.jpeg',
   },
 ]
 
