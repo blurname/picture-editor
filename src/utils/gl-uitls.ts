@@ -81,12 +81,18 @@ export class BeamSpirit {
   }
   render() {}
   updateGuidRect() {}
+	updateScaleMat(scale:number){
+    throw new Error('Method not implemented.')
+	}
   getGuidRect() {
     return this.guidRect
   }
   getId() {
     return this.id
   }
+	getScale(){
+		return this.scale
+	}
 }
 export class ImageSpirit extends BeamSpirit {
   image: HTMLImageElement
@@ -128,18 +134,18 @@ export class ImageSpirit extends BeamSpirit {
     this.textures = this.beam.resource(Textures)
 
     this.rotateMat = createRotateMat(0)
-    this.transMat = createTranslateMat(0, 0)
-    this.scaleMat = createScaleMat(1, 1)
+    //this.transMat = createTranslateMat(0, 0)
+    this.scaleMat = createScaleMat(1)
 
     this.uniforms = this.beam.resource(Uniforms, {
       scaleMat: this.scaleMat,
       transMat: this.transMat,
       rotateMat: this.rotateMat,
-      hue: this.hue,
-      saturation: this.saturation,
-      vignette: this.vignette,
-      brightness: this.brightness,
-      contrast: this.contrast,
+      //hue: this.hue,
+      //saturation: this.saturation,
+      //vignette: this.vignette,
+      //brightness: this.brightness,
+      //contrast: this.contrast,
     })
 
     this.baseResources = []
@@ -159,41 +165,44 @@ export class ImageSpirit extends BeamSpirit {
     ]
     this.outputTextures[0].set('img', this.targets[0])
     this.outputTextures[1].set('img', this.targets[1])
-    this.updateGuidRect()
 		this.rotate = 0
+		this.scale = 1
+    this.updateGuidRect()
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
-		this.pos = distance
+		const scaleedDis = {left:distance.left/this.scale,top:distance.top/this.scale}
     this.prePosition = this.position.map((pos) => pos)
     this.position = this.position.map((pos, index) => {
       const remainder = index % 3
-      if (remainder === 0) return pos + distance.left
+      if (remainder === 0) return (pos + scaleedDis.left)
       // changing y to be negtive since the canvs2d's y positive axis is downward
-      else if (remainder === 1) return pos + distance.top
+      else if (remainder === 1) return (pos + scaleedDis.top)
       else return this.layout
     })
     this.updateGuidRect()
 		this.updateRotateMat(this.rotate)
+		this.updateScaleMat(this.scale)
     this.vertexBuffers.set('position', this.position)
     console.log('child updatePosition')
     //this.updateTransMat(distance.left, distance.top)
   }
   updateGuidRect() {
     this.guidRect = {
-      x: this.position[0],
-      y: this.position[1],
-      width: this.position[6] - this.position[3],
-      height: this.position[4] - this.position[1],
+      x: this.position[0]*this.scale,
+      y: this.position[1]*this.scale,
+      width: (this.position[6] - this.position[3])*this.scale,
+      height: (this.position[4] - this.position[1])*this.scale,
     }
-  }
-  getGuidRect() {
-    return this.guidRect
   }
   updateZ(maxZOffset: number) {
     this.zOffset = maxZOffset
   }
-  updateScaleMat(sx: number, sy: number) {
-    this.scaleMat = createScaleMat(sx, sy)
+  updateScaleMat(scale:number) {
+		if(this.scale===scale){
+			return
+		}
+		this.scale = scale
+    this.scaleMat = createScaleMat(scale)
     this.uniforms.set('scaleMat', this.scaleMat)
   }
   updateRotateMat(rotate: number) {
@@ -310,14 +319,17 @@ export class MarkSpirit extends BeamSpirit {
     this.vertexBuffers = this.beam.resource(VertexBuffers, this.buffers.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, this.buffers.index)
     this.rotateMat = createRotateMat(0)
+		this.scaleMat = createScaleMat(1)
     this.uniforms = this.beam.resource(Uniforms, {
       uColor: this.uColor,
-			rotateMat:this.rotateMat
+			rotateMat:this.rotateMat,
+			scaleMat:this.scaleMat
     })
     this.shader = this.getShaderByShape()
 
     this.position = this.buffers.vertex.position
 		this.rotate = 0
+		this.scale = 1
     this.updateGuidRect()
   }
   getBuffersByShape(): Buffers {
@@ -340,18 +352,27 @@ export class MarkSpirit extends BeamSpirit {
     this.uniforms.set('uColor', color)
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    //this.prePosition = this.position.map((pos) => pos)
+    //this.position = this.position.map((pos, index) => {
+      //const remainder = index % 3
+      //if (remainder === 0) return pos + distance.left
+      //// changing y to be negtive since the canvs2d's y positive axis is downward
+      //else if (remainder === 1) return pos + distance.top
+      //else return this.layout
+    //})
+		const scaleedDis = {left:distance.left/this.scale,top:distance.top/this.scale}
     this.prePosition = this.position.map((pos) => pos)
     this.position = this.position.map((pos, index) => {
       const remainder = index % 3
-      if (remainder === 0) return pos + distance.left
+      if (remainder === 0) return (pos + scaleedDis.left)
       // changing y to be negtive since the canvs2d's y positive axis is downward
-      else if (remainder === 1) return pos + distance.top
+      else if (remainder === 1) return (pos + scaleedDis.top)
       else return this.layout
     })
     this.vertexBuffers.set('position', this.position)
-    //this.updateTransMat(distance.left, distance.top)
-    this.updateGuidRect()
 		this.updateRotateMat(this.rotate)
+		this.updateScaleMat(this.scale)
+    this.updateGuidRect()
     console.log('parent updatePosition')
   }
   updateRotateMat(rotate: number) {
@@ -360,13 +381,21 @@ export class MarkSpirit extends BeamSpirit {
     this.rotateMat = createRotateMat(rotate,origin)
     this.uniforms.set('rotateMat', this.rotateMat)
   }
+  updateScaleMat(scale:number) {
+		if(this.scale===scale){
+			return
+		}
+		this.scale = scale
+    this.scaleMat = createScaleMat(scale)
+    this.uniforms.set('scaleMat', this.scaleMat)
+  }
   updateGuidRect() {
-      this.guidRect = {
-        x: this.position[0],
-        y: this.position[1],
-        width: this.position[6] - this.position[3],
-        height: this.position[4] - this.position[1],
-      }
+    this.guidRect = {
+      x: this.position[0]*this.scale,
+      y: this.position[1]*this.scale,
+      width: (this.position[6] - this.position[3])*this.scale,
+      height: (this.position[4] - this.position[1])*this.scale,
+    }
   }
 
   private draw() {

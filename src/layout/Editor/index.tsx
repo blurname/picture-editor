@@ -38,10 +38,8 @@ export function Editor() {
         chosenImage.updateTransMat(value, 0)
       } else if (desc === 'translateY') {
         chosenImage.updateTransMat(0, value)
-      } else if (desc === 'scaleX') {
-        chosenImage.updateScaleMat(value, 0)
-      } else if (desc === 'scaleY') {
-        chosenImage.updateScaleMat(0, value)
+      } else if (desc === 'scale') {
+        chosenImage.updateScaleMat(value)
       } else if (desc === 'Hue') {
         chosenImage.updateHue(value)
       } else if (desc === 'Saturation') {

@@ -315,6 +315,10 @@ export const createRotateMat = (rotate: number,origin:Pos={left:0,top:0}) => {
 		(-x0*(cos-1)+y0*sin), (-x0*sin+y0*(1-cos)), 0, 1]
 }
 
-export const createScaleMat = (sx: number, sy: number) => {
-  return [sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+export const createScaleMat = (scale:number) => {
+  return [
+		scale, 0, 0, 0, 
+		0, scale, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1]
 }

@@ -12,37 +12,37 @@ export const editorSchema = {
             step: 1,
           },
         },
-				//{
-          //desc: 'translateX',
-          //props: {
-            //value: 0.0,
-            //range: { min: -1, max: 1 },
-            //step: 0.01,
-          //},
+        //{
+        //desc: 'translateX',
+        //props: {
+        //value: 0.0,
+        //range: { min: -1, max: 1 },
+        //step: 0.01,
+        //},
         //},
         //{
-          //desc: 'translateY',
-          //props: {
-            //value: 0.0,
-            //range: { min: -1, max: 1 },
-            //step: 0.01,
-          //},
+        //desc: 'translateY',
+        //props: {
+        //value: 0.0,
+        //range: { min: -1, max: 1 },
+        //step: 0.01,
         //},
-        //{
-          //desc: 'scaleX',
-          //props: {
-            //value: 0.0,
-            //range: { min: -1, max: 1 },
-            //step: 0.01,
-          //},
         //},
+        {
+          desc: 'scale',
+          props: {
+            value: 1,
+            range: { min: 0.1, max: 2 },
+            step: 0.1,
+          },
+        },
         //{
-          //desc: 'scaleY',
-          //props: {
-            //value: 0.0,
-            //range: { min: -1, max: 1 },
-            //step: 0.01,
-          //},
+        //desc: 'scaleY',
+        //props: {
+        //value: 0.0,
+        //range: { min: -1, max: 1 },
+        //step: 0.01,
+        //},
         //},
         {
           desc: 'layout',

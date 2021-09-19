@@ -4,7 +4,6 @@ const { vec4, vec3, vec2, tex2D, float, mat4 } = SchemaTypes
 const imageVS = `
 attribute vec4 position;
 attribute vec2 texCoord;
-uniform mat4 transMat;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 
@@ -24,13 +23,30 @@ void main(){
 	gl_FragColor = texture2D(img,vTexCoord);
 }
 `
+
+export const basicImageShader = {
+  vs: imageVS,
+  fs: imageFS,
+  buffers: {
+    position: { type: vec4, n: 3 },
+    texCoord: { type: vec2 },
+  },
+  textures: {
+    img: { type: tex2D },
+  },
+  uniforms: {
+    scaleMat: { type: mat4 },
+    rotateMat: { type: mat4 },
+  },
+}
 const shapeVS = `
 attribute vec4 position;
 attribute vec4 color;
 varying highp vec4 vColor;
 uniform mat4 rotateMat;
+uniform mat4 scaleMat;
 void main(){
-	gl_Position = rotateMat*position;
+	gl_Position = scaleMat*rotateMat*position;
 	vColor = color;
 }
 `
@@ -60,6 +76,7 @@ export const lineRectShader = {
   ...shapeShader,
   uniforms: {
     rotateMat: { type: mat4 },
+    scaleMat: { type: mat4 },
     uColor: { type: vec4, n: 3 },
   },
 }
@@ -67,6 +84,7 @@ export const hollowRectShader = {
   ...shapeShader,
   uniforms: {
     rotateMat: { type: mat4 },
+    scaleMat: { type: mat4 },
     uColor: { type: vec4 },
   },
 }
@@ -143,22 +161,6 @@ export const circleShader = {
   mode: GLTypes.Lines,
 }
 
-export const basicImageShader = {
-  vs: imageVS,
-  fs: imageFS,
-  buffers: {
-    position: { type: vec4, n: 3 },
-    texCoord: { type: vec2 },
-  },
-  textures: {
-    img: { type: tex2D },
-  },
-  uniforms: {
-    scaleMat: { type: mat4 },
-    transMat: { type: mat4 },
-    rotateMat: { type: mat4 },
-  },
-}
 const defaultVS = `
 attribute vec4 position;
 attribute vec2 texCoord;
