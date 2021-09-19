@@ -18,6 +18,7 @@ import {
   lineRectShader,
   lineShader,
   circleShader,
+	tcircleShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import { mat4 } from 'gl-matrix'
@@ -423,17 +424,17 @@ export class CircleSpirit extends BeamSpirit {
   protected center: CircleCenter
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
-    this.radius = 0.1
+    this.radius = 0.2
     const circle = createCircle()
     this.center = { x: 0.0, y: 0.0 }
     this.vertexBuffers = this.beam.resource(VertexBuffers, circle.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, circle.index)
-    this.uniforms = this.beam.resource(Uniforms, {
+		this.uniforms = this.beam.resource(Uniforms, {
 			radius: this.radius,
 			centerX: this.center.x,
 			centerY: this.center.y,
-			uColor:[1,0,0,1.0]
-    })
+			uColor:[1.0,1.0,1.0,1.0]
+		})
     this.shader = this.beam.shader(circleShader)
     this.updateGuidRect()
   }
@@ -461,15 +462,14 @@ export class CircleSpirit extends BeamSpirit {
   }
   updateColor(color: number[]) {
     this.uColor = color
-    //this.uniforms.set('uColor', color)
     this.uniforms.set('uColor', color)
   }
   render() {
-    this.beam.draw(
+    this.beam.clear().draw(
       this.shader,
       this.vertexBuffers as any,
       this.indexBuffer as any,
-      this.uniforms as any,
+			this.uniforms as any
     )
   }
 }

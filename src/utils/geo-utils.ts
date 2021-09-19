@@ -133,10 +133,17 @@ export const createCircle = (angleNum: number = 100) => {
     color.push(0.2)
     color.push(0.7)
   }
+    color.push(0.5)
+    color.push(0.2)
+    color.push(0.7)
+
+    color.push(0.5)
+    color.push(0.2)
+    color.push(0.7)
   return {
     vertex: {
       position,
-      color: color,
+			color
     },
     index: {
       //array:[0,1,2,0,2,3],

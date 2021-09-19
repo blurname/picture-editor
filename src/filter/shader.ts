@@ -117,7 +117,6 @@ export const lineShader = {
   mode: GLTypes.Lines,
 }
 const circleVS = `
-
 #define pi 3.1415926
 attribute highp vec4 position;
 attribute highp vec4 color;
@@ -131,8 +130,10 @@ void main(){
 		float x = cos(position.x*3.1415926/180.0)*radius;
 		float y = sin(position.x*3.1415926/180.0)*radius;
 		gl_Position = vec4(x+centerX,y+centerY,0.0,1.0);
+		vColor = color;
 }
 `
+
 const circleFS = `
 varying highp vec4 vColor;
 uniform highp vec4 uColor;
@@ -143,20 +144,20 @@ void main(){
 		gl_FragColor = vec4(uColor.r,uColor.g,uColor.b,1.0);
 	}
 }
-
 `
+
 export const circleShader = {
   vs: circleVS,
   fs: circleFS,
   buffers: {
     position: { type: float },
-    color: { type: vec4,n:3 },
+    color: { type: vec4, n: 3 },
   },
   uniforms: {
     radius: { type: float },
-		centerX: { type: float },
-		centerY: { type: float },
-		uColor: { type: vec4 },
+    centerX: { type: float },
+    centerY: { type: float },
+    uColor: { type: vec4,n:3 },
   },
   mode: GLTypes.Lines,
 }
