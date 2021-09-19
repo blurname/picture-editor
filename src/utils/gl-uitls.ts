@@ -300,6 +300,7 @@ export class MarkSpirit extends BeamSpirit {
   private uColor: number[]
   private shape: RectLikeShape
   private buffers: Buffers
+	rotate: number
   constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number) {
     super(canvas, id)
     this.uColor = [1.0, 1.0, 1.0,1.0]
@@ -308,12 +309,15 @@ export class MarkSpirit extends BeamSpirit {
     this.buffers = this.getBuffersByShape()
     this.vertexBuffers = this.beam.resource(VertexBuffers, this.buffers.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, this.buffers.index)
+    this.rotateMat = createRotateMat(0)
     this.uniforms = this.beam.resource(Uniforms, {
       uColor: this.uColor,
+			rotateMat:this.rotateMat
     })
     this.shader = this.getShaderByShape()
 
     this.position = this.buffers.vertex.position
+		this.rotate = 0
     this.updateGuidRect()
   }
   getBuffersByShape(): Buffers {
@@ -347,8 +351,14 @@ export class MarkSpirit extends BeamSpirit {
     this.vertexBuffers.set('position', this.position)
     //this.updateTransMat(distance.left, distance.top)
     this.updateGuidRect()
-		this.updateRotateMat()
+		this.updateRotateMat(this.rotate)
     console.log('parent updatePosition')
+  }
+  updateRotateMat(rotate: number) {
+		const origin:Pos = {left:this.guidRect.x+this.guidRect.width/2,top:this.guidRect.y+this.guidRect.height/2}
+		this.rotate = rotate
+    this.rotateMat = createRotateMat(rotate,origin)
+    this.uniforms.set('rotateMat', this.rotateMat)
   }
   updateGuidRect() {
       this.guidRect = {
@@ -358,9 +368,7 @@ export class MarkSpirit extends BeamSpirit {
         height: this.position[4] - this.position[1],
       }
   }
-  getGuidRect() {
-    return this.guidRect
-  }
+
   private draw() {
     this.beam
 			.depth()

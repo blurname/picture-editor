@@ -28,9 +28,9 @@ const shapeVS = `
 attribute vec4 position;
 attribute vec4 color;
 varying highp vec4 vColor;
-
+uniform mat4 rotateMat;
 void main(){
-	gl_Position = position;
+	gl_Position = rotateMat*position;
 	vColor = color;
 }
 `
@@ -53,6 +53,21 @@ export const shapeShader = {
   buffers: {
     position: { type: vec4, n: 3 },
     color: { type: vec4, n: 3 },
+  },
+}
+
+export const lineRectShader = {
+  ...shapeShader,
+  uniforms: {
+    rotateMat: { type: mat4 },
+    uColor: { type: vec4, n: 3 },
+  },
+}
+export const hollowRectShader = {
+  ...shapeShader,
+  uniforms: {
+    rotateMat: { type: mat4 },
+    uColor: { type: vec4 },
   },
 }
 
@@ -82,20 +97,6 @@ export const lineShader = {
     color: { type: vec3 },
   },
   mode: GLTypes.Lines,
-}
-export const lineRectShader = {
-  ...shapeShader,
-  uniforms: {
-    rotateMat: { type: mat4 },
-    uColor: { type: vec4, n: 3 },
-  },
-}
-export const hollowRectShader = {
-  ...shapeShader,
-  uniforms: {
-    rotateMat: { type: mat4 },
-    uColor: { type: vec4 },
-  },
 }
 const circleVS = `
 
