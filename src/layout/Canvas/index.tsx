@@ -22,6 +22,7 @@ import {
   ImageSpirit,
   MarkSpirit,
 } from '../../utils/gl-uitls'
+import {mat2} from 'gl-matrix'
 
 type Props = {}
 
@@ -40,7 +41,9 @@ export function Canvas(props: Props) {
 
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
-  const handleOnMouseMove = (e: MouseEvent) => {}
+  const handleOnMouseMove = (e: MouseEvent) => {
+	
+	}
   //const handleOnMouseClick = (e: MouseEvent) => {
   //for (let i = 0; i < images.length; i++) {
   //const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
@@ -65,18 +68,16 @@ export function Canvas(props: Props) {
           { x: cursorPos.left, y: cursorPos.top },
           images[i].getGuidRect(),
         )
-        //console.log(images[i].getGuidRect())
         console.log(result)
 
-        if (result !== 'out') {
-          preCursor = e
-          curImage = i
-          //drawRectBorder(canvas2dRef.current, images[i].position)
-          drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
-          canvas3dRef.current.style.cursor = 'move'
-          isChecked = true
-          break
-        }
+				if (result !== 'out') {
+					preCursor = e
+					curImage = i
+					drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
+					canvas3dRef.current.style.cursor = 'move'
+					isChecked = true
+					break
+				}
       }
       if (isChecked === false) {
         preCursor = undefined
@@ -123,28 +124,11 @@ export function Canvas(props: Props) {
 		//spiritCanvas.addMark('circle', 101)
 		spiritCanvas.addImage('../../../public/t4.jpeg', 101)
 
-    //spiritCanvas.addImage('../../../public/test.jpg',101)
-    //const circleBeam = new Beam(canvas3dRef.current)
-
-    //const circlesResource = createCircle()
-    //const vertex = circleBeam.resource(ResourceTypes.VertexBuffers, circlesResource.vertex)
-
-    //const index = circleBeam.resource(ResourceTypes.IndexBuffer, circlesResource.index)
-    //const tShader = circleBeam.shader(circleShader)
-    //const uniforms = circleBeam.resource(ResourceTypes.Uniforms, {
-    //radius: 1.0,
-    //})
-    //images.push(circle as any)
-    //console.log()
-    //circleBeam.draw(tShader, index as any, vertex as any, uniforms as any)
-    //const circle = new CircleSpirit(canvas3dRef.current,101)
-    //circle.updatePosition({left:-0.5,top:-0.2})
-    //circle.render()
-
-    //const hollw = new MarkSpirit(canvas3dRef.current, 'hollowRect')
-    //images.push(hollw)
-    //const line = new MarkSpirit(canvas3dRef.current, 'line')
-    //images.push(line)
+		const a = new Float32Array([1,2,3,4])
+		const b = new Float32Array([5,6,7,8])
+		let c = new Float32Array(4)
+	 mat2.mul(c, a, b)
+		console.log('mat2: '+c)
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
@@ -157,7 +141,6 @@ export function Canvas(props: Props) {
 
   return (
     <div
-      //style={{cursor:}}
 			className="w-12/12 h-12/12"
     >
       <canvas
@@ -166,7 +149,6 @@ export function Canvas(props: Props) {
         style={{
           top: canvas.top,
           left: canvas.left,
-          //backgroundColor: 'whitesmoke',
           position: 'absolute',
         }}
         width={canvas.width}
@@ -174,7 +156,6 @@ export function Canvas(props: Props) {
       />
       <canvas
         className=""
-        //className="bg-blue-200"
         ref={canvas3dRef}
         style={{
           top: canvas.top,
@@ -183,10 +164,9 @@ export function Canvas(props: Props) {
         }}
         width={canvas.width}
         height={canvas.height}
-        //onClick={handleOnMouseClick}
         onMouseUp={handleOnMouseUp}
-        //onMouseMove={handleOnMouseMove}
-        onMouseDown={handleOnMouseDown}
+				//onMouseMove={handleOnMouseMove}
+				onMouseDown={handleOnMouseDown}
       />
     </div>
   )

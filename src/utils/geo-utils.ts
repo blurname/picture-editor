@@ -22,10 +22,14 @@ export const createRectangle = (aspectRatio: number) => {
 }
 export const createRectangleByProjection = (width: number,height:number) => {
   const basePosition = [
-		-width/2,-height/2,0,
-		-width/2,height/2,0,
-		width/2,height/2,0,
-		width/2,-height/2,0
+		-width/2,-height/2,0,1.0,
+		-width/2,height/2,0,1.0,
+		width/2,height/2,0,1.0,
+		width/2,-height/2,0,1.0
+		//-width/2,-height/2,0,
+		//-width/2,height/2,0,
+		//width/2,height/2,0,
+		//width/2,-height/2,0
 	]
 	//const position = basePosition.map((pos) => pos * 0.3 )
   const texCoord = [0, 0, 0, 1, 1, 1, 1, 0]
@@ -34,7 +38,7 @@ export const createRectangleByProjection = (width: number,height:number) => {
   }
   return {
     vertex: {
-      position:basePosition,
+      position:new Float32Array(basePosition),
       texCoord,
     },
     index,
@@ -173,7 +177,7 @@ export const createCircle = (angleNum: number = 100) => {
   }
 }
 
-const getCursorPos = (e: MouseEvent, canvasPos: CanvasPos): Pos => {
+const getRelativeCursorPos = (e: MouseEvent, canvasPos: CanvasPos): Pos => {
   return {
     left: e.pageX - canvasPos.left,
     top: e.pageY - canvasPos.top,
@@ -184,7 +188,7 @@ export const getCursorPosInCanvas = (
   e: MouseEvent,
   canvasPos: CanvasPos,
 ): Pos | 'outOfCanvas' => {
-  const cursorPos = getCursorPos(e, canvasPos)
+  const cursorPos = getRelativeCursorPos(e, canvasPos)
   const isOutsideHorizontal: boolean =
     cursorPos.left < 0 ? true : cursorPos.left > canvasPos.width ? true : false
   const isOutsideVeritcle: boolean =
@@ -203,15 +207,15 @@ const normalize2 = (
 ): number => {
   if (oneDimPos < edge / 2) {
     // console.log(edge)
-    if (forward === 'left') return oneDimPos / (edge / 2) - 1
-    else return -(oneDimPos / (edge / 2) - 1)
+    if (forward === 'left') return oneDimPos - (edge / 2) 
+    else return -(oneDimPos - (edge / 2) )
   } else {
     // console.log(edge)
     // console.log(oneDimPos - edge / 2)
     if (forward === 'left') {
-      return (oneDimPos - edge / 2) / (edge / 2)
+      return (oneDimPos - edge / 2)
     } else {
-      return -(oneDimPos - edge / 2) / (edge / 2)
+      return -(oneDimPos - edge / 2)
     }
   }
 }
@@ -268,40 +272,8 @@ const getIsInTriangle = (p: Point, a: Point, b: Point, c: Point) => {
 
 export const drawRectBorder = (
   canvas2dRef: HTMLCanvasElement,
-	//position: number[],
 	guidRect:Rect
 ) => {
-	const position:number[] = []
-	const a: Point = { x: guidRect.x, y: guidRect.y }
-	const b: Point = { x: guidRect.x, y: guidRect.y+guidRect.height }
-	const c: Point = { x: guidRect.x+guidRect.width, y: guidRect.y+guidRect.height}
-	const d: Point = { x: guidRect.x+guidRect.width, y: guidRect.y }
-	position.push(a.x)
-	position.push(a.y)
-	position.push(0.0)
-	position.push(b.x)
-	position.push(b.y)
-	position.push(0.0)
-	position.push(c.x)
-	position.push(c.y)
-	position.push(0.0)
-	position.push(d.x)
-	position.push(d.y)
-	position.push(0.0)
-  const webglPosInCanvas = position.map((pos, index) => {
-    const remainder = index % 3
-    if (remainder === 0) return (pos * canvas2dRef.width) / 2
-    // changing y to be negtive since the canvs2d's y positive axis is downward
-    else if (remainder === 1) return -((pos * canvas2dRef.height) / 2)
-    else return pos
-  })
-
-  const glPosInCanvas = {
-    x: webglPosInCanvas[3],
-    y: webglPosInCanvas[1],
-    width: webglPosInCanvas[6] - webglPosInCanvas[3],
-    height: webglPosInCanvas[4] - webglPosInCanvas[1],
-  }
 
   const ctx = canvas2dRef.getContext('2d')
   ctx.clearRect(
@@ -313,10 +285,10 @@ export const drawRectBorder = (
   ctx.strokeStyle = 'purple'
   ctx.lineWidth = 8
   ctx.strokeRect(
-    glPosInCanvas.x,
-    glPosInCanvas.y,
-    glPosInCanvas.width,
-    glPosInCanvas.height,
+		guidRect.x,
+		-(guidRect.y+guidRect.height),
+		guidRect.width,
+		guidRect.height
   )
 }
 
@@ -344,12 +316,21 @@ export const createScaleMat = (scale:number) => {
 		0, 0, 1, 0,
 		0, 0, 0, 1]
 }
-export function createProjectionMat(l:number, r:number, t:number, b:number) {
+export function createProjectionMatInShader(l:number, r:number, t:number, b:number) {
     return [
 			2 / (r - l), 0, 0, 0,
 			0, 2 / (t - b), 0, 0,
 			0, 0, 1, 0,
 			-(r + l) / (r - l), -(t + b) / (t - b), 0, 1
     ]
+}
+export function createProjectionMatInJS(l:number, r:number, t:number, b:number){
+	return new Float32Array([
+		2/(r-l),0,0,-(r+l)/(r-l),
+		0,2/(t-b),0,-(t+b)/(t-b),
+		0,0,1,0,
+		0,0,0,1
+	])
+
 }
 

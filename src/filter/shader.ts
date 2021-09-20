@@ -29,7 +29,7 @@ export const basicImageShader = {
   vs: imageVS,
   fs: imageFS,
   buffers: {
-    position: { type: vec4, n: 3 },
+    position: { type: vec4 },
     texCoord: { type: vec2 },
   },
   textures: {
