@@ -18,7 +18,6 @@ import {
   lineRectShader,
   lineShader,
   circleShader,
-	tcircleShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import { mat4 } from 'gl-matrix'
@@ -27,7 +26,9 @@ import {
   createHollowRectangle,
   createLine,
   createLineRect,
+  createProjectionMat,
   createRectangle,
+  createRectangleByProjection,
   createRotateMat,
   createScaleMat,
   createTranslateMat,
@@ -49,6 +50,7 @@ export class BeamSpirit {
   protected scaleMat: number[]
   protected transMat: number[]
   protected rotateMat: number[]
+  protected projectionMat: number[]
   protected baseResources: Resource[]
   protected shader: Shader
   protected layout: number
@@ -115,10 +117,10 @@ export class ImageSpirit extends BeamSpirit {
   vignetteShader: Shader
 	rotate:number
 
-  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number,aspectRatio:number) {
+  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number) {
     super(canvas, id)
-    const quad = createRectangle(aspectRatio)
     this.image = image
+		const quad = createRectangleByProjection(image.width,image.height)
 
     this.beam.define(Offscreen2DCommand)
 
@@ -128,31 +130,29 @@ export class ImageSpirit extends BeamSpirit {
     this.vignetteShader = this.beam.shader(Vignette)
 
     this.position = quad.vertex.position
-    this.prePosition = quad.vertex.position
 
     this.vertexBuffers = this.beam.resource(VertexBuffers, quad.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, quad.index)
     this.textures = this.beam.resource(Textures)
 
     this.rotateMat = createRotateMat(0)
-    //this.transMat = createTranslateMat(0, 0)
     this.scaleMat = createScaleMat(1)
+
+		const w = this.canvas.width/2
+		const h = this.canvas.height/2
+		this.projectionMat = createProjectionMat(-w,w,h,-h)
 
     this.uniforms = this.beam.resource(Uniforms, {
       scaleMat: this.scaleMat,
       transMat: this.transMat,
       rotateMat: this.rotateMat,
+			projectionMat:this.projectionMat
       //hue: this.hue,
       //saturation: this.saturation,
       //vignette: this.vignette,
       //brightness: this.brightness,
       //contrast: this.contrast,
     })
-
-    this.baseResources = []
-    this.baseResources.push(this.indexBuffer as any)
-    this.baseResources.push(this.vertexBuffers as any)
-    this.baseResources.push(this.uniforms as any)
 
     this.textures.set('img', { image: this.image, flip: true })
     this.inputTextures = this.textures

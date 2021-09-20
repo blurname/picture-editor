@@ -6,10 +6,11 @@ attribute vec4 position;
 attribute vec2 texCoord;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
+uniform mat4 projectionMat;
 
 varying highp vec2 vTexCoord;
 void main(){
-	gl_Position = scaleMat*rotateMat*position;
+	gl_Position = scaleMat*rotateMat*projectionMat*position;
 	vTexCoord = texCoord;
 }
 
@@ -37,8 +38,11 @@ export const basicImageShader = {
   uniforms: {
     scaleMat: { type: mat4 },
     rotateMat: { type: mat4 },
+		projectionMat:{type:mat4}
   },
 }
+
+
 const shapeVS = `
 attribute vec4 position;
 attribute vec4 color;

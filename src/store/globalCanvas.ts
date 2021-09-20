@@ -24,10 +24,7 @@ export class SpiritsCanvas {
     console.log('addImage:', id)
     const image = new Image()
     image.src = imgSrc
-		console.log('image.height:', image.height)
-		console.log('image.width:', image.width)
-		const aspectRatio = image.height/image.width
-    const spirit = new ImageSpirit(this.canvas3d, image, id,aspectRatio)
+    const spirit = new ImageSpirit(this.canvas3d, image, id)
     this.spirits.push(spirit)
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),

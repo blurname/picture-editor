@@ -20,6 +20,26 @@ export const createRectangle = (aspectRatio: number) => {
     index,
   }
 }
+export const createRectangleByProjection = (width: number,height:number) => {
+  const basePosition = [
+		-width/2,-height/2,0,
+		-width/2,height/2,0,
+		width/2,height/2,0,
+		width/2,-height/2,0
+	]
+	//const position = basePosition.map((pos) => pos * 0.3 )
+  const texCoord = [0, 0, 0, 1, 1, 1, 1, 0]
+  const index = {
+    array: [0, 1, 2, 0, 2, 3],
+  }
+  return {
+    vertex: {
+      position:basePosition,
+      texCoord,
+    },
+    index,
+  }
+}
 export const createLine = (guidRect: Rect) => {
   const { x, y, width, height } = guidRect
   const position = [
@@ -310,11 +330,6 @@ export const createRotateMat = (rotate: number,origin:Pos={left:0,top:0}) => {
   const sin = Math.sin(rotate)
 	const x0 = origin.left
 	const y0 = origin.top
-  //return [
-		//cos, sin, 0, 0, 
-		//-sin, cos, 0, 0,
-		//0, 0, 1, 0,
-		//0, 0, 0, 1]
   return [
 		cos, sin, 0, 0, 
 		-sin, cos, 0, 0,
@@ -329,3 +344,12 @@ export const createScaleMat = (scale:number) => {
 		0, 0, 1, 0,
 		0, 0, 0, 1]
 }
+export function createProjectionMat(l:number, r:number, t:number, b:number) {
+    return [
+			2 / (r - l), 0, 0, 0,
+			0, 2 / (t - b), 0, 0,
+			0, 0, 1, 0,
+			-(r + l) / (r - l), -(t + b) / (t - b), 0, 1
+    ]
+}
+
