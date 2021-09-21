@@ -34,6 +34,8 @@ import {
   createScaleMat,
   createTranslateMat,
 	createProjectionVec44Radius,
+	createProjectionVec44CenterY,
+	createProjectionXY,
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
@@ -398,27 +400,30 @@ type CircleCenter = {
   y: number
 }
 export class CircleSpirit extends BeamSpirit {
-  protected radius: number
+	protected radius:number
   protected uColor: number[]
   protected center: CircleCenter
+	protected projectionX:number
+	protected projectionY:number
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
-		const projection4Radius = createProjectionVec44Radius(getCanvasEdge(this.canvas))
-		const result = new Float32Array([4])
-    this.radius = 100
-		const radius = new Float32Array([200,0,0,0])
-		vec4.mul(result, radius, projection4Radius)
-		
-
+		this.radius = 200
+		this.scale = 1
+		const xy = createProjectionXY(getCanvasEdge(this.canvas))
+		this.projectionX = xy.x
+		this.projectionY = xy.y
     const circle = createCircle()
     this.center = { x: 0.0, y: 0.0 }
     this.vertexBuffers = this.beam.resource(VertexBuffers, circle.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, circle.index)
     this.uniforms = this.beam.resource(Uniforms, {
-      radius: radius[0],
+      radius: this.radius,
+			scale:this.scale,
       centerX: this.center.x,
       centerY: this.center.y,
       uColor: [1.0, 1.0, 1.0, 1.0],
+			projectionX:this.projectionX,
+			projectionY:this.projectionY
     })
     this.shader = this.beam.shader(circleShader)
     this.updateGuidRect()
@@ -426,25 +431,22 @@ export class CircleSpirit extends BeamSpirit {
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.center.x += distance.left
     this.center.y += distance.top
-    this.uniforms.set('centerX', this.center.x)
-    this.uniforms.set('centerY', this.center.y)
+    this.uniforms.set('centerX',this.center.x)
+		this.uniforms.set('centerY',this.center.y)
     this.updateGuidRect()
   }
-  updateScaleMat(scale: number) {
-    this.updateRadius(scale)
-  }
-  updateRadius(radius: number) {
-    this.radius = radius
-    this.uniforms.set('radius', this.radius)
-  }
+	updateScaleMat(scale: number) {
+		this.scale = scale
+		this.uniforms.set('scale', scale)
+	}
   updateGuidRect() {
     const circleBase = { center: this.center, radius: this.radius }
     this.guidRect = fUpdateGuidRect(circleBase, (circleArgs) => {
       return {
-        x: circleArgs.center.x - circleArgs.radius,
-        y: circleArgs.center.y - circleArgs.radius,
-        width: circleArgs.radius * 2,
-        height: circleArgs.radius * 2,
+        x: circleArgs.center.x - circleArgs.radius*this.scale,
+        y: circleArgs.center.y - circleArgs.radius*this.scale,
+        width: (circleArgs.radius * 2)*this.scale,
+        height:(circleArgs.radius * 2)*this.scale,
       }
     })
   }

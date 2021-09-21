@@ -353,11 +353,25 @@ export function createProjectionMatInJS(l:number, r:number, t:number, b:number){
 		0,0,0,1
 	])
 }
-export function createProjectionVec44Radius(edge:Edge){
-
+export function createProjection(edge:Edge){
 	const l = edge.l
 	const r = edge.r
 	return new Float32Array([
 		2/(r-l),0,0,-(r+l)/(r-l),
 ])}
-
+export function createProjectionVec44CenterY(edge:Edge){
+	const t = edge.t
+	const b = edge.b
+	return new Float32Array([
+		0,2/(t-b),0,-(t+b)/(t-b),
+])}
+export function createProjectionXY(edge:Edge){
+	const l = edge.l
+	const r = edge.r
+	const t = edge.t
+	const b = edge.b
+	return {
+		x:2/(r-l),
+		y:2/(t-b)
+	}
+}

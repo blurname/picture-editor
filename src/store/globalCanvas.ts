@@ -39,9 +39,9 @@ export class SpiritsCanvas {
       mark = new MarkSpirit(this.canvas3d, shape, id)
     }
     this.spirits.push(mark)
-    this.guidLines.push(
-      new GuidLine(this.canvas3d, mark.getGuidRect(), mark.getId()),
-    )
+		this.guidLines.push(
+			new GuidLine(this.canvas3d, mark.getGuidRect(), mark.getId()),
+		)
   }
 
   setCanvas3d(canvas: HTMLCanvasElement) {

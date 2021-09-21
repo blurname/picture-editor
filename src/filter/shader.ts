@@ -131,12 +131,17 @@ attribute highp vec4 color;
 uniform highp float radius;
 uniform highp float centerX;
 uniform highp float centerY;
+uniform highp float projectionX;
+uniform highp float projectionY;
+uniform highp float scale;
 
 varying vec4 vColor;
 void main(){
-		float x = cos(position.x*3.1415926/180.0)*radius;
-		float y = sin(position.x*3.1415926/180.0)*radius;
-		gl_Position = vec4(x+centerX,y+centerY,0.0,1.0);
+
+		float glRad = radius*projectionX*scale;
+		float x = cos(position.x*3.1415926/180.0)*glRad;
+		float y = sin(position.x*3.1415926/180.0)*glRad;
+		gl_Position = vec4(x+centerX*projectionX,y+centerY*projectionY,0.0,1.0);
 		vColor = color;
 }
 `
@@ -162,8 +167,11 @@ export const circleShader = {
   },
   uniforms: {
     radius: { type: float },
+		scale: {type:float},
     centerX: { type: float },
     centerY: { type: float },
+		projectionX:{type:float},
+		projectionY:{type:float},
     uColor: { type: vec4,n:3 },
   },
   mode: GLTypes.Lines,
