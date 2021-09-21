@@ -20,21 +20,15 @@ import {
   circleShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
-import { mat4, vec4 } from 'gl-matrix'
 import {
   createCircle,
   createHollowRectangle,
   createLine,
   createLineRect,
   createProjectionMatInShader,
-  createProjectionMatInJS,
-  createRectangle,
   createRectangleByProjection,
   createRotateMat,
   createScaleMat,
-  createTranslateMat,
-	createProjectionVec44Radius,
-	createProjectionVec44CenterY,
 	createProjectionXY,
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
@@ -138,7 +132,7 @@ export class ImageSpirit extends BeamSpirit {
 
     const w = this.canvas.width / 2
     const h = this.canvas.height / 2
-    this.projectionMat = createProjectionMatInShader(-w, w, h, -h)
+    this.projectionMat = createProjectionMatInShader(getCanvasEdge(this.canvas))
     //this.projectionMatInJS = createProjectionMatInJS(-w, w, h, -h)
 
     //this.guidRectPosition = new Float32Array(16)
@@ -456,7 +450,6 @@ export class CircleSpirit extends BeamSpirit {
   }
   render() {
     this.beam
-      .clear()
       .draw(
         this.shader,
         this.vertexBuffers as any,
@@ -472,13 +465,19 @@ export class GuidLine {
   protected indexBuffer: IndexBufferResource
   protected shader: Shader
   protected canvas: HTMLCanvasElement
+	protected projectionMat:number[]
+	protected uniform:UniformsResource
   constructor(canvas: HTMLCanvasElement, rect: Rect, id: number) {
     this.id = id
     this.canvas = canvas
     this.beam = new Beam(canvas)
+		this.projectionMat = createProjectionMatInShader(getCanvasEdge(this.canvas))
     const line = createLine(rect)
     this.vertexBuffers = this.beam.resource(VertexBuffers, line.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, line.index)
+		this.uniform = this.beam.resource(Uniforms,{
+			projectionMat:this.projectionMat
+		})
     this.shader = this.beam.shader(lineShader)
   }
   updateRect(rect: Rect) {
@@ -491,6 +490,7 @@ export class GuidLine {
       this.shader,
       this.vertexBuffers as any,
       this.indexBuffer as any,
+			this.uniform as any
     )
   }
   getId() {

@@ -26,7 +26,6 @@ export class SpiritsCanvas {
     image.src = imgSrc
     const spirit = new ImageSpirit(this.canvas3d, image, id)
     this.spirits.push(spirit)
-		console.log(spirit.getGuidRect())
 		this.guidLines.push(
 			new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
 		)

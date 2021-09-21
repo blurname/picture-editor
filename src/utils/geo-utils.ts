@@ -51,13 +51,13 @@ export const createLine = (guidRect: Rect) => {
     y,
     0.0, //0
     x,
-    y + height + 0.3,
+    y + height + 200,
     0.0, //1
 
     x,
     y + height,
     0.0, //2
-    x + width + 0.3,
+    x + width + 200,
     y + height,
     0.0, //3
 
@@ -65,10 +65,10 @@ export const createLine = (guidRect: Rect) => {
     y,
     0.0, //4
     x + width,
-    y + height + 0.3,
+    y + height + 200,
     0.0, //5
 
-    x + width + 0.3,
+    x + width + 200,
     y,
     0.0, //6
     //x,y,

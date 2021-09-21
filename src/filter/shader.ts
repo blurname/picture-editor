@@ -101,9 +101,10 @@ const lineVS = `
 attribute vec4 position;
 attribute vec4 color;
 varying highp vec4 vColor;
+uniform mat4 projectionMat;
 
 void main(){
-	gl_Position = position;
+	gl_Position = projectionMat*position;
 	vColor = color;
 }
 `
@@ -121,6 +122,9 @@ export const lineShader = {
     position: { type: vec3 },
     color: { type: vec3 },
   },
+	uniforms:{
+		projectionMat:{type:mat4}
+	},
   mode: GLTypes.Lines,
 }
 const circleVS = `

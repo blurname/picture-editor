@@ -123,7 +123,7 @@ export function Canvas(props: Props) {
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
-    //spiritCanvas.renderAllLine()
+		spiritCanvas.renderAllLine()
   }, [])
 
   useEffect(() => {
