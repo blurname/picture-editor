@@ -45,16 +45,7 @@ export function Canvas(props: Props) {
 	
 	}
   //const handleOnMouseClick = (e: MouseEvent) => {
-  //for (let i = 0; i < images.length; i++) {
-  //const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
-  //const result = getCursorIsInQuad(
-  //{ x: cursorPos.left, y: cursorPos.top },
-  //images[i].position,
-  //)
-  //if (result !== 'out') {
-  //}
-  //}
-  //}
+	//}
 
   let preCursor: MouseEvent | undefined
   let curImage: number

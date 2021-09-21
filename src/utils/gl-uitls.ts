@@ -58,6 +58,7 @@ export class BeamSpirit {
   protected scale: number
   protected rotate: number
   protected guidRectPosition: Float32Array
+
   constructor(canvas: HTMLCanvasElement, id: number) {
     this.canvas = canvas
     this.beam = new Beam(canvas)
@@ -91,56 +92,6 @@ export class BeamSpirit {
     return this.scale
   }
   render() {}
-}
-export class RectLikeSpirit extends BeamSpirit {
-  //updatePosition(distance: Pos = { left: 0, top: 0 }) {
-  //const scaleedDis = {
-  //left: distance.left / this.scale,
-  //top: distance.top / this.scale,
-  //}
-  //this.position = this.position.map((pos, index) => {
-  //const remainder = index % 3
-  //if (remainder === 0) return pos + scaleedDis.left
-  //// changing y to be negtive since the canvs2d's y positive axis is downward
-  //else if (remainder === 1) return pos + scaleedDis.top
-  //else return this.layout
-  //})
-  //this.updateGuidRect()
-  //this.updateRotateMat(this.rotate)
-  //this.updateScaleMat(this.scale)
-  //this.vertexBuffers.set('position', this.position)
-  //console.log('child updatePosition')
-  ////this.updateTransMat(distance.left, distance.top)
-  //}
-  //updateGuidRect() {
-  //this.guidRect = {
-  //x: this.guidRectPosition[0] * this.scale,
-  //y: this.guidRectPosition[1] * this.scale,
-  //width: (Math.abs(2*this.guidRectPosition[0])) * this.scale,
-  //height: (Math.abs(2*this.guidRectPosition[1])) * this.scale,
-  //}
-  //console.log(this.guidRect)
-  //}
-  //udpateGuidRect(){
-  //console.log('parent updateguidrect')
-  //}
-  //updateScaleMat(scale: number) {
-  //if (this.scale === scale) {
-  //return
-  //}
-  //this.scale = scale
-  //this.scaleMat = createScaleMat(scale)
-  //this.uniforms.set('scaleMat', this.scaleMat)
-  //}
-  //updateRotateMat(rotate: number) {
-  //const origin: Pos = {
-  //left: this.guidRect.x + this.guidRect.width / 2,
-  //top: this.guidRect.y + this.guidRect.height / 2,
-  //}
-  //this.rotate = rotate
-  //this.rotateMat = createRotateMat(rotate, origin)
-  //this.uniforms.set('rotateMat', this.rotateMat)
-  //}
 }
 export class ImageSpirit extends BeamSpirit {
   image: HTMLImageElement
@@ -223,10 +174,10 @@ export class ImageSpirit extends BeamSpirit {
   updateGuidRect() {
     this.guidRect = fUpdateGuidRect(this.position, (position: Float32Array) => {
       return {
-        x: position[0],
-        y: position[1],
-        width: Math.abs(position[0]-position[8]),
-        height: Math.abs(position[1]-position[5]),
+        x: position[0]*this.scale,
+        y: position[1]*this.scale,
+        width: Math.abs(position[0]-position[8])*this.scale,
+        height: Math.abs(position[1]-position[5])*this.scale,
       }
     })
   }
@@ -250,6 +201,7 @@ export class ImageSpirit extends BeamSpirit {
     this.vertexBuffers.set('position', this.position)
     console.log('child updatePosition')
     //this.updateTransMat(distance.left, distance.top)
+
   }
 
   updateZ(maxZOffset: number) {
@@ -331,7 +283,7 @@ type Buffers = {
   }
 }
 type RectLikeShape = Exclude<Shape, 'circle'>
-export class MarkSpirit extends RectLikeSpirit {
+export class MarkSpirit extends BeamSpirit {
   private uColor: number[]
   private shape: RectLikeShape
   private buffers: Buffers
