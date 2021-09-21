@@ -49,8 +49,9 @@ attribute vec4 color;
 varying highp vec4 vColor;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
+uniform mat4 projectionMat;
 void main(){
-	gl_Position = scaleMat*rotateMat*position;
+	gl_Position = projectionMat*rotateMat*scaleMat*position;
 	vColor = color;
 }
 `
@@ -71,7 +72,7 @@ export const shapeShader = {
   vs: shapeVS,
   fs: shapeFS,
   buffers: {
-    position: { type: vec4, n: 3 },
+    position: { type: vec4 },
     color: { type: vec4, n: 3 },
   },
 }
@@ -81,6 +82,7 @@ export const lineRectShader = {
   uniforms: {
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
+		projectionMat:{type:mat4},
     uColor: { type: vec4, n: 3 },
   },
 }
@@ -89,6 +91,7 @@ export const hollowRectShader = {
   uniforms: {
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
+		projectionMat:{type:mat4},
     uColor: { type: vec4 },
   },
 }

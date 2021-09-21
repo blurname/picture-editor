@@ -20,7 +20,7 @@ import {
   circleShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
-import { mat4 } from 'gl-matrix'
+import { mat4, vec4 } from 'gl-matrix'
 import {
   createCircle,
   createHollowRectangle,
@@ -33,6 +33,7 @@ import {
   createRotateMat,
   createScaleMat,
   createTranslateMat,
+	createProjectionVec44Radius,
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
@@ -174,10 +175,10 @@ export class ImageSpirit extends BeamSpirit {
   updateGuidRect() {
     this.guidRect = fUpdateGuidRect(this.position, (position: Float32Array) => {
       return {
-        x: position[0]*this.scale,
-        y: position[1]*this.scale,
-        width: Math.abs(position[0]-position[8])*this.scale,
-        height: Math.abs(position[1]-position[5])*this.scale,
+        x: position[0] * this.scale,
+        y: position[1] * this.scale,
+        width: Math.abs(position[0] - position[8]) * this.scale,
+        height: Math.abs(position[1] - position[5]) * this.scale,
       }
     })
   }
@@ -201,7 +202,6 @@ export class ImageSpirit extends BeamSpirit {
     this.vertexBuffers.set('position', this.position)
     console.log('child updatePosition')
     //this.updateTransMat(distance.left, distance.top)
-
   }
 
   updateZ(maxZOffset: number) {
@@ -275,7 +275,7 @@ export class ImageSpirit extends BeamSpirit {
 
 type Buffers = {
   vertex: {
-    position: number[]
+    position: Float32Array
     color: number[]
   }
   index: {
@@ -297,23 +297,47 @@ export class MarkSpirit extends BeamSpirit {
     this.indexBuffer = this.beam.resource(IndexBuffer, this.buffers.index)
     this.rotateMat = createRotateMat(0)
     this.scaleMat = createScaleMat(1)
+    const w = this.canvas.width / 2
+    const h = this.canvas.height / 2
+    //this.projectionMat = createProjectionMatInShader(-w, w, h, -h)
+    this.projectionMat = createProjectionMatInShader(getCanvasEdge(canvas))
     this.uniforms = this.beam.resource(Uniforms, {
       uColor: this.uColor,
       rotateMat: this.rotateMat,
       scaleMat: this.scaleMat,
+      projectionMat: this.projectionMat,
     })
     this.shader = this.getShaderByShape()
-
     this.position = this.buffers.vertex.position
     this.rotate = 0
     this.scale = 1
     this.updateGuidRect()
   }
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    const scaleedDis = {
+      left: distance.left / this.scale,
+      top: distance.top / this.scale,
+    }
+    this.position = this.position.map((pos, index) => {
+      const remainder = index % 4
+      if (remainder === 0) return pos + scaleedDis.left
+      // changing y to be negtive since the canvs2d's y positive axis is downward
+      else if (remainder === 1) return pos + scaleedDis.top
+      else return pos
+    })
+    console.log(this.position)
+    this.updateGuidRect()
+    this.updateRotateMat(this.rotate)
+    this.updateScaleMat(this.scale)
+    this.vertexBuffers.set('position', this.position)
+    console.log('child updatePosition')
+    //this.updateTransMat(distance.left, distance.top)
+  }
   getBuffersByShape(): Buffers {
     if (this.shape === 'line') {
-      return createLineRect()
+      return createLineRect(400, 400)
     } else if (this.shape === 'hollowRect') {
-      return createHollowRectangle()
+      return createHollowRectangle(400, 400)
     }
   }
   getShaderByShape() {
@@ -326,6 +350,33 @@ export class MarkSpirit extends BeamSpirit {
   updateColor(color: number[]) {
     this.uColor = color
     this.uniforms.set('uColor', color)
+  }
+  updateGuidRect() {
+    this.guidRect = fUpdateGuidRect(this.position, (position: Float32Array) => {
+      return {
+        x: position[0] * this.scale,
+        y: position[1] * this.scale,
+        width: Math.abs(position[0] - position[8]) * this.scale,
+        height: Math.abs(position[1] - position[5]) * this.scale,
+      }
+    })
+  }
+  updateScaleMat(scale: number) {
+    if (this.scale === scale) {
+      return
+    }
+    this.scale = scale
+    this.scaleMat = createScaleMat(scale)
+    this.uniforms.set('scaleMat', this.scaleMat)
+  }
+  updateRotateMat(rotate: number) {
+    const origin: Pos = {
+      left: this.guidRect.x + this.guidRect.width / 2,
+      top: this.guidRect.y + this.guidRect.height / 2,
+    }
+    this.rotate = rotate
+    this.rotateMat = createRotateMat(rotate, origin)
+    this.uniforms.set('rotateMat', this.rotateMat)
   }
   private draw() {
     this.beam
@@ -352,13 +403,19 @@ export class CircleSpirit extends BeamSpirit {
   protected center: CircleCenter
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
-    this.radius = 0.2
+		const projection4Radius = createProjectionVec44Radius(getCanvasEdge(this.canvas))
+		const result = new Float32Array([4])
+    this.radius = 100
+		const radius = new Float32Array([200,0,0,0])
+		vec4.mul(result, radius, projection4Radius)
+		
+
     const circle = createCircle()
     this.center = { x: 0.0, y: 0.0 }
     this.vertexBuffers = this.beam.resource(VertexBuffers, circle.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, circle.index)
     this.uniforms = this.beam.resource(Uniforms, {
-      radius: this.radius,
+      radius: radius[0],
       centerX: this.center.x,
       centerY: this.center.y,
       uColor: [1.0, 1.0, 1.0, 1.0],
@@ -381,12 +438,15 @@ export class CircleSpirit extends BeamSpirit {
     this.uniforms.set('radius', this.radius)
   }
   updateGuidRect() {
-    this.guidRect = {
-      x: this.center.x - this.radius,
-      y: this.center.y - this.radius,
-      width: this.radius * 2,
-      height: this.radius * 2,
-    }
+    const circleBase = { center: this.center, radius: this.radius }
+    this.guidRect = fUpdateGuidRect(circleBase, (circleArgs) => {
+      return {
+        x: circleArgs.center.x - circleArgs.radius,
+        y: circleArgs.center.y - circleArgs.radius,
+        width: circleArgs.radius * 2,
+        height: circleArgs.radius * 2,
+      }
+    })
   }
   updateColor(color: number[]) {
     this.uColor = color
@@ -435,10 +495,7 @@ export class GuidLine {
     return this.id
   }
 }
-const fUpdateGuidRect = (
-  position: Float32Array,
-  fn: (position: Float32Array) => Rect,
-): Rect => {
+const fUpdateGuidRect = <T>(position: T, fn: (args: T) => Rect): Rect => {
   return fn(position)
 }
 const fUpdatePosition = (
@@ -446,4 +503,14 @@ const fUpdatePosition = (
   fn: (position: Float32Array) => Float32Array,
 ) => {
   return fn(position)
+}
+const getCanvasEdge=(canvas:HTMLCanvasElement)=>{
+	const w = canvas.width / 2
+	const h = canvas.height / 2
+	return{
+		l:-w,
+		r:w,
+		t:h,
+		b:-h
+	}
 }

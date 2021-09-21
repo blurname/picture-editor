@@ -91,29 +91,40 @@ export const createLine = (guidRect: Rect) => {
     index,
   }
 }
-export const createLineRect = (offset: number = 0) => {
-  const basePosition = [-1, 0, 0, 
-		-1, 0.1, 0,
-	1, 0.1, 0,
-	1, 0, 0]
-  const position = basePosition.map((pos) => pos*0.1 + offset)
+export const createLineRect = (width: number,height:number) => {
+  const basePosition = [
+		-width/2,-height/2,0,1.0,
+		-width/2,height/2,0,1.0,
+		width/2,height/2,0,1.0,
+		width/2,-height/2,0,1.0
+	]
+	const position = basePosition.map((pos,index) => {
+		if(index % 4===3)return pos
+		else if(index%4===1)return pos * 0.05
+		else return pos*0.5})
   const index = {
     array: [0, 1, 2, 0, 2, 3],
   }
   return {
     vertex: {
-      position,
+      position:new Float32Array(position),
       color: [0, 1, 1, 0.5, 1, 0.5, 0.4, 1, 0.6, 0.7, 0, 1],
     },
     index,
   }
 }
-export const createHollowRectangle = (offset: number = 0) => {
+export const createHollowRectangle = (width: number,height:number) => {
   const basePosition = [
-    -1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0, -0.5, -0.5, 0, -0.5, 0.5, 0, 0.5,
-    0.5, 0, 0.5, -0.5, 0,
+    -1*width/2, -1*height/2, 0,1.0,  
+		-1*width/2, 1*height/2, 0,1.0,  
+		1*width/2, 1*height/2, 0,1.0,  
+		1*width/2, -1*height/2, 0,1.0,  
+		-0.5*width/2, -0.5*height/2, 0 ,1.0, 
+		-0.5*width/2, 0.5*height/2, 0 ,1.0, 
+		0.5*width/2,0.5*height/2, 0 ,1.0, 
+		0.5*width/2, -0.5*height/2, 0 ,1.0, 
   ]
-  const position = basePosition.map((pos) => pos * 0.3 + offset)
+	const position = basePosition.map((pos,index) => {if(index % 4===3){return pos}else{return pos*0.3}} )
   // const position = pos.map((item) => {
   // 	if(item%3 ==2){
   // 		return item+offset
@@ -128,7 +139,7 @@ export const createHollowRectangle = (offset: number = 0) => {
   }
   return {
     vertex: {
-      position,
+      position:new Float32Array(position),
       color: [
         1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0,
       ],
@@ -316,7 +327,17 @@ export const createScaleMat = (scale:number) => {
 		0, 0, 1, 0,
 		0, 0, 0, 1]
 }
-export function createProjectionMatInShader(l:number, r:number, t:number, b:number) {
+type Edge ={
+	l:number
+	r:number
+	t:number
+	b:number
+}
+export function createProjectionMatInShader(edge:Edge) {
+	const l = edge.l
+	const r = edge.r
+	const t = edge.t
+	const b = edge.b
     return [
 			2 / (r - l), 0, 0, 0,
 			0, 2 / (t - b), 0, 0,
@@ -331,6 +352,12 @@ export function createProjectionMatInJS(l:number, r:number, t:number, b:number){
 		0,0,1,0,
 		0,0,0,1
 	])
-
 }
+export function createProjectionVec44Radius(edge:Edge){
+
+	const l = edge.l
+	const r = edge.r
+	return new Float32Array([
+		2/(r-l),0,0,-(r+l)/(r-l),
+])}
 

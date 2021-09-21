@@ -112,8 +112,8 @@ export function Canvas(props: Props) {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
-		//spiritCanvas.addMark('circle', 101)
-		spiritCanvas.addImage('../../../public/t4.jpeg', 101)
+		spiritCanvas.addMark('circle', 101)
+		//spiritCanvas.addImage('../../../public/t4.jpeg', 101)
 
 		const a = new Float32Array([1,2,3,4])
 		const b = new Float32Array([5,6,7,8])
