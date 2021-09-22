@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react'
 import { globalContext } from '../../context'
-import { circleShader } from '../../filter/shader'
+import { circleShader, theWShader } from '../../filter/shader'
 import {
   createCircle,
   createHollowRectangle,
@@ -21,6 +21,7 @@ import {
   CircleSpirit,
   ImageSpirit,
   MarkSpirit,
+	TheW,
 } from '../../utils/gl-uitls'
 import {mat2} from 'gl-matrix'
 
@@ -112,14 +113,10 @@ export function Canvas(props: Props) {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
-		spiritCanvas.addMark('circle', 101)
+		//spiritCanvas.addMark('theW', 101)
 		//spiritCanvas.addImage('../../../public/t4.jpeg', 101)
-
-		const a = new Float32Array([1,2,3,4])
-		const b = new Float32Array([5,6,7,8])
-		let c = new Float32Array(4)
-	 mat2.mul(c, a, b)
-		console.log('mat2: '+c)
+		const theW = new TheW(canvas3dRef.current,101)
+		theW.render()
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)

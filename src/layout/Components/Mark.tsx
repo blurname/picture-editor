@@ -17,6 +17,7 @@ const marks: MarkType[] = [
     value: 'hollowRect',
   },
   { id: 3, value: 'circle' },
+  { id: 4, value: 'theW' },
 ]
 export function Mark() {
   const { props } = menu.children.filter((child) => child.desc === 'mark')[0]

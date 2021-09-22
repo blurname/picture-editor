@@ -1,10 +1,12 @@
 import { Beam } from 'beam-gl'
+import {theWShader} from '../filter/shader'
 import {
   BeamSpirit,
   CircleSpirit,
   GuidLine,
   ImageSpirit,
   MarkSpirit,
+	TheW,
 } from '../utils/gl-uitls'
 
 export class SpiritsCanvas {
@@ -34,9 +36,12 @@ export class SpiritsCanvas {
     let mark: BeamSpirit
     if (shape === 'circle') {
       mark = new CircleSpirit(this.canvas3d, id)
-    } else {
+    }else if(shape ==='theW') {
+			mark = new TheW(this.canvas3d,id)
+		}
+		else {
       mark = new MarkSpirit(this.canvas3d, shape, id)
-    }
+    } 
     this.spirits.push(mark)
 		this.guidLines.push(
 			new GuidLine(this.canvas3d, mark.getGuidRect(), mark.getId()),

@@ -1,5 +1,5 @@
 import { MouseEvent, MutableRefObject } from 'react'
-import { mat4 } from 'gl-matrix'
+import { mat4, vec2 } from 'gl-matrix'
 
 export const createRectangle = (aspectRatio: number) => {
   const basePosition = [
@@ -187,6 +187,122 @@ export const createCircle = (angleNum: number = 100) => {
     },
   }
 }
+
+export const createW = (line:number) =>{
+	const width = 600
+	const height = 400
+	const halfLine = line*0.5
+	const basePosition = [
+		width,height,
+		width*3/2,0,
+		width*2,height,
+		width*5/2,0,
+		width*3,height
+	]
+	const position = basePosition.map((pos) => pos )
+	const points:Vec2[] =[]
+	for (let index = 0; index < position.length; index+=2) {
+		const element = position[index];
+		const element1 = position[index+1];
+		points.push({d1:element,d2:element1})
+	}
+	const outsides = []
+	const insides = []
+	for (let i = 0; i < points.length; i++) {
+		if(i===0){
+			const a = getVec2(points[i])
+
+			const normal = getVec2({d1:-a[1],d2:a[0]})
+			const nnormal = new Float32Array(2)
+			vec2.normalize(nnormal, normal)
+			const snnormal = new Float32Array(2)
+			vec2.scale(snnormal, nnormal,halfLine )
+
+			const vOut = new Float32Array(2)
+			const vIn = new Float32Array(2)
+			vec2.add(vOut, a, snnormal)
+			vec2.sub(vIn, a, snnormal)
+
+			outsides.push(...vOut)
+			insides.push(...vIn)
+		}
+		else if(i===points.length-1){
+			const a = getVec2(points[i])
+
+			const normal = getVec2({d1:a[1],d2:-a[0]})
+			const nnormal = new Float32Array(2)
+			vec2.normalize(nnormal, normal)
+			const snnormal = new Float32Array(2)
+			vec2.scale(snnormal, nnormal,halfLine )
+			const vOut = new Float32Array(2)
+			const vIn = new Float32Array(2)
+			vec2.sub(vOut, a, snnormal)
+			vec2.add(vIn, a, snnormal)
+
+			outsides.push(...vOut)
+			insides.push(...vIn)
+		}else{
+			const a = getVec2(points[i])
+			const b = getVec2(points[i-1])
+			const c = getVec2(points[i+1])
+
+			const v1 = new Float32Array(2)
+			const v2 = new Float32Array(2)
+			const v = new Float32Array(2)
+
+			vec2.sub(v1,a, b)
+			vec2.sub(v2,a, c)
+			vec2.add(v, v1, v2)
+
+			const aNormal = new Float32Array([-a[1],a[0]])		
+			const cos = vec2.dot(aNormal, v)/vec2.length(aNormal)/vec2.length(v)
+			const normalizedAnormal = new Float32Array(2) 
+			vec2.normalize(normalizedAnormal, v)
+
+			const realV = new Float32Array(2)
+			const vLine = line/2/cos 
+			vec2.scale(realV, normalizedAnormal,vLine )
+
+			const vOut = new Float32Array(2)
+			const vIn = new Float32Array(2)
+			vec2.add(vOut, a, realV)
+			vec2.sub(vIn, a, realV)
+			outsides.push(...vOut)
+			insides.push(...vIn)
+		}
+	}
+	console.log(...outsides)
+	const final = position.concat(insides,outsides)
+	//const final = position
+	console.log('final:', final)
+	const indexArray = [
+		0,1,1,2,2,3,3,4,
+		5,6,6,7,7,8,8,9,
+		10,11,11,12,12,13,13,14,
+	]
+	const color = []
+	for (let index = 0; index < 5; index++) {
+		color.push(1,0,0)
+		
+	}
+	return {
+		vertex:{
+			position:final.map((pos) => {
+				return pos*0.3
+			}),
+			color
+		},
+		index:{
+			array:indexArray  
+		}
+	}
+
+}
+
+const getVec2 = (point:Vec2) => {
+	return new Float32Array([point.d1,point.d2])
+}
+
 
 const getRelativeCursorPos = (e: MouseEvent, canvasPos: CanvasPos): Pos => {
   return {

@@ -95,6 +95,20 @@ export const hollowRectShader = {
     uColor: { type: vec4 },
   },
 }
+export const theWShader = {
+  ...shapeShader,
+	buffers:{
+		position:{type:vec4,n:2},
+		color:{type:vec4,n:3}
+	},
+  uniforms: {
+    rotateMat: { type: mat4 },
+    scaleMat: { type: mat4 },
+		projectionMat:{type:mat4},
+    uColor: { type: vec4, n: 3 },
+  },
+	mode:GLTypes.Lines
+}
 
 const lineVS = `
 

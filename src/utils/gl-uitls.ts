@@ -18,6 +18,7 @@ import {
   lineRectShader,
   lineShader,
   circleShader,
+	theWShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {
@@ -30,6 +31,7 @@ import {
   createRotateMat,
   createScaleMat,
 	createProjectionXY,
+	createW,
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
@@ -254,18 +256,18 @@ export class ImageSpirit extends BeamSpirit {
     console.log('drawImg')
   }
   render() {
-    //this.beam.clear()
-    //this.beam
-    //.offscreen2D(this.targets[0], () => {
-    //this.draw(this.brightnessContrastShader, this.textures)
-    //})
-    // .offscreen2D(this.targets[1], () => {
-    //this.draw(this.hueSaturationShader, this.outputTextures[0])
-    //}
-    //)
-    //this.draw(this.vignetteShader, this.outputTextures[0])
+		//this.beam.clear()
+		//this.beam
+		//.offscreen2D(this.targets[0], () => {
+		//this.draw(this.brightnessContrastShader, this.textures)
+		//})
+		//.offscreen2D(this.targets[1], () => {
+		//this.draw(this.hueSaturationShader, this.outputTextures[0])
+		//}
+		//)
+		//this.draw(this.vignetteShader, this.outputTextures[0])
 
-    this.draw(this.shader, this.textures)
+		this.draw(this.shader, this.textures)
   }
 }
 
@@ -457,6 +459,35 @@ export class CircleSpirit extends BeamSpirit {
         this.uniforms as any,
       )
   }
+}
+export class TheW extends BeamSpirit{
+	constructor (canvas:HTMLCanvasElement,id:number) {
+		super(canvas,id)
+		const theW = createW(100)
+		this.beam = new Beam(this.canvas)
+		console.log(theW.vertex)
+		this.vertexBuffers = this.beam.resource(VertexBuffers,theW.vertex)
+		this.indexBuffer = this.beam.resource(IndexBuffer,theW.index)
+		this.shader = this.beam.shader(theWShader)
+    this.rotateMat = createRotateMat(0)
+    this.scaleMat = createScaleMat(1)
+    this.projectionMat = createProjectionMatInShader(getCanvasEdge(canvas))
+    this.uniforms = this.beam.resource(Uniforms, {
+      uColor: [1.0, 1.0, 1.0, 1.0],
+      rotateMat: this.rotateMat,
+      scaleMat: this.scaleMat,
+      projectionMat: this.projectionMat,
+    })
+	}
+	render(){
+		this.beam
+		.draw(
+			this.shader,
+			this.vertexBuffers as any,
+			this.indexBuffer as any,
+			this.uniforms as any,
+		)
+	}
 }
 export class GuidLine {
   protected beam: Beam
