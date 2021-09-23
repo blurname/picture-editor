@@ -31,7 +31,7 @@ export const createRectangleByProjection = (width: number,height:number) => {
 		//width/2,height/2,0,
 		//width/2,-height/2,0
 	]
-	const position = basePosition.map((pos,index) => {if(index % 4===3){return pos}else{return pos*0.3}} )
+	const position = basePosition.map((pos,index) => {if(index % 4===3){return pos}else{return pos*0.4}} )
   const texCoord = [0, 0, 0, 1, 1, 1, 1, 0]
   const index = {
     array: [0, 1, 2, 0, 2, 3],

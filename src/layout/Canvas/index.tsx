@@ -60,7 +60,6 @@ export function Canvas(props: Props) {
             { x: cursorPos.left, y: cursorPos.top },
             images[i].getGuidRect(),
           )
-
           if (result !== 'out') {
             preCursor = e
             curImage = i
@@ -87,7 +86,7 @@ export function Canvas(props: Props) {
         images[curImage].getGuidRect(),
         images[curImage].getId(),
       )
-
+			spiritCanvas.setChosenType(images[curImage].getSpiritType())
       setSelectNum(curImage)
       //setMaxZOffset(maxZOffset - 0.000001)
       for (let i = 0; i < images.length; i++) {

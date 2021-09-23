@@ -213,7 +213,7 @@ const backgroundFS =`
 		float d1 = step(st.x,0.9);
 		float d2 = step(0.1,st.y);
 
-		gl_FragColor.rgb = mix(vec3(0.5,0.4,0.7),vec3(1.0),d1*d2);
+		gl_FragColor.rgb = mix(vec3(0.5,0.,0.7),vec3(1.0),d1*d2);
 		gl_FragColor.a = 1.0;
 	}
 `

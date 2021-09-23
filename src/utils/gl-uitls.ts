@@ -60,6 +60,7 @@ export class BeamSpirit {
   protected rotate: number
   protected guidRectPosition: Float32Array
   protected isToggle: boolean
+	protected spiritType: SpiritType
 
   constructor(canvas: HTMLCanvasElement, id: number) {
     this.canvas = canvas
@@ -97,6 +98,9 @@ export class BeamSpirit {
   getIsToggle() {
     return this.isToggle
   }
+	getSpiritType(){
+		return this.spiritType
+	}
   render() {}
 }
 export class ImageSpirit extends BeamSpirit {
@@ -120,6 +124,7 @@ export class ImageSpirit extends BeamSpirit {
 
   constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number) {
     super(canvas, id)
+		this.spiritType = 'Image'
     this.image = image
     const quad = createRectangleByProjection(image.width, image.height)
 
@@ -294,6 +299,7 @@ export class MarkSpirit extends BeamSpirit {
   private buffers: Buffers
   constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number) {
     super(canvas, id)
+		this.spiritType = 'Mark'
     this.uColor = [1.0, 1.0, 1.0, 1.0]
     this.shape = shape
 
@@ -410,6 +416,7 @@ export class CircleSpirit extends BeamSpirit {
   protected projectionY: number
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
+		this.spiritType = 'Mark'
     this.radius = 200
     this.scale = 1
     const xy = createProjectionXY(getCanvasEdge(this.canvas))
@@ -471,6 +478,7 @@ export class TheW extends BeamSpirit {
     super(canvas, id)
     const theW = createW(100)
     console.log(theW.vertex)
+		this.spiritType = 'Mark'
     this.vertexBuffers = this.beam.resource(VertexBuffers, theW.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, theW.index)
     this.shader = this.beam.shader(theWShader)

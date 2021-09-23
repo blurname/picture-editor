@@ -19,6 +19,7 @@ export class SpiritsCanvas {
   guidLines: GuidLine[]
   beamClener: Beam
 	background:BackSpirit
+	chosenType:SpiritType
   constructor() {
     this.spirits = []
     this.guidLines = []
@@ -74,6 +75,9 @@ export class SpiritsCanvas {
   }
 	setBackgournd(back:BackSpirit){
 		this.background = back
+	}
+	setChosenType(type:SpiritType){
+		this.chosenType = type
 	}
 	renderBackground(){
 		this.background.render()

@@ -27,3 +27,4 @@ interface GuidRect extends Rect{
 	id:number
 }
 type Shape = 'line' | 'hollowRect'|'circle'|'theW'
+type SpiritType = 'Image'| 'Mark'
