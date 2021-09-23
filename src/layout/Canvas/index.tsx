@@ -17,6 +17,7 @@ import {
   getCursorPosInCanvas,
 } from '../../utils/geo-utils'
 import {
+	BackGrid,
   BeamSpirit,
   CircleSpirit,
   ImageSpirit,
@@ -115,12 +116,15 @@ export function Canvas(props: Props) {
     spiritCanvas.spirits = images
 		//spiritCanvas.addMark('theW', 101)
 		//spiritCanvas.addImage('../../../public/t4.jpeg', 101)
-		const theW = new TheW(canvas3dRef.current,101)
-		theW.render()
+		//const theW = new TheW(canvas3dRef.current,101)
+		//theW.render()
+		const back = new BackGrid(canvas3dRef.current,101);
+		spiritCanvas.spirits.push(back)
+		//back.render()
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
-		spiritCanvas.renderAllLine()
+		//spiritCanvas.renderAllLine()
   }, [])
 
   useEffect(() => {

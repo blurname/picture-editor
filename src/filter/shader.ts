@@ -194,6 +194,40 @@ export const circleShader = {
   },
   mode: GLTypes.Lines,
 }
+const backgroundVS = `
+	attribute vec4 position;
+	attribute vec2 texCoord;
+	varying vec2 vTexCoord;
+	void main(){
+		gl_Position = position;
+		vTexCoord = texCoord;
+	}
+`
+const backgroundFS =`
+	precision highp float;
+	varying vec2 vTexCoord;
+	uniform float rows;
+	void main(){
+		vec2 st = fract(vTexCoord*32.0);
+		float d1 = step(st.x,0.9);
+		float d2 = step(0.1,st.y);
+
+		gl_FragColor.rgb = mix(vec3(0.4),vec3(1.0),d1*d2);
+		gl_FragColor.a = 1.0;
+	}
+`
+export const backgourndShader = {
+	vs:backgroundVS,
+	fs:backgroundFS,
+	buffers:{
+		position:{type:vec4,n:2},
+		texCoord:{type:vec2}
+	},
+	unifroms:{
+		rows:{type:float}
+	},
+}
+
 
 const defaultVS = `
 attribute vec4 position;

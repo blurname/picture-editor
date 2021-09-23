@@ -19,6 +19,7 @@ import {
   lineShader,
   circleShader,
 	theWShader,
+	backgourndShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {
@@ -32,6 +33,7 @@ import {
   createScaleMat,
 	createProjectionXY,
 	createW,
+	createBackGrid,
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
@@ -464,7 +466,6 @@ export class TheW extends BeamSpirit{
 	constructor (canvas:HTMLCanvasElement,id:number) {
 		super(canvas,id)
 		const theW = createW(100)
-		this.beam = new Beam(this.canvas)
 		console.log(theW.vertex)
 		this.vertexBuffers = this.beam.resource(VertexBuffers,theW.vertex)
 		this.indexBuffer = this.beam.resource(IndexBuffer,theW.index)
@@ -528,6 +529,29 @@ export class GuidLine {
     return this.id
   }
 }
+export class BackGrid extends BeamSpirit{
+	constructor (canvas:HTMLCanvasElement,id:number) {
+		super(canvas,id)
+		const back = createBackGrid()
+		this.vertexBuffers = this.beam.resource(VertexBuffers,back.vertex)
+		this.indexBuffer = this.beam.resource(IndexBuffer,back.index)
+		this.shader = this.beam.shader(backgourndShader)
+		this.uniforms = this.beam.resource(Uniforms,{
+			rows:64
+		})
+
+	}
+	render(){
+		this.beam.draw(
+			this.shader,
+			this.vertexBuffers as any,
+			this.indexBuffer as any,
+			this.uniforms as any
+		)
+	}
+
+}
+
 const fUpdateGuidRect = <T>(position: T, fn: (args: T) => Rect): Rect => {
   return fn(position)
 }
@@ -547,3 +571,4 @@ const getCanvasEdge=(canvas:HTMLCanvasElement)=>{
 		b:-h
 	}
 }
+

@@ -189,7 +189,7 @@ export const createCircle = (angleNum: number = 100) => {
 }
 
 export const createW = (line:number) =>{
-	const width = 600
+	const width = 500
 	const height = 400
 	const halfLine = line*0.5
 	const basePosition = [
@@ -197,8 +197,15 @@ export const createW = (line:number) =>{
 		width*3/2,0,
 		width*2,height,
 		width*5/2,0,
-		width*3,height
+		width*3,height,
 	]
+	//const basePosition = [
+		//width,height,
+		//width,0,
+		//width*2,height,
+		//width*3,0,
+		//width*3,height,
+	//]
 	const position = basePosition.map((pos) => pos )
 	const points:Vec2[] =[]
 	for (let index = 0; index < position.length; index+=2) {
@@ -220,8 +227,8 @@ export const createW = (line:number) =>{
 
 			const vOut = new Float32Array(2)
 			const vIn = new Float32Array(2)
-			vec2.add(vOut, a, snnormal)
-			vec2.sub(vIn, a, snnormal)
+			vec2.sub(vOut, a, snnormal)
+			vec2.add(vIn, a, snnormal)
 
 			outsides.push(...vOut)
 			insides.push(...vIn)
@@ -260,7 +267,7 @@ export const createW = (line:number) =>{
 			vec2.normalize(normalizedAnormal, v)
 
 			const realV = new Float32Array(2)
-			const vLine = line/2/cos 
+			const vLine = halfLine/cos 
 			vec2.scale(realV, normalizedAnormal,vLine )
 
 			const vOut = new Float32Array(2)
@@ -275,10 +282,15 @@ export const createW = (line:number) =>{
 	const final = position.concat(insides,outsides)
 	//const final = position
 	console.log('final:', final)
+	//const indexArray = [
+		//0,1,1,2,2,3,3,4,
+		//5,6,6,7,7,8,8,9,
+		//10,11,11,12,12,13,13,14,
+	//]
 	const indexArray = [
-		0,1,1,2,2,3,3,4,
-		5,6,6,7,7,8,8,9,
-		10,11,11,12,12,13,13,14,
+		//0,1,1,2,2,3,3,4,
+		0,6,6,7,7,8,8,4,
+		0,11,11,12,12,13,13,4,
 	]
 	const color = []
 	for (let index = 0; index < 5; index++) {
@@ -301,6 +313,35 @@ export const createW = (line:number) =>{
 
 const getVec2 = (point:Vec2) => {
 	return new Float32Array([point.d1,point.d2])
+}
+
+export const createBackGrid = () => {
+	const position = [
+		-1,-1,
+		-1,1,
+		1,1,
+		1,-1
+	]
+	const texCoord = [
+		0,0,
+		0,1,
+		1,1,
+		1,0
+	]
+	const indexArray = [
+		0,1,2,
+		0,2,3
+	]
+	
+	return{
+		vertex:{
+			position,
+			texCoord
+		},
+		index:{
+			array:indexArray
+		}
+	}
 }
 
 
