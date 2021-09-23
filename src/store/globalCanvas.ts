@@ -1,6 +1,7 @@
 import { Beam } from 'beam-gl'
 import {theWShader} from '../filter/shader'
 import {
+	BackSpirit,
   BeamSpirit,
   CircleSpirit,
   GuidLine,
@@ -17,6 +18,7 @@ export class SpiritsCanvas {
   //guidRects: GuidRect[]
   guidLines: GuidLine[]
   beamClener: Beam
+	background:BackSpirit
   constructor() {
     this.spirits = []
     this.guidLines = []
@@ -64,11 +66,18 @@ export class SpiritsCanvas {
   }
   renderAllLine() {
     //this.beamClener.clear()
+		this.background.render()
     for (let index = 0; index < this.guidLines.length; index++) {
       if (this.guidLines[index] !== null) this.guidLines[index].render()
       //console.log('renderLine:' + index)
     }
   }
+	setBackgournd(back:BackSpirit){
+		this.background = back
+	}
+	renderBackground(){
+		this.background.render()
+	}
   deleteElement(id: number) {
     for (let index = 0; index < this.spirits.length; index++) {
       if (this.spirits[index] !== null) {

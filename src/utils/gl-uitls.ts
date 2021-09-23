@@ -18,8 +18,8 @@ import {
   lineRectShader,
   lineShader,
   circleShader,
-	theWShader,
-	backgourndShader,
+  theWShader,
+  backgourndShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {
@@ -31,9 +31,9 @@ import {
   createRectangleByProjection,
   createRotateMat,
   createScaleMat,
-	createProjectionXY,
-	createW,
-	createBackGrid,
+  createProjectionXY,
+  createW,
+  createBackGrid,
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
@@ -59,6 +59,7 @@ export class BeamSpirit {
   protected scale: number
   protected rotate: number
   protected guidRectPosition: Float32Array
+  protected isToggle: boolean
 
   constructor(canvas: HTMLCanvasElement, id: number) {
     this.canvas = canvas
@@ -66,6 +67,7 @@ export class BeamSpirit {
     this.beam.define(depthCommand)
     this.layout = 0.7
     this.id = id
+    this.isToggle = true
   }
   updateGuidRect() {
     throw new Error('Method not implemented.')
@@ -91,6 +93,9 @@ export class BeamSpirit {
   }
   getScale() {
     return this.scale
+  }
+  getIsToggle() {
+    return this.isToggle
   }
   render() {}
 }
@@ -258,18 +263,18 @@ export class ImageSpirit extends BeamSpirit {
     console.log('drawImg')
   }
   render() {
-		//this.beam.clear()
-		//this.beam
-		//.offscreen2D(this.targets[0], () => {
-		//this.draw(this.brightnessContrastShader, this.textures)
-		//})
-		//.offscreen2D(this.targets[1], () => {
-		//this.draw(this.hueSaturationShader, this.outputTextures[0])
-		//}
-		//)
-		//this.draw(this.vignetteShader, this.outputTextures[0])
+    //this.beam.clear()
+    //this.beam
+    //.offscreen2D(this.targets[0], () => {
+    //this.draw(this.brightnessContrastShader, this.textures)
+    //})
+    //.offscreen2D(this.targets[1], () => {
+    //this.draw(this.hueSaturationShader, this.outputTextures[0])
+    //}
+    //)
+    //this.draw(this.vignetteShader, this.outputTextures[0])
 
-		this.draw(this.shader, this.textures)
+    this.draw(this.shader, this.textures)
   }
 }
 
@@ -398,30 +403,30 @@ type CircleCenter = {
   y: number
 }
 export class CircleSpirit extends BeamSpirit {
-	protected radius:number
+  protected radius: number
   protected uColor: number[]
   protected center: CircleCenter
-	protected projectionX:number
-	protected projectionY:number
+  protected projectionX: number
+  protected projectionY: number
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
-		this.radius = 200
-		this.scale = 1
-		const xy = createProjectionXY(getCanvasEdge(this.canvas))
-		this.projectionX = xy.x
-		this.projectionY = xy.y
+    this.radius = 200
+    this.scale = 1
+    const xy = createProjectionXY(getCanvasEdge(this.canvas))
+    this.projectionX = xy.x
+    this.projectionY = xy.y
     const circle = createCircle()
     this.center = { x: 0.0, y: 0.0 }
     this.vertexBuffers = this.beam.resource(VertexBuffers, circle.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, circle.index)
     this.uniforms = this.beam.resource(Uniforms, {
       radius: this.radius,
-			scale:this.scale,
+      scale: this.scale,
       centerX: this.center.x,
       centerY: this.center.y,
       uColor: [1.0, 1.0, 1.0, 1.0],
-			projectionX:this.projectionX,
-			projectionY:this.projectionY
+      projectionX: this.projectionX,
+      projectionY: this.projectionY,
     })
     this.shader = this.beam.shader(circleShader)
     this.updateGuidRect()
@@ -429,22 +434,22 @@ export class CircleSpirit extends BeamSpirit {
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.center.x += distance.left
     this.center.y += distance.top
-    this.uniforms.set('centerX',this.center.x)
-		this.uniforms.set('centerY',this.center.y)
+    this.uniforms.set('centerX', this.center.x)
+    this.uniforms.set('centerY', this.center.y)
     this.updateGuidRect()
   }
-	updateScaleMat(scale: number) {
-		this.scale = scale
-		this.uniforms.set('scale', scale)
-	}
+  updateScaleMat(scale: number) {
+    this.scale = scale
+    this.uniforms.set('scale', scale)
+  }
   updateGuidRect() {
     const circleBase = { center: this.center, radius: this.radius }
     this.guidRect = fUpdateGuidRect(circleBase, (circleArgs) => {
       return {
-        x: circleArgs.center.x - circleArgs.radius*this.scale,
-        y: circleArgs.center.y - circleArgs.radius*this.scale,
-        width: (circleArgs.radius * 2)*this.scale,
-        height:(circleArgs.radius * 2)*this.scale,
+        x: circleArgs.center.x - circleArgs.radius * this.scale,
+        y: circleArgs.center.y - circleArgs.radius * this.scale,
+        width: circleArgs.radius * 2 * this.scale,
+        height: circleArgs.radius * 2 * this.scale,
       }
     })
   }
@@ -453,23 +458,22 @@ export class CircleSpirit extends BeamSpirit {
     this.uniforms.set('uColor', color)
   }
   render() {
-    this.beam
-      .draw(
-        this.shader,
-        this.vertexBuffers as any,
-        this.indexBuffer as any,
-        this.uniforms as any,
-      )
+    this.beam.draw(
+      this.shader,
+      this.vertexBuffers as any,
+      this.indexBuffer as any,
+      this.uniforms as any,
+    )
   }
 }
-export class TheW extends BeamSpirit{
-	constructor (canvas:HTMLCanvasElement,id:number) {
-		super(canvas,id)
-		const theW = createW(100)
-		console.log(theW.vertex)
-		this.vertexBuffers = this.beam.resource(VertexBuffers,theW.vertex)
-		this.indexBuffer = this.beam.resource(IndexBuffer,theW.index)
-		this.shader = this.beam.shader(theWShader)
+export class TheW extends BeamSpirit {
+  constructor(canvas: HTMLCanvasElement, id: number) {
+    super(canvas, id)
+    const theW = createW(100)
+    console.log(theW.vertex)
+    this.vertexBuffers = this.beam.resource(VertexBuffers, theW.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, theW.index)
+    this.shader = this.beam.shader(theWShader)
     this.rotateMat = createRotateMat(0)
     this.scaleMat = createScaleMat(1)
     this.projectionMat = createProjectionMatInShader(getCanvasEdge(canvas))
@@ -479,16 +483,15 @@ export class TheW extends BeamSpirit{
       scaleMat: this.scaleMat,
       projectionMat: this.projectionMat,
     })
-	}
-	render(){
-		this.beam
-		.draw(
-			this.shader,
-			this.vertexBuffers as any,
-			this.indexBuffer as any,
-			this.uniforms as any,
-		)
-	}
+  }
+  render() {
+    this.beam.draw(
+      this.shader,
+      this.vertexBuffers as any,
+      this.indexBuffer as any,
+      this.uniforms as any,
+    )
+  }
 }
 export class GuidLine {
   protected beam: Beam
@@ -497,19 +500,19 @@ export class GuidLine {
   protected indexBuffer: IndexBufferResource
   protected shader: Shader
   protected canvas: HTMLCanvasElement
-	protected projectionMat:number[]
-	protected uniform:UniformsResource
+  protected projectionMat: number[]
+  protected uniform: UniformsResource
   constructor(canvas: HTMLCanvasElement, rect: Rect, id: number) {
     this.id = id
     this.canvas = canvas
     this.beam = new Beam(canvas)
-		this.projectionMat = createProjectionMatInShader(getCanvasEdge(this.canvas))
+    this.projectionMat = createProjectionMatInShader(getCanvasEdge(this.canvas))
     const line = createLine(rect)
     this.vertexBuffers = this.beam.resource(VertexBuffers, line.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, line.index)
-		this.uniform = this.beam.resource(Uniforms,{
-			projectionMat:this.projectionMat
-		})
+    this.uniform = this.beam.resource(Uniforms, {
+      projectionMat: this.projectionMat,
+    })
     this.shader = this.beam.shader(lineShader)
   }
   updateRect(rect: Rect) {
@@ -522,34 +525,35 @@ export class GuidLine {
       this.shader,
       this.vertexBuffers as any,
       this.indexBuffer as any,
-			this.uniform as any
+      this.uniform as any,
     )
   }
   getId() {
     return this.id
   }
 }
-export class BackGrid extends BeamSpirit{
-	constructor (canvas:HTMLCanvasElement,id:number) {
-		super(canvas,id)
-		const back = createBackGrid()
-		this.vertexBuffers = this.beam.resource(VertexBuffers,back.vertex)
-		this.indexBuffer = this.beam.resource(IndexBuffer,back.index)
-		this.shader = this.beam.shader(backgourndShader)
-		this.uniforms = this.beam.resource(Uniforms,{
-			rows:64
-		})
-
-	}
-	render(){
-		this.beam.draw(
-			this.shader,
-			this.vertexBuffers as any,
-			this.indexBuffer as any,
-			this.uniforms as any
-		)
-	}
-
+export class BackSpirit extends BeamSpirit {
+  constructor(canvas: HTMLCanvasElement, id: number) {
+    super(canvas, id)
+    this.isToggle = false
+    const back = createBackGrid()
+    this.vertexBuffers = this.beam.resource(VertexBuffers, back.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, back.index)
+    this.shader = this.beam.shader(backgourndShader)
+    this.uniforms = this.beam.resource(Uniforms, {
+      rows: 32,
+    })
+  }
+  render() {
+    this.beam
+      .depth()
+      .draw(
+        this.shader,
+        this.vertexBuffers as any,
+        this.indexBuffer as any,
+        this.uniforms as any,
+      )
+  }
 }
 
 const fUpdateGuidRect = <T>(position: T, fn: (args: T) => Rect): Rect => {
@@ -561,14 +565,13 @@ const fUpdatePosition = (
 ) => {
   return fn(position)
 }
-const getCanvasEdge=(canvas:HTMLCanvasElement)=>{
-	const w = canvas.width / 2
-	const h = canvas.height / 2
-	return{
-		l:-w,
-		r:w,
-		t:h,
-		b:-h
-	}
+const getCanvasEdge = (canvas: HTMLCanvasElement) => {
+  const w = canvas.width / 2
+  const h = canvas.height / 2
+  return {
+    l: -w,
+    r: w,
+    t: h,
+    b: -h,
+  }
 }
-

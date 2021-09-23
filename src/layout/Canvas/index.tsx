@@ -17,14 +17,14 @@ import {
   getCursorPosInCanvas,
 } from '../../utils/geo-utils'
 import {
-	BackGrid,
+  BackSpirit,
   BeamSpirit,
   CircleSpirit,
   ImageSpirit,
   MarkSpirit,
-	TheW,
+  TheW,
 } from '../../utils/gl-uitls'
-import {mat2} from 'gl-matrix'
+import { mat2 } from 'gl-matrix'
 
 type Props = {}
 
@@ -43,11 +43,9 @@ export function Canvas(props: Props) {
 
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
-  const handleOnMouseMove = (e: MouseEvent) => {
-	
-	}
+  const handleOnMouseMove = (e: MouseEvent) => {}
   //const handleOnMouseClick = (e: MouseEvent) => {
-	//}
+  //}
 
   let preCursor: MouseEvent | undefined
   let curImage: number
@@ -57,23 +55,24 @@ export function Canvas(props: Props) {
     let isChecked: boolean = false
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
-        const result = getCursorIsInQuad(
-          { x: cursorPos.left, y: cursorPos.top },
-          images[i].getGuidRect(),
-        )
-        console.log(result)
+        if (images[i].getIsToggle()) {
+          const result = getCursorIsInQuad(
+            { x: cursorPos.left, y: cursorPos.top },
+            images[i].getGuidRect(),
+          )
 
-				if (result !== 'out') {
-					preCursor = e
-					curImage = i
-					drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
-					canvas3dRef.current.style.cursor = 'move'
-					isChecked = true
-					break
-				}
-      }
-      if (isChecked === false) {
-        preCursor = undefined
+          if (result !== 'out') {
+            preCursor = e
+            curImage = i
+            drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
+            canvas3dRef.current.style.cursor = 'move'
+            isChecked = true
+            break
+          }
+        }
+        if (isChecked === false) {
+          preCursor = undefined
+        }
       }
     }
   }
@@ -105,6 +104,8 @@ export function Canvas(props: Props) {
     }
   }
   const renderImages = () => {
+
+		//spiritCanvas.renderBackground()
     for (const image of images) {
       if (image !== null) image.render()
     }
@@ -114,27 +115,27 @@ export function Canvas(props: Props) {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
-		//spiritCanvas.addMark('theW', 101)
-		//spiritCanvas.addImage('../../../public/t4.jpeg', 101)
-		//const theW = new TheW(canvas3dRef.current,101)
-		//theW.render()
-		const back = new BackGrid(canvas3dRef.current,101);
-		spiritCanvas.spirits.push(back)
-		//back.render()
+    //spiritCanvas.addMark('theW', 101)
+    //spiritCanvas.addImage('../../../public/t4.jpeg', 101)
+    //const theW = new TheW(canvas3dRef.current,101)
+    //theW.render()
+		const back = new BackSpirit(canvas3dRef.current, 101)
+		spiritCanvas.setBackgournd(back)
+    //spiritCanvas.spirits.push(back)
+    //back.render()
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
-		//spiritCanvas.renderAllLine()
+		spiritCanvas.renderAllLine()
   }, [])
 
   useEffect(() => {
     renderImages()
+		spiritCanvas.renderAllLine()
   }, [adjustNum, cmpCount])
 
   return (
-    <div
-			className="w-12/12 h-12/12"
-    >
+    <div className="w-12/12 h-12/12">
       <canvas
         className="bg-gray-100"
         ref={canvas2dRef}
@@ -157,8 +158,8 @@ export function Canvas(props: Props) {
         width={canvas.width}
         height={canvas.height}
         onMouseUp={handleOnMouseUp}
-				//onMouseMove={handleOnMouseMove}
-				onMouseDown={handleOnMouseDown}
+        //onMouseMove={handleOnMouseMove}
+        onMouseDown={handleOnMouseDown}
       />
     </div>
   )

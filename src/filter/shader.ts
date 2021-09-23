@@ -200,6 +200,7 @@ const backgroundVS = `
 	varying vec2 vTexCoord;
 	void main(){
 		gl_Position = position;
+		gl_Position.z = 0.8;
 		vTexCoord = texCoord;
 	}
 `
@@ -208,11 +209,11 @@ const backgroundFS =`
 	varying vec2 vTexCoord;
 	uniform float rows;
 	void main(){
-		vec2 st = fract(vTexCoord*32.0);
+		vec2 st = fract(vTexCoord*rows);
 		float d1 = step(st.x,0.9);
 		float d2 = step(0.1,st.y);
 
-		gl_FragColor.rgb = mix(vec3(0.4),vec3(1.0),d1*d2);
+		gl_FragColor.rgb = mix(vec3(0.5,0.4,0.7),vec3(1.0),d1*d2);
 		gl_FragColor.a = 1.0;
 	}
 `
@@ -223,7 +224,7 @@ export const backgourndShader = {
 		position:{type:vec4,n:2},
 		texCoord:{type:vec2}
 	},
-	unifroms:{
+	uniforms:{
 		rows:{type:float}
 	},
 }
