@@ -409,3 +409,37 @@ export const Vignette = {
     vignette: { type: float, default: 0 },
   },
 }
+const basicMosaicVS =`
+attribute vec4 position;
+attribute vec4 texCoord;
+varying vec4 vTexCoord;
+void main(){
+	gl_Position = position;
+	vTexCoord = texCoord;
+}
+`
+
+const mosaicMultiVS =`
+precision highp float;
+varying vec4 vTexCoord;
+float random (vec2 st) {
+	return fract(sin(dot(st.xy,
+											 vec2(12.9898,78.233)))*
+												 43758.5453123);
+}
+
+void main(){
+	vec2 st = vec2(vTexCoord.x,vTexCoord.y)*5.0;
+	gl_FragColor.rgb = vec3(random(floor(st)),0.5,0.6);
+	gl_FragColor.a = 1.0;
+}
+`
+
+export const MosaicMultiShader={
+	vs:basicMosaicVS,
+	fs:mosaicMultiVS,
+	buffers:{
+		position:{type:vec4,n:2},
+		texCoord:{type:vec4,n:2}
+	}
+}

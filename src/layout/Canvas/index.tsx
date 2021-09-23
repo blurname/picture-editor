@@ -7,10 +7,11 @@ import React, {
   useState,
 } from 'react'
 import { globalContext } from '../../context'
-import { circleShader, theWShader } from '../../filter/shader'
+import { circleShader, MosaicShader, theWShader } from '../../filter/shader'
 import {
   createCircle,
   createHollowRectangle,
+  createMosaic,
   drawRectBorder,
   getCursorIsInQuad,
   getCursorMovDistance,
@@ -118,8 +119,15 @@ export function Canvas(props: Props) {
     //spiritCanvas.addImage('../../../public/t4.jpeg', 101)
     //const theW = new TheW(canvas3dRef.current,101)
     //theW.render()
-		const back = new BackSpirit(canvas3dRef.current, 101)
-		spiritCanvas.setBackgournd(back)
+		//const back = new BackSpirit(canvas3dRef.current, 101)
+		//spiritCanvas.setBackgournd(back)
+		//const test = new Beam(canvas3dRef.current)
+		//const mosaic = createMosaic()
+		//const vertex = test.resource(ResourceTypes.VertexBuffers,mosaic.vertex)
+		//const index = test.resource(ResourceTypes.IndexBuffer,mosaic.index)
+		//const shader = test.shader(MosaicShader)
+		//test.draw(shader,vertex as any,index as any)
+
     //spiritCanvas.spirits.push(back)
     //back.render()
 

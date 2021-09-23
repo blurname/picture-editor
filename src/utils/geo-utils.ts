@@ -344,6 +344,35 @@ export const createBackGrid = () => {
 	}
 }
 
+export const createMosaic = () => {
+	const position = [
+		-1,-1,
+		-1,1,
+		1,1,
+		1,-1
+	]
+	const texCoord = [
+		0,0,
+		0,1,
+		1,1,
+		1,0
+	]
+	const indexArray = [
+		0,1,2,
+		0,2,3
+	]
+	
+	return{
+		vertex:{
+			position,
+			texCoord
+		},
+		index:{
+			array:indexArray
+		}
+	}
+}
+
 
 const getRelativeCursorPos = (e: MouseEvent, canvasPos: CanvasPos): Pos => {
   return {
@@ -418,6 +447,8 @@ guidRect:Rect): 'fir' | 'sec' | 'out' => {
     else return 'out'
   }
 }
+
+
 type Vec2 = {
   d1: number
   d2: number

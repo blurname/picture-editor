@@ -67,7 +67,7 @@ export class SpiritsCanvas {
   }
   renderAllLine() {
     //this.beamClener.clear()
-		this.background.render()
+		//this.background.render()
     for (let index = 0; index < this.guidLines.length; index++) {
       if (this.guidLines[index] !== null) this.guidLines[index].render()
       //console.log('renderLine:' + index)

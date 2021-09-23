@@ -20,6 +20,7 @@ import {
   circleShader,
   theWShader,
   backgourndShader,
+	MosaicMultiShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {
@@ -500,6 +501,41 @@ export class TheW extends BeamSpirit {
       this.uniforms as any,
     )
   }
+}
+
+export class MosaicSpirit extends BeamSpirit{
+	constructor (canvas:HTMLCanvasElement,id:number) {
+		super(canvas,id)
+    const theW = createW(100)
+    console.log(theW.vertex)
+		this.spiritType = 'Mark'
+    this.vertexBuffers = this.beam.resource(VertexBuffers, theW.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, theW.index)
+    this.shader = this.beam.shader(theWShader)
+    this.rotateMat = createRotateMat(0)
+    this.scaleMat = createScaleMat(1)
+    this.projectionMat = createProjectionMatInShader(getCanvasEdge(canvas))
+    this.uniforms = this.beam.resource(Uniforms, {
+      uColor: [1.0, 1.0, 1.0, 1.0],
+      rotateMat: this.rotateMat,
+      scaleMat: this.scaleMat,
+      projectionMat: this.projectionMat,
+    })
+	}
+  getShaderByShape(type:MosaicType) {
+		let shader:any
+		if(type==='multi'){
+			shader = MosaicMultiShader
+		}
+  }
+	render(){
+		this.beam.draw(
+			this.shader,
+			this.vertexBuffers as any,
+			this.indexBuffer as any,
+			this.uniforms as any,
+		)
+	}
 }
 export class GuidLine {
   protected beam: Beam
