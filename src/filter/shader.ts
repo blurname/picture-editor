@@ -2,15 +2,18 @@ import { GLTypes, SchemaTypes } from 'beam-gl'
 const { vec4, vec3, vec2, tex2D, float, mat4 } = SchemaTypes
 
 const imageVS = `
+precision highp float;
 attribute vec4 position;
 attribute vec2 texCoord;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
+uniform float layout;
 
 varying highp vec2 vTexCoord;
 void main(){
 	gl_Position = projectionMat*rotateMat*scaleMat*position;
+	gl_Position.z = layout;
 	vTexCoord = texCoord;
 }
 
@@ -38,20 +41,26 @@ export const basicImageShader = {
   uniforms: {
     scaleMat: { type: mat4 },
     rotateMat: { type: mat4 },
-		projectionMat:{type:mat4}
+		projectionMat:{type:mat4},
+		layout:{type:float}
+
   },
 }
 
 
 const shapeVS = `
+precision highp float;
 attribute vec4 position;
 attribute vec4 color;
 varying highp vec4 vColor;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
+uniform float layout;
+
 void main(){
 	gl_Position = projectionMat*rotateMat*scaleMat*position;
+	gl_Position.z = layout;
 	vColor = color;
 }
 `
@@ -84,6 +93,7 @@ export const lineRectShader = {
     scaleMat: { type: mat4 },
 		projectionMat:{type:mat4},
     uColor: { type: vec4, n: 3 },
+		layout:{type:float}
   },
 }
 export const hollowRectShader = {
@@ -93,6 +103,7 @@ export const hollowRectShader = {
     scaleMat: { type: mat4 },
 		projectionMat:{type:mat4},
     uColor: { type: vec4 },
+		layout:{type:float}
   },
 }
 export const theWShader = {
@@ -410,16 +421,19 @@ export const Vignette = {
   },
 }
 const basicMosaicVS =`
+precision hgihp float;
 attribute vec4 position;
 attribute vec4 texCoord;
 
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
+uniform float layout;
 
 varying vec4 vTexCoord;
 void main(){
 	gl_Position = projectionMat*rotateMat*scaleMat*position;
+	gl_Position.z = layout;
 	vTexCoord = texCoord;
 }
 `
@@ -427,6 +441,7 @@ void main(){
 const mosaicMultiVS =`
 precision highp float;
 varying vec4 vTexCoord;
+
 float random (vec2 st) {
 	return fract(sin(dot(st.xy,
 											 vec2(12.9898,78.233)))*

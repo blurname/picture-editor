@@ -79,8 +79,9 @@ export class BeamSpirit {
     throw new Error('Method not implemented.')
   }
   updateLayout(layout: number) {
-    this.layout = layout
-    this.uniforms.set('layout', this.layout)
+    //throw new Error('Method not implemented.')
+		this.layout = layout
+		this.uniforms.set('layout', this.layout)
   }
   updateScaleMat(scale: number) {
     throw new Error('Method not implemented.')
@@ -159,6 +160,7 @@ export class ImageSpirit extends BeamSpirit {
       transMat: this.transMat,
       rotateMat: this.rotateMat,
       projectionMat: this.projectionMat,
+			layout:this.layout
       //hue: this.hue,
       //saturation: this.saturation,
       //vignette: this.vignette,
@@ -253,6 +255,11 @@ export class ImageSpirit extends BeamSpirit {
     this.uniforms.set('rotateMat', this.rotateMat)
   }
 
+  //updateLayout(layout: number) {
+    ////throw new Error('Method not implemented.')
+		//this.layout = layout
+		//this.uniforms.set('layout', this.layout)
+  //}
   draw(shader: Shader, input: TexturesResource) {
     this.beam
       .depth()
@@ -314,6 +321,7 @@ export class MarkSpirit extends BeamSpirit {
       rotateMat: this.rotateMat,
       scaleMat: this.scaleMat,
       projectionMat: this.projectionMat,
+			layout:this.layout
     })
     this.shader = this.getShaderByShape()
     this.position = this.buffers.vertex.position
