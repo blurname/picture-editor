@@ -104,6 +104,9 @@ export class BeamSpirit {
 	getSpiritType(){
 		return this.spiritType
 	}
+	getLayout(){
+		return this.layout
+	}
   render() {}
 }
 export class ImageSpirit extends BeamSpirit {
@@ -523,6 +526,7 @@ export class MosaicSpirit extends BeamSpirit{
       rotateMat: this.rotateMat,
       scaleMat: this.scaleMat,
       projectionMat: this.projectionMat,
+			layout:this.layout
     })
 		this.updateGuidRect()
 	}

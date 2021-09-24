@@ -39,6 +39,25 @@ export function Canvas(props: Props) {
   const handleOnMouseMove = (e: MouseEvent) => {}
   //const handleOnMouseClick = (e: MouseEvent) => {
   //}
+  const maxLayout = (
+    indexArray: number[],
+    spirits: BeamSpirit[],
+  ) => {
+	console.log(indexArray)
+    let min = 2
+    let maxIndex = -1
+    for (let i = 0; i < indexArray.length; i++) {
+      const j = indexArray[i]
+      const element = spirits[j]
+      const elementLayout = element.getLayout()
+      if (elementLayout < min) {
+        min = elementLayout
+        maxIndex = j
+      }
+    }
+		console.log('maxIndex:', maxIndex)
+    return maxIndex
+  }
 
   let preCursor: MouseEvent | undefined
   let curImage: number
@@ -46,6 +65,7 @@ export function Canvas(props: Props) {
     e.preventDefault()
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     let isChecked: boolean = false
+		let indexArray:number[] = []
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
         if (images[i].getIsToggle()) {
@@ -54,19 +74,23 @@ export function Canvas(props: Props) {
             images[i].getGuidRect(),
           )
           if (result !== 'out') {
-            preCursor = e
-            curImage = i
-            drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
-            canvas3dRef.current.style.cursor = 'move'
-            isChecked = true
-            break
+					indexArray.push(i)
+					
           }
-        }
-        if (isChecked === false) {
-          preCursor = undefined
         }
       }
     }
+						if(indexArray.length>0){
+						const cur = maxLayout(indexArray,images)
+            preCursor = e
+            curImage = cur
+            drawRectBorder(canvas2dRef.current, images[cur].getGuidRect())
+            canvas3dRef.current.style.cursor = 'move'
+            isChecked = true
+						}
+        if (isChecked === false) {
+          preCursor = undefined
+        }
   }
   const handleOnMouseUp = (e: MouseEvent) => {
     e.preventDefault()

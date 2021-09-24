@@ -421,7 +421,7 @@ export const Vignette = {
   },
 }
 const basicMosaicVS =`
-precision hgihp float;
+precision highp float;
 attribute vec4 position;
 attribute vec4 texCoord;
 
@@ -467,6 +467,7 @@ export const MosaicMultiShader={
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
 		projectionMat:{type:mat4},
+		layout:{type:float}
 	}
 
 }
