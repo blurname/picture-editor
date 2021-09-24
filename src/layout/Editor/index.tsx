@@ -6,8 +6,15 @@ import { ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
 import { editorSchema } from './editorSchema'
 import { ImageEditor } from './ImageEditor'
 export function Editor() {
-  const { spiritCanvas, adjustNum, setAdjustNum, selectNum } =
-    useContext(globalContext)
+  const {
+    spiritCanvas,
+    adjustNum,
+    setAdjustNum,
+    selectNum,
+    enlargeable,
+    setEnlargeable,
+		appRef
+  } = useContext(globalContext)
   const shaping = editorSchema.children[0]
   const onColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value)
@@ -52,13 +59,25 @@ export function Editor() {
       setAdjustNum(adjustNum + 1)
     }
   const filters = editorSchema.children[1]
+  const onEnlargeable = () => {
+	//appRef.current.style.cursor='zoom-in'
+		setEnlargeable(!enlargeable)
+  }
 
   return (
     <div className="w-2/12 bg-blue-100 object-right">
       Editor
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
       <div>
-        <Button onClick={onDeleteClik}>delete element</Button>
+        {enlargeable && <Button onClick={onEnlargeable}  className="bg-green-200 text-dark-500 text-lg mb-4">
+				zoom-out
+        </Button>}
+        {!enlargeable && <Button onClick={onEnlargeable}  className="bg-green-200 text-dark-500 text-lg mb-4">
+				zoom-in
+        </Button>}
+      </div>
+      <div>
+        <Button onClick={onDeleteClik} className="bg-pink-200 text-red-500 text-lg mb-4">delete element</Button>
       </div>
       <Collapse className="w-12/12" defaultActiveKey={[1, 2, 3]}>
         <CollapsePanel header="shaping" key="1">
@@ -85,7 +104,7 @@ export function Editor() {
                     min={cur.props.range.min}
                     max={cur.props.range.max}
                     defaultValue={cur.props.value}
-										onInput={onChangeInput(cur.desc)}
+                    onInput={onChangeInput(cur.desc)}
                     id={cur.desc}
                   />
                   <label htmlFor={cur.desc}>{cur.desc}</label>

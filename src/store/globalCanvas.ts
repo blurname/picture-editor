@@ -21,6 +21,7 @@ export class SpiritsCanvas {
   beamClener: Beam
 	background:BackSpirit
 	chosenType:SpiritType
+	isLarged:boolean
   constructor() {
     this.spirits = []
     this.guidLines = []
@@ -94,6 +95,10 @@ export class SpiritsCanvas {
 	renderBackground(){
 		this.background.render()
 	}
+	setIsLarged(isLarged:boolean){
+		this.isLarged = isLarged
+	}
+
   deleteElement(id: number) {
     for (let index = 0; index < this.spirits.length; index++) {
       if (this.spirits[index] !== null) {

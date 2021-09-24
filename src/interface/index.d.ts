@@ -29,3 +29,4 @@ interface GuidRect extends Rect{
 type Shape = 'line' | 'hollowRect'|'circle'|'theW'
 type SpiritType = 'Image'| 'Mark'|'Mosaic'
 type MosaicType = 'multi'| 'fract'
+type Point = { x: number; y: number }

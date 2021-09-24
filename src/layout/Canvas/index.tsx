@@ -8,22 +8,32 @@ import React, {
 } from 'react'
 import { globalContext } from '../../context'
 import {
-  createCircle,
-  createHollowRectangle,
-  createMosaic,
   drawRectBorder,
   getCursorIsInQuad,
   getCursorMovDistance,
   getCursorPosInCanvas,
 } from '../../utils/geo-utils'
-import { BeamSpirit, MosaicSpirit, TheW } from '../../utils/gl-uitls'
+import {
+  BeamSpirit,
+  ImageSpirit,
+  MosaicSpirit,
+  TheW,
+} from '../../utils/gl-uitls'
 import { mat2 } from 'gl-matrix'
 
 type Props = {}
 
 export function Canvas(props: Props) {
-  const { spiritCanvas, selectNum, setSelectNum, adjustNum, cmpCount } =
-    useContext(globalContext)
+  const {
+    spiritCanvas,
+    selectNum,
+    setSelectNum,
+    adjustNum,
+    cmpCount,
+    setEnlargeable,
+    enlargeable,
+    appRef,
+  } = useContext(globalContext)
   let canvas: CanvasPos = {
     width: 1300,
     height: 1300,
@@ -39,11 +49,8 @@ export function Canvas(props: Props) {
   const handleOnMouseMove = (e: MouseEvent) => {}
   //const handleOnMouseClick = (e: MouseEvent) => {
   //}
-  const maxLayout = (
-    indexArray: number[],
-    spirits: BeamSpirit[],
-  ) => {
-	console.log(indexArray)
+  const maxLayout = (indexArray: number[], spirits: BeamSpirit[]) => {
+    console.log(indexArray)
     let min = 2
     let maxIndex = -1
     for (let i = 0; i < indexArray.length; i++) {
@@ -55,7 +62,7 @@ export function Canvas(props: Props) {
         maxIndex = j
       }
     }
-		console.log('maxIndex:', maxIndex)
+    console.log('maxIndex:', maxIndex)
     return maxIndex
   }
 
@@ -65,7 +72,7 @@ export function Canvas(props: Props) {
     e.preventDefault()
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     let isChecked: boolean = false
-		let indexArray:number[] = []
+    let indexArray: number[] = []
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
         if (images[i].getIsToggle()) {
@@ -74,23 +81,32 @@ export function Canvas(props: Props) {
             images[i].getGuidRect(),
           )
           if (result !== 'out') {
-					indexArray.push(i)
-					
+            indexArray.push(i)
           }
         }
       }
     }
-						if(indexArray.length>0){
-						const cur = maxLayout(indexArray,images)
-            preCursor = e
-            curImage = cur
-            drawRectBorder(canvas2dRef.current, images[cur].getGuidRect())
-            canvas3dRef.current.style.cursor = 'move'
-            isChecked = true
-						}
-        if (isChecked === false) {
-          preCursor = undefined
+    if (indexArray.length > 0) {
+      const cur = maxLayout(indexArray, images)
+      preCursor = e
+      curImage = cur
+      drawRectBorder(canvas2dRef.current, images[cur].getGuidRect())
+      isChecked = true
+      if (enlargeable && images[curImage].getSpiritType() === 'Image') {
+        const image = images[curImage] as ImageSpirit
+        if (image.isZoomed) {
+          canvas3dRef.current.style.cursor = 'zoom-in'
+        } else {
+          canvas3dRef.current.style.cursor = 'zoom-out'
         }
+        image.zoom({ x: cursorPos.left, y: cursorPos.top })
+        return
+      }
+      canvas3dRef.current.style.cursor = 'move'
+    }
+    if (isChecked === false) {
+      preCursor = undefined
+    }
   }
   const handleOnMouseUp = (e: MouseEvent) => {
     e.preventDefault()
@@ -112,6 +128,7 @@ export function Canvas(props: Props) {
           if (curImage === i) {
             preCursor = e
             drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
+						if(!enlargeable)
             canvas3dRef.current.style.cursor = 'default'
           }
         }
@@ -136,7 +153,7 @@ export function Canvas(props: Props) {
     //mosaic.render()
 
     //spiritCanvas.addMark('theW', 101)
-    //spiritCanvas.addImage('../../../public/t4.jpeg', 101)
+    spiritCanvas.addImage('../../../public/t4.jpeg', 101)
     //const theW = new TheW(canvas3dRef.current,101)
     //theW.render()
     //const back = new BackSpirit(canvas3dRef.current, 101)
@@ -150,11 +167,18 @@ export function Canvas(props: Props) {
 
     //spiritCanvas.spirits.push(back)
     //back.render()
-
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
     //spiritCanvas.renderAllLine()
+    console.log('appRef:', appRef.current)
   }, [])
+	useEffect(() => {
+	if(enlargeable)
+   canvas3dRef.current.style.cursor = 'zoom-in'
+	 else
+   canvas3dRef.current.style.cursor = 'default'
+
+	}, [enlargeable]);
 
   useEffect(() => {
     renderImages()

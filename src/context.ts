@@ -1,5 +1,5 @@
-import React from 'react'
-import {  SpiritsCanvas } from './store/globalCanvas'
+import React, {Dispatch, SetStateAction} from 'react'
+import {SpiritsCanvas } from './store/globalCanvas'
 type globalCanvasType = {
 	spiritCanvas:SpiritsCanvas
   cmpCount: number
@@ -7,7 +7,9 @@ type globalCanvasType = {
 	selectNum:number
   setSelectNum: React.Dispatch<React.SetStateAction<number>>
 	adjustNum:number
+	enlargeable:boolean
+	setEnlargeable:Dispatch<SetStateAction<boolean>>
   setAdjustNum: React.Dispatch<React.SetStateAction<number>>
-	kRef:React.MutableRefObject<HTMLDivElement>
+	appRef:React.MutableRefObject<HTMLDivElement>
 }
 export const globalContext = React.createContext({} as globalCanvasType)

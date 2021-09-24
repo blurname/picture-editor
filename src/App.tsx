@@ -10,14 +10,15 @@ function App() {
   const [cmpCount, setCmpCount] = useState(0)
   const [selectNum, setSelectNum] = useState(0)
   const [adjustNum, setAdjustNum] = useState(0)
-  const kRef = useRef(null as HTMLDivElement)
+  const [enlargeable, setEnlargeable] = useState(false)
+  const appRef = useRef(null as HTMLDivElement)
 
   const canvasParent = useRef(null as HTMLDivElement)
   useEffect(() => {
     //console.log(canvasParent.current)
   }, [])
   return (
-    <div className="App h-max">
+    <div className="App h-max" ref={appRef}>
       <Header className="bg-green-100">
         <h1 className="text-blue-gray-900 font-large">picture editor</h1>
       </Header>
@@ -31,7 +32,9 @@ function App() {
             adjustNum,
             setAdjustNum,
             spiritCanvas,
-            kRef,
+            appRef,
+						enlargeable,
+						setEnlargeable
           }}
         >
           <Components />

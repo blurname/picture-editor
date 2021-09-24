@@ -19,12 +19,16 @@ void main(){
 
 `
 const imageFS = `
+precision highp float;
 varying highp vec2 vTexCoord;
+uniform vec3 zoomSection;
 
 uniform sampler2D img;
-
 void main(){
-	gl_FragColor = texture2D(img,vTexCoord);
+	vec2 uv = vTexCoord/zoomSection.z;
+	uv.x+=zoomSection.x;
+	uv.y+=zoomSection.y;
+	gl_FragColor = texture2D(img,uv);
 }
 `
 
@@ -41,12 +45,36 @@ export const basicImageShader = {
   uniforms: {
     scaleMat: { type: mat4 },
     rotateMat: { type: mat4 },
-		projectionMat:{type:mat4},
-		layout:{type:float}
-
+    projectionMat: { type: mat4 },
+    layout: { type: float },
+    zoomSection: { type: vec3 },
   },
 }
+//const zoomImageFS = `
+//precision highp float;
+//varying highp vec2 vTexCoord;
 
+//uniform sampler2D img;
+//unifrom vec2 zoomSection;
+
+//void main(){
+	//vec2 uv = vTexCoord/2.0;
+	//uv.xy+=zoomSection;
+	//gl_FragColor = texture2D(img,uv);
+//}
+
+//`
+//export const zoomImageShader = {
+  //...basicImageShader,
+	//FS:zoomImageFS,
+  //uniforms: {
+    //scaleMat: { type: mat4 },
+    //rotateMat: { type: mat4 },
+    //projectionMat: { type: mat4 },
+    //layout: { type: float },
+    //zoomSection: { type: vec2 },
+  //},
+//}
 
 const shapeVS = `
 precision highp float;
@@ -91,9 +119,9 @@ export const lineRectShader = {
   uniforms: {
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
-		projectionMat:{type:mat4},
+    projectionMat: { type: mat4 },
     uColor: { type: vec4, n: 3 },
-		layout:{type:float}
+    layout: { type: float },
   },
 }
 export const hollowRectShader = {
@@ -101,24 +129,24 @@ export const hollowRectShader = {
   uniforms: {
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
-		projectionMat:{type:mat4},
+    projectionMat: { type: mat4 },
     uColor: { type: vec4 },
-		layout:{type:float}
+    layout: { type: float },
   },
 }
 export const theWShader = {
   ...shapeShader,
-	buffers:{
-		position:{type:vec4,n:2},
-		color:{type:vec4,n:3}
-	},
+  buffers: {
+    position: { type: vec4, n: 2 },
+    color: { type: vec4, n: 3 },
+  },
   uniforms: {
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
-		projectionMat:{type:mat4},
+    projectionMat: { type: mat4 },
     uColor: { type: vec4, n: 3 },
   },
-	mode:GLTypes.Lines
+  mode: GLTypes.Lines,
 }
 
 const lineVS = `
@@ -147,9 +175,9 @@ export const lineShader = {
     position: { type: vec3 },
     color: { type: vec3 },
   },
-	uniforms:{
-		projectionMat:{type:mat4}
-	},
+  uniforms: {
+    projectionMat: { type: mat4 },
+  },
   mode: GLTypes.Lines,
 }
 const circleVS = `
@@ -196,12 +224,12 @@ export const circleShader = {
   },
   uniforms: {
     radius: { type: float },
-		scale: {type:float},
+    scale: { type: float },
     centerX: { type: float },
     centerY: { type: float },
-		projectionX:{type:float},
-		projectionY:{type:float},
-    uColor: { type: vec4,n:3 },
+    projectionX: { type: float },
+    projectionY: { type: float },
+    uColor: { type: vec4, n: 3 },
   },
   mode: GLTypes.Lines,
 }
@@ -215,7 +243,7 @@ const backgroundVS = `
 		vTexCoord = texCoord;
 	}
 `
-const backgroundFS =`
+const backgroundFS = `
 	precision highp float;
 	varying vec2 vTexCoord;
 	uniform float rows;
@@ -229,17 +257,16 @@ const backgroundFS =`
 	}
 `
 export const backgourndShader = {
-	vs:backgroundVS,
-	fs:backgroundFS,
-	buffers:{
-		position:{type:vec4,n:2},
-		texCoord:{type:vec2}
-	},
-	uniforms:{
-		rows:{type:float}
-	},
+  vs: backgroundVS,
+  fs: backgroundFS,
+  buffers: {
+    position: { type: vec4, n: 2 },
+    texCoord: { type: vec2 },
+  },
+  uniforms: {
+    rows: { type: float },
+  },
 }
-
 
 const defaultVS = `
 attribute vec4 position;
@@ -420,7 +447,7 @@ export const Vignette = {
     vignette: { type: float, default: 0 },
   },
 }
-const basicMosaicVS =`
+const basicMosaicVS = `
 precision highp float;
 attribute vec4 position;
 attribute vec4 texCoord;
@@ -438,7 +465,7 @@ void main(){
 }
 `
 
-const mosaicMultiVS =`
+const mosaicMultiVS = `
 precision highp float;
 varying vec4 vTexCoord;
 
@@ -456,18 +483,17 @@ void main(){
 }
 `
 
-export const MosaicMultiShader={
-	vs:basicMosaicVS,
-	fs:mosaicMultiVS,
-	buffers:{
-		position:{type:vec4,},
-		texCoord:{type:vec4,n:2}
-	},
-	uniforms:{
+export const MosaicMultiShader = {
+  vs: basicMosaicVS,
+  fs: mosaicMultiVS,
+  buffers: {
+    position: { type: vec4 },
+    texCoord: { type: vec4, n: 2 },
+  },
+  uniforms: {
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
-		projectionMat:{type:mat4},
-		layout:{type:float}
-	}
-
+    projectionMat: { type: mat4 },
+    layout: { type: float },
+  },
 }
