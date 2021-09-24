@@ -7,6 +7,7 @@ import {
   GuidLine,
   ImageSpirit,
   MarkSpirit,
+	MosaicSpirit,
 	TheW,
 } from '../utils/gl-uitls'
 
@@ -25,6 +26,7 @@ export class SpiritsCanvas {
     this.guidLines = []
     this.curSpirit = null
   }
+
   addImage(imgSrc: string, id: number) {
     console.log('addImage:', id)
     const image = new Image()
@@ -35,6 +37,7 @@ export class SpiritsCanvas {
 			new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
 		)
   }
+
   addMark(shape: Shape, id: number) {
     let mark: BeamSpirit
     if (shape === 'circle') {
@@ -50,6 +53,15 @@ export class SpiritsCanvas {
 			new GuidLine(this.canvas3d, mark.getGuidRect(), mark.getId()),
 		)
   }
+
+	addMosaic(mosaicType:MosaicType,id:number){
+		let mosaic:MosaicSpirit;
+		mosaic = new MosaicSpirit(this.canvas3d,mosaicType,id)
+		this.spirits.push(mosaic)
+		this.guidLines.push(
+			new GuidLine(this.canvas3d, mosaic.getGuidRect(), mosaic.getId()),
+		)
+	}
 
   setCanvas3d(canvas: HTMLCanvasElement) {
     this.canvas3d = canvas

@@ -7,7 +7,6 @@ import React, {
   useState,
 } from 'react'
 import { globalContext } from '../../context'
-import { circleShader, MosaicShader, theWShader } from '../../filter/shader'
 import {
   createCircle,
   createHollowRectangle,
@@ -17,14 +16,7 @@ import {
   getCursorMovDistance,
   getCursorPosInCanvas,
 } from '../../utils/geo-utils'
-import {
-  BackSpirit,
-  BeamSpirit,
-  CircleSpirit,
-  ImageSpirit,
-  MarkSpirit,
-  TheW,
-} from '../../utils/gl-uitls'
+import { BeamSpirit, MosaicSpirit, TheW } from '../../utils/gl-uitls'
 import { mat2 } from 'gl-matrix'
 
 type Props = {}
@@ -87,7 +79,7 @@ export function Canvas(props: Props) {
         images[curImage].getGuidRect(),
         images[curImage].getId(),
       )
-			spiritCanvas.setChosenType(images[curImage].getSpiritType())
+      spiritCanvas.setChosenType(images[curImage].getSpiritType())
       setSelectNum(curImage)
       //setMaxZOffset(maxZOffset - 0.000001)
       for (let i = 0; i < images.length; i++) {
@@ -104,8 +96,7 @@ export function Canvas(props: Props) {
     }
   }
   const renderImages = () => {
-
-		//spiritCanvas.renderBackground()
+    //spiritCanvas.renderBackground()
     for (const image of images) {
       if (image !== null) image.render()
     }
@@ -115,30 +106,35 @@ export function Canvas(props: Props) {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
+
+    //spiritCanvas.addMosaic('multi', 101)
+    //const mosaic = new MosaicSpirit(canvas3dRef.current,101)
+    //mosaic.render()
+
     //spiritCanvas.addMark('theW', 101)
     //spiritCanvas.addImage('../../../public/t4.jpeg', 101)
     //const theW = new TheW(canvas3dRef.current,101)
     //theW.render()
-		//const back = new BackSpirit(canvas3dRef.current, 101)
-		//spiritCanvas.setBackgournd(back)
-		//const test = new Beam(canvas3dRef.current)
-		//const mosaic = createMosaic()
-		//const vertex = test.resource(ResourceTypes.VertexBuffers,mosaic.vertex)
-		//const index = test.resource(ResourceTypes.IndexBuffer,mosaic.index)
-		//const shader = test.shader(MosaicShader)
-		//test.draw(shader,vertex as any,index as any)
+    //const back = new BackSpirit(canvas3dRef.current, 101)
+    //spiritCanvas.setBackgournd(back)
+    //const test = new Beam(canvas3dRef.current)
+    //const mosaic = createMosaic()
+    //const vertex = test.resource(ResourceTypes.VertexBuffers,mosaic.vertex)
+    //const index = test.resource(ResourceTypes.IndexBuffer,mosaic.index)
+    //const shader = test.shader(MosaicShader)
+    //test.draw(shader,vertex as any,index as any)
 
     //spiritCanvas.spirits.push(back)
     //back.render()
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
-		spiritCanvas.renderAllLine()
+    //spiritCanvas.renderAllLine()
   }, [])
 
   useEffect(() => {
     renderImages()
-		spiritCanvas.renderAllLine()
+    spiritCanvas.renderAllLine()
   }, [adjustNum, cmpCount])
 
   return (

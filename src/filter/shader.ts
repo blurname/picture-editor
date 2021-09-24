@@ -412,9 +412,14 @@ export const Vignette = {
 const basicMosaicVS =`
 attribute vec4 position;
 attribute vec4 texCoord;
+
+uniform mat4 rotateMat;
+uniform mat4 scaleMat;
+uniform mat4 projectionMat;
+
 varying vec4 vTexCoord;
 void main(){
-	gl_Position = position;
+	gl_Position = projectionMat*rotateMat*scaleMat*position;
 	vTexCoord = texCoord;
 }
 `
@@ -429,8 +434,9 @@ float random (vec2 st) {
 }
 
 void main(){
-	vec2 st = vec2(vTexCoord.x,vTexCoord.y)*5.0;
+	vec2 st = vec2(vTexCoord.x,vTexCoord.y)*10.0;
 	gl_FragColor.rgb = vec3(random(floor(st)),0.5,0.6);
+	//gl_FragColor.rgb = vec3(fract(st.x),0.5,0.6);
 	gl_FragColor.a = 1.0;
 }
 `
@@ -439,7 +445,13 @@ export const MosaicMultiShader={
 	vs:basicMosaicVS,
 	fs:mosaicMultiVS,
 	buffers:{
-		position:{type:vec4,n:2},
+		position:{type:vec4,},
 		texCoord:{type:vec4,n:2}
+	},
+	uniforms:{
+    rotateMat: { type: mat4 },
+    scaleMat: { type: mat4 },
+		projectionMat:{type:mat4},
 	}
+
 }

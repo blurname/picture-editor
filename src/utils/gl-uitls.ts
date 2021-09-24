@@ -35,6 +35,7 @@ import {
   createProjectionXY,
   createW,
   createBackGrid,
+	createMosaic,
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
@@ -152,7 +153,6 @@ export class ImageSpirit extends BeamSpirit {
 
     //this.guidRectPosition = new Float32Array(16)
     //mat4.mul(this.guidRectPosition, this.position, this.projectionMatInJS)
-    //console.log('this.guidRectPosition:', this.guidRectPosition)
 
     this.uniforms = this.beam.resource(Uniforms, {
       scaleMat: this.scaleMat,
@@ -181,7 +181,6 @@ export class ImageSpirit extends BeamSpirit {
     this.rotate = 0
     this.scale = 1
     this.updateGuidRect()
-    console.log(this.guidRect)
   }
   updateGuidRect() {
     this.guidRect = fUpdateGuidRect(this.position, (position: Float32Array) => {
@@ -206,12 +205,10 @@ export class ImageSpirit extends BeamSpirit {
       else if (remainder === 1) return pos + scaleedDis.top
       else return pos
     })
-    console.log(this.position)
     this.updateGuidRect()
     this.updateRotateMat(this.rotate)
     this.updateScaleMat(this.scale)
     this.vertexBuffers.set('position', this.position)
-    console.log('child updatePosition')
     //this.updateTransMat(distance.left, distance.top)
   }
 
@@ -266,7 +263,6 @@ export class ImageSpirit extends BeamSpirit {
         this.uniforms as any,
         input as any,
       )
-    console.log('drawImg')
   }
   render() {
     //this.beam.clear()
@@ -337,12 +333,10 @@ export class MarkSpirit extends BeamSpirit {
       else if (remainder === 1) return pos + scaleedDis.top
       else return pos
     })
-    console.log(this.position)
     this.updateGuidRect()
-    this.updateRotateMat(this.rotate)
-    this.updateScaleMat(this.scale)
+		this.updateRotateMat(this.rotate)
+		this.updateScaleMat(this.scale)
     this.vertexBuffers.set('position', this.position)
-    console.log('child updatePosition')
     //this.updateTransMat(distance.left, distance.top)
   }
   getBuffersByShape(): Buffers {
@@ -382,6 +376,7 @@ export class MarkSpirit extends BeamSpirit {
     this.uniforms.set('scaleMat', this.scaleMat)
   }
   updateRotateMat(rotate: number) {
+		//if(this.rotate === rotate) return
     const origin: Pos = {
       left: this.guidRect.x + this.guidRect.width / 2,
       top: this.guidRect.y + this.guidRect.height / 2,
@@ -399,7 +394,6 @@ export class MarkSpirit extends BeamSpirit {
         this.indexBuffer as any,
         this.uniforms as any,
       )
-    console.log('drawMark')
   }
   render() {
     this.draw()
@@ -478,7 +472,6 @@ export class TheW extends BeamSpirit {
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
     const theW = createW(100)
-    console.log(theW.vertex)
 		this.spiritType = 'Mark'
     this.vertexBuffers = this.beam.resource(VertexBuffers, theW.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, theW.index)
@@ -504,36 +497,97 @@ export class TheW extends BeamSpirit {
 }
 
 export class MosaicSpirit extends BeamSpirit{
-	constructor (canvas:HTMLCanvasElement,id:number) {
+	constructor (canvas:HTMLCanvasElement,type:MosaicType,id:number) {
 		super(canvas,id)
-    const theW = createW(100)
-    console.log(theW.vertex)
 		this.spiritType = 'Mark'
-    this.vertexBuffers = this.beam.resource(VertexBuffers, theW.vertex)
-    this.indexBuffer = this.beam.resource(IndexBuffer, theW.index)
-    this.shader = this.beam.shader(theWShader)
+		const buffers = this.getBuffersByShape(type)
+		this.position = buffers.vertex.position
+		console.log(this.position)
+    this.vertexBuffers = this.beam.resource(VertexBuffers, buffers.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, buffers.index)
+    this.shader = this.beam.shader(this.getShaderByShape(type))
     this.rotateMat = createRotateMat(0)
     this.scaleMat = createScaleMat(1)
+		this.scale = 1
+		this.rotate = 0
     this.projectionMat = createProjectionMatInShader(getCanvasEdge(canvas))
     this.uniforms = this.beam.resource(Uniforms, {
-      uColor: [1.0, 1.0, 1.0, 1.0],
       rotateMat: this.rotateMat,
       scaleMat: this.scaleMat,
       projectionMat: this.projectionMat,
     })
+		this.updateGuidRect()
 	}
   getShaderByShape(type:MosaicType) {
 		let shader:any
 		if(type==='multi'){
 			shader = MosaicMultiShader
 		}
+		return shader
   }
+	getBuffersByShape(type:MosaicType):Buffers{
+		let buffers:any
+		if(type==='multi'){
+			buffers = createMosaic(300,300)
+		}
+		return buffers
+	}
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    const scaleedDis = {
+      left: distance.left / this.scale,
+      top: distance.top / this.scale,
+    }
+    this.position = this.position.map((pos, index) => {
+      const remainder = index % 4
+      if (remainder === 0) return pos + scaleedDis.left
+      // changing y to be negtive since the canvs2d's y positive axis is downward
+      else if (remainder === 1) return pos + scaleedDis.top
+      else return pos
+    })
+    this.updateGuidRect()
+		this.updateRotateMat(this.rotate)
+		this.updateScaleMat(this.scale)
+    this.vertexBuffers.set('position', this.position)
+    //this.updateTransMat(distance.left, distance.top)
+  }
+  updateGuidRect() {
+    this.guidRect = fUpdateGuidRect(this.position, (position: Float32Array) => {
+      return {
+        x: position[0] * this.scale,
+        y: position[1] * this.scale,
+        width: Math.abs(position[0] - position[8]) * this.scale,
+        height: Math.abs(position[1] - position[5]) * this.scale,
+      }
+    })
+		console.log(this.guidRect)
+  }
+  updateScaleMat(scale: number) {
+    if (this.scale === scale) {
+      return
+    }
+    this.scale = scale
+    this.scaleMat = createScaleMat(scale)
+    this.uniforms.set('scaleMat', this.scaleMat)
+  }
+  updateRotateMat(rotate: number) {
+		//if(this.rotate === rotate) return
+    const origin: Pos = {
+      left: this.guidRect.x + this.guidRect.width / 2,
+      top: this.guidRect.y + this.guidRect.height / 2,
+    }
+    this.rotate = rotate
+    this.rotateMat = createRotateMat(rotate, origin)
+    this.uniforms.set('rotateMat', this.rotateMat)
+  }
+
 	render(){
-		this.beam.draw(
+		this.beam
+		.depth()
+		.draw(
 			this.shader,
 			this.vertexBuffers as any,
 			this.indexBuffer as any,
-			this.uniforms as any,
+			this.uniforms as any
 		)
 	}
 }
@@ -561,7 +615,6 @@ export class GuidLine {
   }
   updateRect(rect: Rect) {
     const vertex = createLine(rect).vertex
-    console.log(vertex)
     this.vertexBuffers.set('position', vertex.position)
   }
   render() {

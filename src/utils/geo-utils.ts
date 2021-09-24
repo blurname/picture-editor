@@ -278,10 +278,10 @@ export const createW = (line:number) =>{
 			insides.push(...vIn)
 		}
 	}
-	console.log(...outsides)
+	//console.log(...outsides)
 	const final = position.concat(insides,outsides)
 	//const final = position
-	console.log('final:', final)
+	//console.log('final:', final)
 	//const indexArray = [
 		//0,1,1,2,2,3,3,4,
 		//5,6,6,7,7,8,8,9,
@@ -344,12 +344,16 @@ export const createBackGrid = () => {
 	}
 }
 
-export const createMosaic = () => {
+export const createMosaic = (width:number,height:number) => {
 	const position = [
-		-1,-1,
-		-1,1,
-		1,1,
-		1,-1
+		//-width/2,-height/2,
+		//-width/2,height/2,
+		//width/2,height/2,
+		//width/2,-height/2,
+		-width/2,-height/2,0,1.0,
+		-width/2,height/2,0,1.0,
+		width/2,height/2,0,1.0,
+		width/2,-height/2,0,1.0
 	]
 	const texCoord = [
 		0,0,
@@ -361,7 +365,6 @@ export const createMosaic = () => {
 		0,1,2,
 		0,2,3
 	]
-	
 	return{
 		vertex:{
 			position,

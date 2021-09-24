@@ -85,7 +85,7 @@ export function Editor() {
                     min={cur.props.range.min}
                     max={cur.props.range.max}
                     defaultValue={cur.props.value}
-                    //onInput={onChangeInput(cur.desc)}
+										onInput={onChangeInput(cur.desc)}
                     id={cur.desc}
                   />
                   <label htmlFor={cur.desc}>{cur.desc}</label>

@@ -12,6 +12,12 @@ export const menu = {
       props: {
         style: { width: 250, height: 100, backgroundColor: '#389201' },
       },
+		},
+		{
+			desc:'mosaic',
+      props: {
+        style: { width: 250, height: 100, backgroundColor: '#389201' },
+      },
 		}
   ],
 }
