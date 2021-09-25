@@ -8,7 +8,7 @@ import { spiritCanvas } from './store/globalCanvas'
 import Layout, { Content, Footer, Header } from 'antd/lib/layout/layout'
 function App() {
   const [cmpCount, setCmpCount] = useState(0)
-  const [selectNum, setSelectNum] = useState(0)
+  const [selectNum, setSelectNum] = useState(-1)
   const [adjustNum, setAdjustNum] = useState(0)
   const [zoomable, setZoomable] = useState(false)
   const appRef = useRef(null as HTMLDivElement)

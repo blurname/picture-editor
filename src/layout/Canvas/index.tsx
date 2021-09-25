@@ -25,6 +25,7 @@ type Props = {}
 export function Canvas(props: Props) {
   const {
     spiritCanvas,
+    selectNum,
     setSelectNum,
     adjustNum,
     cmpCount,
@@ -49,20 +50,19 @@ export function Canvas(props: Props) {
       const distance = getCursorMovDistance(preCursor, e, canvas)
       images[curImage].updatePosition(distance)
       spiritCanvas.updateGuidRect(images[curImage])
-      spiritCanvas.setChosenType(images[curImage].getSpiritType())
-      setSelectNum(curImage)
+      preCursor = e
+      //spiritCanvas.spirits[curImage].render()
       for (let i = 0; i < images.length; i++) {
         if (images[i] !== null) {
-          images[i].render()
+					images[i].render()
           if (curImage === i) {
-            preCursor = e
-            drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
-            if (!zoomable && !isMoveable)
-              canvas3dRef.current.style.cursor = 'default'
+            //drawRectBorder(canvas2dRef.current, images[curImage].getGuidRect())
+            //if (!zoomable && !isMoveable)
+            //spiritCanvas.setChosenType(images[curImage].getSpiritType())
           }
         }
       }
-      spiritCanvas.renderAllLine()
+      //spiritCanvas.renderAllLine()
     }
   }
 
@@ -86,6 +86,7 @@ export function Canvas(props: Props) {
 
   let preCursor: MouseEvent | undefined
   let curImage: number
+
   const handleOnMouseDown = (e: MouseEvent) => {
     e.preventDefault()
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
@@ -109,8 +110,10 @@ export function Canvas(props: Props) {
       preCursor = e
       curImage = cur
       setSelectNum(curImage)
-      drawRectBorder(canvas2dRef.current, images[cur].getGuidRect())
+      spiritCanvas.setChosenType(images[curImage].getSpiritType())
+			drawRectBorder(canvas2dRef.current, images[cur].getGuidRect())
       isChecked = true
+
       if (zoomable && images[curImage].getSpiritType() === 'Image') {
         const image = images[curImage] as ImageSpirit
         if (image.isZoomed) {
@@ -121,6 +124,7 @@ export function Canvas(props: Props) {
         image.zoom({ x: cursorPos.left, y: cursorPos.top })
         return
       }
+
       isMoveable = true
       //setIsMoveable(true)
       canvas3dRef.current.style.cursor = 'move'
@@ -132,37 +136,42 @@ export function Canvas(props: Props) {
 
   const thandleOnMouseUp = (e: MouseEvent) => {
     isMoveable = false
+    //if (selectNum !== curImage) {
+    //console.log('curImage:', curImage)
+    //console.log('images[curImage]:', images[curImage])
+    //setSelectNum(curImage)
+    //}
     //setIsMoveable(false)
     if (!zoomable) canvas3dRef.current.style.cursor = 'default'
     //setSelectNum(curImage)
     renderImages()
   }
   //const handleOnMouseUp = (e: MouseEvent) => {
-    //e.preventDefault()
-    //if (preCursor !== undefined) {
-      //const distance = getCursorMovDistance(preCursor, e, canvas)
-      ////console.log(maxZOffset)
-      ////images[curImage].zOffset = maxZOffset
-      //images[curImage].updatePosition(distance)
-      //spiritCanvas.updateGuidRect(
-        //images[curImage].getGuidRect(),
-        //images[curImage].getId(),
-      //)
-      //spiritCanvas.setChosenType(images[curImage].getSpiritType())
-      //setSelectNum(curImage)
-      ////setMaxZOffset(maxZOffset - 0.000001)
-      //for (let i = 0; i < images.length; i++) {
-        //if (images[i] !== null) {
-          //images[i].render()
-          //if (curImage === i) {
-            //preCursor = e
-            //drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
-            //if (!zoomable) canvas3dRef.current.style.cursor = 'default'
-          //}
-        //}
-      //}
-      //spiritCanvas.renderAllLine()
-    //}
+  //e.preventDefault()
+  //if (preCursor !== undefined) {
+  //const distance = getCursorMovDistance(preCursor, e, canvas)
+  ////console.log(maxZOffset)
+  ////images[curImage].zOffset = maxZOffset
+  //images[curImage].updatePosition(distance)
+  //spiritCanvas.updateGuidRect(
+  //images[curImage].getGuidRect(),
+  //images[curImage].getId(),
+  //)
+  //spiritCanvas.setChosenType(images[curImage].getSpiritType())
+  //setSelectNum(curImage)
+  ////setMaxZOffset(maxZOffset - 0.000001)
+  //for (let i = 0; i < images.length; i++) {
+  //if (images[i] !== null) {
+  //images[i].render()
+  //if (curImage === i) {
+  //preCursor = e
+  //drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
+  //if (!zoomable) canvas3dRef.current.style.cursor = 'default'
+  //}
+  //}
+  //}
+  //spiritCanvas.renderAllLine()
+  //}
   //}
   const renderImages = () => {
     //spiritCanvas.renderBackground()
@@ -176,25 +185,6 @@ export function Canvas(props: Props) {
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
 
-    //spiritCanvas.addMosaic('multi', 101)
-    //const mosaic = new MosaicSpirit(canvas3dRef.current,101)
-    //mosaic.render()
-
-    //spiritCanvas.addMark('theW', 101)
-    spiritCanvas.addImage('../../../public/t4.jpeg', 101)
-    //const theW = new TheW(canvas3dRef.current,101)
-    //theW.render()
-    //const back = new BackSpirit(canvas3dRef.current, 101)
-    //spiritCanvas.setBackgournd(back)
-    //const test = new Beam(canvas3dRef.current)
-    //const mosaic = createMosaic()
-    //const vertex = test.resource(ResourceTypes.VertexBuffers,mosaic.vertex)
-    //const index = test.resource(ResourceTypes.IndexBuffer,mosaic.index)
-    //const shader = test.shader(MosaicShader)
-    //test.draw(shader,vertex as any,index as any)
-
-    //spiritCanvas.spirits.push(back)
-    //back.render()
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
     //spiritCanvas.renderAllLine()
@@ -204,10 +194,12 @@ export function Canvas(props: Props) {
     if (zoomable) canvas3dRef.current.style.cursor = 'zoom-in'
     else canvas3dRef.current.style.cursor = 'default'
   }, [zoomable])
+  useEffect(() => {
+    console.log('canvas changed the selectNum')
+  }, [selectNum])
 
   useEffect(() => {
     renderImages()
-    spiritCanvas.renderAllLine()
   }, [adjustNum, cmpCount])
 
   return (
