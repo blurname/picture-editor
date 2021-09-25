@@ -46,22 +46,25 @@ export function Canvas(props: Props) {
     if (!isMoveable || zoomable) return
     e.preventDefault()
     //canvas3dRef.current.style.cursor = 'move'
+		const cursorPos = getCursorPosInCanvas(e,canvas) as Pos
+		const result = getCursorIsInQuad({x:cursorPos.left,y:cursorPos.top} ,images[selectNum].getGuidRect())
+		if(result ==='out')return
     if (preCursor !== undefined) {
       const distance = getCursorMovDistance(preCursor, e, canvas)
       images[curImage].updatePosition(distance)
       spiritCanvas.updateGuidRect(images[curImage])
       preCursor = e
       //spiritCanvas.spirits[curImage].render()
-      for (let i = 0; i < images.length; i++) {
-        if (images[i] !== null) {
-					images[i].render()
-          if (curImage === i) {
-            //drawRectBorder(canvas2dRef.current, images[curImage].getGuidRect())
-            //if (!zoomable && !isMoveable)
-            //spiritCanvas.setChosenType(images[curImage].getSpiritType())
-          }
-        }
-      }
+     //for (let i = 0; i < images.length; i++) {
+        //if (images[i] !== null) {
+					////images[i].render()
+          //if (curImage === i) {
+						drawRectBorder(canvas2dRef.current, images[curImage].getGuidRect())
+            ////if (!zoomable && !isMoveable)
+            ////spiritCanvas.setChosenType(images[curImage].getSpiritType())
+          //}
+        //}
+      //}
       //spiritCanvas.renderAllLine()
     }
   }
