@@ -11,8 +11,8 @@ export function Editor() {
     adjustNum,
     setAdjustNum,
     selectNum,
-    enlargeable,
-    setEnlargeable,
+    zoomable,
+    setZoomable,
 		appRef
   } = useContext(globalContext)
   const shaping = editorSchema.children[0]
@@ -61,7 +61,7 @@ export function Editor() {
   const filters = editorSchema.children[1]
   const onEnlargeable = () => {
 	//appRef.current.style.cursor='zoom-in'
-		setEnlargeable(!enlargeable)
+		setZoomable(!zoomable)
   }
 
   return (
@@ -69,10 +69,10 @@ export function Editor() {
       Editor
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
       <div>
-        {enlargeable && <Button onClick={onEnlargeable}  className="bg-green-200 text-dark-500 text-lg mb-4">
+        {zoomable && <Button onClick={onEnlargeable}  className="bg-green-200 text-dark-500 text-lg mb-4">
 				zoom-out
         </Button>}
-        {!enlargeable && <Button onClick={onEnlargeable}  className="bg-green-200 text-dark-500 text-lg mb-4">
+        {!zoomable && <Button onClick={onEnlargeable}  className="bg-green-200 text-dark-500 text-lg mb-4">
 				zoom-in
         </Button>}
       </div>

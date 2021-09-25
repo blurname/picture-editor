@@ -19,19 +19,16 @@ import {
   MosaicSpirit,
   TheW,
 } from '../../utils/gl-uitls'
-import { mat2 } from 'gl-matrix'
 
 type Props = {}
 
 export function Canvas(props: Props) {
   const {
     spiritCanvas,
-    selectNum,
     setSelectNum,
     adjustNum,
     cmpCount,
-    setEnlargeable,
-    enlargeable,
+    zoomable,
     appRef,
   } = useContext(globalContext)
   let canvas: CanvasPos = {
@@ -41,13 +38,34 @@ export function Canvas(props: Props) {
     top: 110,
   }
   const [images, setImages] = useState([] as BeamSpirit[])
-
-  //const [maxZOffset, setMaxZOffset] = useState(1)
-
+  let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
-  const handleOnMouseMove = (e: MouseEvent) => {}
-  //const handleOnMouseClick = (e: MouseEvent) => {
+  const handleOnMouseMove = (e: MouseEvent) => {
+    if (!isMoveable || zoomable) return
+    e.preventDefault()
+    //canvas3dRef.current.style.cursor = 'move'
+    if (preCursor !== undefined) {
+      const distance = getCursorMovDistance(preCursor, e, canvas)
+      images[curImage].updatePosition(distance)
+      spiritCanvas.updateGuidRect(images[curImage])
+      spiritCanvas.setChosenType(images[curImage].getSpiritType())
+      setSelectNum(curImage)
+      for (let i = 0; i < images.length; i++) {
+        if (images[i] !== null) {
+          images[i].render()
+          if (curImage === i) {
+            preCursor = e
+            drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
+            if (!zoomable && !isMoveable)
+              canvas3dRef.current.style.cursor = 'default'
+          }
+        }
+      }
+      spiritCanvas.renderAllLine()
+    }
+  }
+
   //}
   const maxLayout = (indexArray: number[], spirits: BeamSpirit[]) => {
     console.log(indexArray)
@@ -90,9 +108,10 @@ export function Canvas(props: Props) {
       const cur = maxLayout(indexArray, images)
       preCursor = e
       curImage = cur
+      setSelectNum(curImage)
       drawRectBorder(canvas2dRef.current, images[cur].getGuidRect())
       isChecked = true
-      if (enlargeable && images[curImage].getSpiritType() === 'Image') {
+      if (zoomable && images[curImage].getSpiritType() === 'Image') {
         const image = images[curImage] as ImageSpirit
         if (image.isZoomed) {
           canvas3dRef.current.style.cursor = 'zoom-in'
@@ -102,40 +121,49 @@ export function Canvas(props: Props) {
         image.zoom({ x: cursorPos.left, y: cursorPos.top })
         return
       }
+      isMoveable = true
+      //setIsMoveable(true)
       canvas3dRef.current.style.cursor = 'move'
     }
     if (isChecked === false) {
       preCursor = undefined
     }
   }
-  const handleOnMouseUp = (e: MouseEvent) => {
-    e.preventDefault()
-    if (preCursor !== undefined) {
-      const distance = getCursorMovDistance(preCursor, e, canvas)
-      //console.log(maxZOffset)
-      //images[curImage].zOffset = maxZOffset
-      images[curImage].updatePosition(distance)
-      spiritCanvas.updateGuidRect(
-        images[curImage].getGuidRect(),
-        images[curImage].getId(),
-      )
-      spiritCanvas.setChosenType(images[curImage].getSpiritType())
-      setSelectNum(curImage)
-      //setMaxZOffset(maxZOffset - 0.000001)
-      for (let i = 0; i < images.length; i++) {
-        if (images[i] !== null) {
-          images[i].render()
-          if (curImage === i) {
-            preCursor = e
-            drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
-						if(!enlargeable)
-            canvas3dRef.current.style.cursor = 'default'
-          }
-        }
-      }
-      spiritCanvas.renderAllLine()
-    }
+
+  const thandleOnMouseUp = (e: MouseEvent) => {
+    isMoveable = false
+    //setIsMoveable(false)
+    if (!zoomable) canvas3dRef.current.style.cursor = 'default'
+    //setSelectNum(curImage)
+    renderImages()
   }
+  //const handleOnMouseUp = (e: MouseEvent) => {
+    //e.preventDefault()
+    //if (preCursor !== undefined) {
+      //const distance = getCursorMovDistance(preCursor, e, canvas)
+      ////console.log(maxZOffset)
+      ////images[curImage].zOffset = maxZOffset
+      //images[curImage].updatePosition(distance)
+      //spiritCanvas.updateGuidRect(
+        //images[curImage].getGuidRect(),
+        //images[curImage].getId(),
+      //)
+      //spiritCanvas.setChosenType(images[curImage].getSpiritType())
+      //setSelectNum(curImage)
+      ////setMaxZOffset(maxZOffset - 0.000001)
+      //for (let i = 0; i < images.length; i++) {
+        //if (images[i] !== null) {
+          //images[i].render()
+          //if (curImage === i) {
+            //preCursor = e
+            //drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
+            //if (!zoomable) canvas3dRef.current.style.cursor = 'default'
+          //}
+        //}
+      //}
+      //spiritCanvas.renderAllLine()
+    //}
+  //}
   const renderImages = () => {
     //spiritCanvas.renderBackground()
     for (const image of images) {
@@ -172,13 +200,10 @@ export function Canvas(props: Props) {
     //spiritCanvas.renderAllLine()
     console.log('appRef:', appRef.current)
   }, [])
-	useEffect(() => {
-	if(enlargeable)
-   canvas3dRef.current.style.cursor = 'zoom-in'
-	 else
-   canvas3dRef.current.style.cursor = 'default'
-
-	}, [enlargeable]);
+  useEffect(() => {
+    if (zoomable) canvas3dRef.current.style.cursor = 'zoom-in'
+    else canvas3dRef.current.style.cursor = 'default'
+  }, [zoomable])
 
   useEffect(() => {
     renderImages()
@@ -208,8 +233,8 @@ export function Canvas(props: Props) {
         }}
         width={canvas.width}
         height={canvas.height}
-        onMouseUp={handleOnMouseUp}
-        //onMouseMove={handleOnMouseMove}
+        onMouseUp={thandleOnMouseUp}
+        onMouseMove={handleOnMouseMove}
         onMouseDown={handleOnMouseDown}
       />
     </div>

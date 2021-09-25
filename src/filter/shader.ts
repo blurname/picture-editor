@@ -9,9 +9,11 @@ uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
 uniform float layout;
+uniform vec2 offset;
 
 varying highp vec2 vTexCoord;
 void main(){
+	//vec4 nPosition = vec4(position.x+offset.x,position.y+offset.y,0.0,1.0);
 	gl_Position = projectionMat*rotateMat*scaleMat*position;
 	gl_Position.z = layout;
 	vTexCoord = texCoord;
@@ -48,6 +50,7 @@ export const basicImageShader = {
     projectionMat: { type: mat4 },
     layout: { type: float },
     zoomSection: { type: vec3 },
+		offset:{type:vec2}
   },
 }
 //const zoomImageFS = `

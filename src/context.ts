@@ -7,8 +7,8 @@ type globalCanvasType = {
 	selectNum:number
   setSelectNum: React.Dispatch<React.SetStateAction<number>>
 	adjustNum:number
-	enlargeable:boolean
-	setEnlargeable:Dispatch<SetStateAction<boolean>>
+	zoomable:boolean
+	setZoomable:Dispatch<SetStateAction<boolean>>
   setAdjustNum: React.Dispatch<React.SetStateAction<number>>
 	appRef:React.MutableRefObject<HTMLDivElement>
 }

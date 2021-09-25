@@ -10,7 +10,7 @@ function App() {
   const [cmpCount, setCmpCount] = useState(0)
   const [selectNum, setSelectNum] = useState(0)
   const [adjustNum, setAdjustNum] = useState(0)
-  const [enlargeable, setEnlargeable] = useState(false)
+  const [zoomable, setZoomable] = useState(false)
   const appRef = useRef(null as HTMLDivElement)
 
   const canvasParent = useRef(null as HTMLDivElement)
@@ -33,8 +33,8 @@ function App() {
             setAdjustNum,
             spiritCanvas,
             appRef,
-						enlargeable,
-						setEnlargeable
+						zoomable,
+						setZoomable
           }}
         >
           <Components />

@@ -68,11 +68,12 @@ export class SpiritsCanvas {
     this.canvas3d = canvas
     this.beamClener = new Beam(this.canvas3d)
   }
-  updateGuidRect(rect: Rect, id: number) {
+  updateGuidRect(spirit:BeamSpirit) {
+
     for (let index = 0; index < this.guidLines.length; index++) {
       if (this.guidLines[index] !== null) {
-        if (this.guidLines[index].getId() === id) {
-          this.guidLines[index].updateRect(rect)
+        if (this.guidLines[index].getId() === spirit.getId()) {
+          this.guidLines[index].updateRect(spirit.getGuidRect())
           break
         }
       }

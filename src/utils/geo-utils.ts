@@ -495,16 +495,20 @@ export const drawRectBorder = (
 }
 
 export const createTranslateMat = (tx: number, ty: number) => {
-  return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, 0, 1]
+  return [
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		tx, ty, 0, 1]
 }
 
 export const createRotateMat = (rotate: number,origin:Pos={left:0,top:0}) => {
-  rotate = (rotate * Math.PI) / 180
-  const cos = Math.cos(rotate)
-  const sin = Math.sin(rotate)
+	rotate = (rotate * Math.PI) / 180
+	const cos = Math.cos(rotate)
+	const sin = Math.sin(rotate)
 	const x0 = origin.left
 	const y0 = origin.top
-  return [
+	return [
 		cos, sin, 0, 0, 
 		-sin, cos, 0, 0,
 		0, 0, 1, 0,
