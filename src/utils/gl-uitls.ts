@@ -149,10 +149,12 @@ export class RectModel extends BeamSpirit{
       left: offset.left / this.scale,
       top: offset.top / this.scale,
     }
+		//const guidRect = this.getGuidRect()
+		//const center:Pos = {left:guidRect.x+guidRect.width/2,top:guidRect.y+guidRect.height/2}
     this.transMat = createTranslateMat({
       left: offset.left,
-      top: offset.top,
-    })
+			top: offset.top,
+		})
     this.uniforms.set('transMat', this.transMat)
   }
 }
@@ -491,8 +493,8 @@ export class CircleSpirit extends BeamSpirit {
     this.updateGuidRect()
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    this.offset.left += distance.left
-    this.offset.top += distance.top
+    this.offset.left = distance.left
+    this.offset.top = distance.top
     this.uniforms.set('centerX', this.offset.left)
     this.uniforms.set('centerY', this.offset.top)
     this.updateGuidRect()
