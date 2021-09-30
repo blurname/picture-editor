@@ -1,37 +1,16 @@
 import { MouseEvent, MutableRefObject } from 'react'
 import { mat4, vec2 } from 'gl-matrix'
 
-export const createRectangle = (aspectRatio: number) => {
-  const basePosition = [
-		-1, -1*aspectRatio, 0,
-		-1, 1 *aspectRatio, 0,
-		1, 1 *aspectRatio, 0,
-		1, -1 *aspectRatio, 0]
-  const position = basePosition.map((pos) => pos * 0.3 )
-  const texCoord = [0, 0, 0, 1, 1, 1, 1, 0]
-  const index = {
-    array: [0, 1, 2, 0, 2, 3],
-  }
-  return {
-    vertex: {
-      position,
-      texCoord,
-    },
-    index,
-  }
-}
 export const createRectangleByProjection = (width: number,height:number) => {
   const basePosition = [
-		-width/2,-height/2,0,1.0,
-		-width/2,height/2,0,1.0,
-		width/2,height/2,0,1.0,
-		width/2,-height/2,0,1.0
-		//-width/2,-height/2,0,
-		//-width/2,height/2,0,
-		//width/2,height/2,0,
-		//width/2,-height/2,0
+		-width/2,-height/2,
+		-width/2,height/2,
+		width/2,height/2,
+		width/2,-height/2,
 	]
-	const position = basePosition.map((pos,index) => {if(index % 4===3){return pos}else{return pos*0.4}} )
+
+	//const position = basePosition.map((pos,index) => {if(index % 4===3){return pos}else{return pos*0.4}} )
+	const position = basePosition.map((pos) =>pos*0.4)
   const texCoord = [0, 0, 0, 1, 1, 1, 1, 0]
   const index = {
     array: [0, 1, 2, 0, 2, 3],
@@ -93,14 +72,13 @@ export const createLine = (guidRect: Rect) => {
 }
 export const createLineRect = (width: number,height:number) => {
   const basePosition = [
-		-width/2,-height/2,0,1.0,
-		-width/2,height/2,0,1.0,
-		width/2,height/2,0,1.0,
-		width/2,-height/2,0,1.0
+		-width/2,-height/2,
+		-width/2,height/2,
+		width/2,height/2,
+		width/2,-height/2,
 	]
 	const position = basePosition.map((pos,index) => {
-		if(index % 4===3)return pos
-		else if(index%4===1)return pos * 0.05
+		if(index%2===1)return pos * 0.05
 		else return pos*0.5})
   const index = {
     array: [0, 1, 2, 0, 2, 3],
@@ -115,23 +93,16 @@ export const createLineRect = (width: number,height:number) => {
 }
 export const createHollowRectangle = (width: number,height:number) => {
   const basePosition = [
-    -1*width/2, -1*height/2, 0,1.0,  
-		-1*width/2, 1*height/2, 0,1.0,  
-		1*width/2, 1*height/2, 0,1.0,  
-		1*width/2, -1*height/2, 0,1.0,  
-		-0.5*width/2, -0.5*height/2, 0 ,1.0, 
-		-0.5*width/2, 0.5*height/2, 0 ,1.0, 
-		0.5*width/2,0.5*height/2, 0 ,1.0, 
-		0.5*width/2, -0.5*height/2, 0 ,1.0, 
+    -1*width/2, -1*height/2,   
+		-1*width/2, 1*height/2,   
+		1*width/2, 1*height/2,   
+		1*width/2, -1*height/2,   
+		-0.5*width/2, -0.5*height/2,  
+		-0.5*width/2, 0.5*height/2,  
+		0.5*width/2,0.5*height/2,  
+		0.5*width/2, -0.5*height/2,  
   ]
-	const position = basePosition.map((pos,index) => {if(index % 4===3){return pos}else{return pos*0.3}} )
-  // const position = pos.map((item) => {
-  // 	if(item%3 ==2){
-  // 		return item+offset
-  // 	}else {
-  // 		return item
-  // 	}
-  // })
+	const position = basePosition.map((pos,index) => pos*0.3 )
   const index = {
     array: [
       0, 1, 4, 1, 4, 5, 1, 2, 5, 2, 5, 6, 2, 3, 6, 3, 6, 7, 3, 0, 7, 0, 7, 4,
@@ -350,10 +321,10 @@ export const createMosaic = (width:number,height:number) => {
 		//-width/2,height/2,
 		//width/2,height/2,
 		//width/2,-height/2,
-		-width/2,-height/2,0,1.0,
-		-width/2,height/2,0,1.0,
-		width/2,height/2,0,1.0,
-		width/2,-height/2,0,1.0
+		-width/2,-height/2,
+		-width/2,height/2,
+		width/2,height/2,
+		width/2,-height/2	
 	]
 	const texCoord = [
 		0,0,
@@ -421,13 +392,11 @@ const normalize2 = (
 }
 
 export const getCursorMovDistance = (
-  pre: MouseEvent,
   cur: MouseEvent,
   canvas: CanvasPos,
 ): Pos => {
-  const prePos = getCursorPosInCanvas(pre, canvas) as Pos
   const curPos = getCursorPosInCanvas(cur, canvas) as Pos
-  return { left: curPos.left - prePos.left, top: curPos.top - prePos.top }
+  return { left: curPos.left, top: curPos.top }
 }
 
 type Point = { x: number; y: number }
@@ -494,25 +463,35 @@ export const drawRectBorder = (
   )
 }
 
-export const createTranslateMat = (tx: number, ty: number) => {
+export const createTranslateMat = (offset:Pos) => {
   return [
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
-		tx, ty, 0, 1]
+		offset.left, offset.top, 0, 1]
 }
 
-export const createRotateMat = (rotate: number,origin:Pos={left:0,top:0}) => {
+//export const createRotateMat = (rotate: number,origin:Pos={left:0,top:0}) => {
+	//rotate = (rotate * Math.PI) / 180
+	//const cos = Math.cos(rotate)
+	//const sin = Math.sin(rotate)
+	//const x0 = origin.left
+	//const y0 = origin.top
+	//return [
+		//cos, sin, 0, 0, 
+		//-sin, cos, 0, 0,
+		//0, 0, 1, 0,
+		//(-x0*(cos-1)+y0*sin), (-x0*sin+y0*(1-cos)), 0, 1]
+//}
+export const createRotateMat = (rotate: number,) => {
 	rotate = (rotate * Math.PI) / 180
 	const cos = Math.cos(rotate)
 	const sin = Math.sin(rotate)
-	const x0 = origin.left
-	const y0 = origin.top
 	return [
 		cos, sin, 0, 0, 
 		-sin, cos, 0, 0,
 		0, 0, 1, 0,
-		(-x0*(cos-1)+y0*sin), (-x0*sin+y0*(1-cos)), 0, 1]
+		0, 0, 0, 1]
 }
 
 export const createScaleMat = (scale:number) => {

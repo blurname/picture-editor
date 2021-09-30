@@ -5,6 +5,7 @@ const imageVS = `
 precision highp float;
 attribute vec4 position;
 attribute vec2 texCoord;
+uniform mat4 transMat;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
@@ -14,7 +15,7 @@ uniform vec2 offset;
 varying highp vec2 vTexCoord;
 void main(){
 	//vec4 nPosition = vec4(position.x+offset.x,position.y+offset.y,0.0,1.0);
-	gl_Position = projectionMat*rotateMat*scaleMat*position;
+	gl_Position = projectionMat*transMat*rotateMat*scaleMat*position;
 	gl_Position.z = layout;
 	vTexCoord = texCoord;
 }
@@ -38,13 +39,14 @@ export const basicImageShader = {
   vs: imageVS,
   fs: imageFS,
   buffers: {
-    position: { type: vec4 },
+    position: { type: vec4,n:2 },
     texCoord: { type: vec2 },
   },
   textures: {
     img: { type: tex2D },
   },
   uniforms: {
+    transMat: { type: mat4 },
     scaleMat: { type: mat4 },
     rotateMat: { type: mat4 },
     projectionMat: { type: mat4 },
@@ -53,44 +55,22 @@ export const basicImageShader = {
 		offset:{type:vec2}
   },
 }
-//const zoomImageFS = `
-//precision highp float;
-//varying highp vec2 vTexCoord;
-
-//uniform sampler2D img;
-//unifrom vec2 zoomSection;
-
-//void main(){
-	//vec2 uv = vTexCoord/2.0;
-	//uv.xy+=zoomSection;
-	//gl_FragColor = texture2D(img,uv);
-//}
-
-//`
-//export const zoomImageShader = {
-  //...basicImageShader,
-	//FS:zoomImageFS,
-  //uniforms: {
-    //scaleMat: { type: mat4 },
-    //rotateMat: { type: mat4 },
-    //projectionMat: { type: mat4 },
-    //layout: { type: float },
-    //zoomSection: { type: vec2 },
-  //},
-//}
 
 const shapeVS = `
 precision highp float;
 attribute vec4 position;
 attribute vec4 color;
+
 varying highp vec4 vColor;
+
+uniform mat4 transMat;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
 uniform float layout;
 
 void main(){
-	gl_Position = projectionMat*rotateMat*scaleMat*position;
+	gl_Position = projectionMat*transMat*rotateMat*scaleMat*position;
 	gl_Position.z = layout;
 	vColor = color;
 }
@@ -112,7 +92,7 @@ export const shapeShader = {
   vs: shapeVS,
   fs: shapeFS,
   buffers: {
-    position: { type: vec4 },
+    position: { type: vec4,n:2 },
     color: { type: vec4, n: 3 },
   },
 }
@@ -120,6 +100,7 @@ export const shapeShader = {
 export const lineRectShader = {
   ...shapeShader,
   uniforms: {
+    transMat: { type: mat4 },
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
     projectionMat: { type: mat4 },
@@ -130,6 +111,7 @@ export const lineRectShader = {
 export const hollowRectShader = {
   ...shapeShader,
   uniforms: {
+    transMat: { type: mat4 },
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
     projectionMat: { type: mat4 },
@@ -455,6 +437,7 @@ precision highp float;
 attribute vec4 position;
 attribute vec4 texCoord;
 
+uniform mat4 transMat;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
@@ -462,7 +445,7 @@ uniform float layout;
 
 varying vec4 vTexCoord;
 void main(){
-	gl_Position = projectionMat*rotateMat*scaleMat*position;
+	gl_Position = projectionMat*transMat*rotateMat*scaleMat*position;
 	gl_Position.z = layout;
 	vTexCoord = texCoord;
 }
@@ -490,10 +473,11 @@ export const MosaicMultiShader = {
   vs: basicMosaicVS,
   fs: mosaicMultiVS,
   buffers: {
-    position: { type: vec4 },
+    position: { type: vec4,n:2 },
     texCoord: { type: vec4, n: 2 },
   },
   uniforms: {
+    transMat: { type: mat4 },
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
     projectionMat: { type: mat4 },

@@ -36,6 +36,7 @@ import {
   createW,
   createBackGrid,
   createMosaic,
+  createTranslateMat,
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
@@ -57,13 +58,12 @@ export class BeamSpirit {
   protected shader: Shader
   protected layout: number
   protected guidRect: Rect
-  protected pos: Pos
+  protected offset: Pos
   protected scale: number
   protected rotate: number
   protected guidRectPosition: Float32Array
   protected isToggle: boolean
   protected spiritType: SpiritType
-
 
   constructor(canvas: HTMLCanvasElement, id: number) {
     this.canvas = canvas
@@ -72,6 +72,9 @@ export class BeamSpirit {
     this.layout = 0.7
     this.id = id
     this.isToggle = true
+		this.scale = 1
+		this.rotate = 0
+		this.offset = {left:0,top:0}
   }
   updateGuidRect() {
     throw new Error('Method not implemented.')
@@ -110,10 +113,52 @@ export class BeamSpirit {
   }
   render() {}
 }
-export class ImageSpirit extends BeamSpirit {
+export class RectModel extends BeamSpirit{
+	//rotate:number
+	//scale:number
+	//offset:Pos
+	//transMat:number[]
+	//rotateMat:number[]
+	//scaleMat:number[]
+	constructor (canvas:HTMLCanvasElement,id:number) {
+		super(canvas,id)
+    this.transMat = createTranslateMat(this.offset)
+    this.rotateMat = createRotateMat(0)
+    this.scaleMat = createScaleMat(1)
+    this.projectionMat = createProjectionMatInShader(getCanvasEdge(this.canvas))
+	}
+  updateScaleMat(scale: number) {
+    this.scale = scale
+    this.scaleMat = createScaleMat(scale)
+    this.uniforms.set('scaleMat', this.scaleMat)
+  }
+  updateRotateMat(rotate: number) {
+    this.rotate = rotate
+    this.rotateMat = createRotateMat(rotate)
+    this.uniforms.set('rotateMat', this.rotateMat)
+  }
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    this.updateTransMat(distance)
+    this.updateGuidRect()
+  }
+  updateGuidRect() {
+    this.guidRect = updateRectLike(this.position, this.offset, this.scale)
+  }
+  updateTransMat(offset: Pos) {
+    this.offset = {
+      left: offset.left / this.scale,
+      top: offset.top / this.scale,
+    }
+    this.transMat = createTranslateMat({
+      left: offset.left,
+      top: offset.top,
+    })
+    this.uniforms.set('transMat', this.transMat)
+  }
+}
+export class ImageSpirit extends RectModel {
   image: HTMLImageElement
   textures: TexturesResource
-  zOffset: number
 
   targets: OffscreenTargetResource[]
   inputTextures: TexturesResource
@@ -130,19 +175,19 @@ export class ImageSpirit extends BeamSpirit {
   vignetteShader: Shader
 
   isZoomed: boolean
-	zoomSection:number[]
-	defaultZoom:number[]
+  zoomSection: number[]
+  defaultZoom: number[]
 
   constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number) {
     super(canvas, id)
     this.isZoomed = false
     this.spiritType = 'Image'
     this.image = image
-		this.defaultZoom = []
-		this.defaultZoom.push(0.0)
-		this.defaultZoom.push(0.0)
-		this.defaultZoom.push(1.0)
-		this.zoomSection = this.defaultZoom
+    this.defaultZoom = []
+    this.defaultZoom.push(0.0)
+    this.defaultZoom.push(0.0)
+    this.defaultZoom.push(1.0)
+    this.zoomSection = this.defaultZoom
 
     const quad = createRectangleByProjection(image.width, image.height)
 
@@ -159,80 +204,30 @@ export class ImageSpirit extends BeamSpirit {
     this.indexBuffer = this.beam.resource(IndexBuffer, quad.index)
     this.textures = this.beam.resource(Textures)
 
-    this.rotateMat = createRotateMat(0)
-    this.scaleMat = createScaleMat(1)
-
-    const w = this.canvas.width / 2
-    const h = this.canvas.height / 2
-    this.projectionMat = createProjectionMatInShader(getCanvasEdge(this.canvas))
-    //this.projectionMatInJS = createProjectionMatInJS(-w, w, h, -h)
-
-    //this.guidRectPosition = new Float32Array(16)
-    //mat4.mul(this.guidRectPosition, this.position, this.projectionMatInJS)
-
     this.uniforms = this.beam.resource(Uniforms, {
       scaleMat: this.scaleMat,
       transMat: this.transMat,
       rotateMat: this.rotateMat,
       projectionMat: this.projectionMat,
       layout: this.layout,
-			zoomSection:this.zoomSection
-      //hue: this.hue,
-      //saturation: this.saturation,
-      //vignette: this.vignette,
-      //brightness: this.brightness,
-      //contrast: this.contrast,
+      zoomSection: this.zoomSection,
     })
 
     this.textures.set('img', { image: this.image, flip: true })
-    this.inputTextures = this.textures
-    this.outputTextures = [
-      this.beam.resource(Textures),
-      this.beam.resource(Textures),
-    ]
-    this.targets = [
-      this.beam.resource(OffscreenTarget),
-      this.beam.resource(OffscreenTarget),
-    ]
-    this.outputTextures[0].set('img', this.targets[0])
-    this.outputTextures[1].set('img', this.targets[1])
-    this.rotate = 0
-    this.scale = 1
+    //this.inputTextures = this.textures
+    //this.outputTextures = [
+    //this.beam.resource(Textures),
+    //this.beam.resource(Textures),
+    //]
+    //this.targets = [
+    //this.beam.resource(OffscreenTarget),
+    //this.beam.resource(OffscreenTarget),
+    //]
+    //this.outputTextures[0].set('img', this.targets[0])
+    //this.outputTextures[1].set('img', this.targets[1])
     this.updateGuidRect()
   }
-  updateGuidRect() {
-    this.guidRect = fUpdateGuidRect(this.position, (position: Float32Array) => {
-      return {
-        x: position[0] * this.scale,
-        y: position[1] * this.scale,
-        width: Math.abs(position[0] - position[8]) * this.scale,
-        height: Math.abs(position[1] - position[5]) * this.scale,
-      }
-    })
-  }
 
-  updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    const scaleedDis = {
-      left: distance.left / this.scale,
-      top: distance.top / this.scale,
-    }
-    this.position = this.position.map((pos, index) => {
-      const remainder = index % 4
-      if (remainder === 0) return pos + scaleedDis.left
-      // changing y to be negtive since the canvs2d's y positive axis is downward
-      else if (remainder === 1) return pos + scaleedDis.top
-      else return pos
-    })
-    this.updateGuidRect()
-    this.updateRotateMat(this.rotate)
-    this.updateScaleMat(this.scale)
-    this.vertexBuffers.set('position', this.position)
-    //this.updateTransMat(distance.left, distance.top)
-  }
-
-  updateZ(maxZOffset: number) {
-    this.zOffset = maxZOffset
-  }
   updateContrast(contrast: number) {
     this.contrast = contrast
     this.uniforms.set('contrast', this.contrast)
@@ -253,36 +248,19 @@ export class ImageSpirit extends BeamSpirit {
     this.vignette = vignette
     this.uniforms.set('vignette', this.vignette)
   }
-  updateScaleMat(scale: number) {
-    if (this.scale === scale) {
-      return
-    }
-    this.scale = scale
-    this.scaleMat = createScaleMat(scale)
-    this.uniforms.set('scaleMat', this.scaleMat)
+  getIsZoomed() {
+    return this.isZoomed
   }
-  updateRotateMat(rotate: number) {
-    const origin: Pos = {
-      left: this.guidRect.x + this.guidRect.width / 2,
-      top: this.guidRect.y + this.guidRect.height / 2,
-    }
-    this.rotate = rotate
-    this.rotateMat = createRotateMat(rotate, origin)
-    this.uniforms.set('rotateMat', this.rotateMat)
-  }
-	getIsZoomed(){
-		return this.isZoomed
-	}
 
-	zoom(cursorPosInCanvas:Point){
-		if(this.isZoomed){
-			this.zoomSection = this.defaultZoom
-		}else{
-			this.zoomSection = this.setZoomSection(cursorPosInCanvas)
-		}
-			this.uniforms.set('zoomSection', this.zoomSection)
-			this.isZoomed = !this.isZoomed
-	}
+  zoom(cursorPosInCanvas: Point) {
+    if (this.isZoomed) {
+      this.zoomSection = this.defaultZoom
+    } else {
+      this.zoomSection = this.setZoomSection(cursorPosInCanvas)
+    }
+    this.uniforms.set('zoomSection', this.zoomSection)
+    this.isZoomed = !this.isZoomed
+  }
 
   setZoomSection(cursorPosInCanvas: Point) {
     const section = this.getInRectSection(cursorPosInCanvas)
@@ -290,21 +268,21 @@ export class ImageSpirit extends BeamSpirit {
     if (section === 0) {
       sectionVec3.push(0.0)
       sectionVec3.push(0.0)
-			sectionVec3.push(2.0)
+      sectionVec3.push(2.0)
     } else if (section === 1) {
       sectionVec3.push(0.0)
       sectionVec3.push(0.5)
-			sectionVec3.push(2.0)
+      sectionVec3.push(2.0)
     } else if (section === 2) {
       sectionVec3.push(0.5)
       sectionVec3.push(0.5)
-			sectionVec3.push(2.0)
+      sectionVec3.push(2.0)
     } else if (section === 3) {
       sectionVec3.push(0.5)
       sectionVec3.push(0.0)
-			sectionVec3.push(2.0)
+      sectionVec3.push(2.0)
     }
-		return sectionVec3
+    return sectionVec3
   }
   getInRectSection(cursorPosInCanvas: Point) {
     const { x, y, width, height } = this.guidRect
@@ -316,7 +294,7 @@ export class ImageSpirit extends BeamSpirit {
       section = 0
     else if (
       cx >= x &&
-      cx < x + width/2 &&
+      cx < x + width / 2 &&
       cy >= y + height / 2 &&
       cy <= y + height
     ) {
@@ -339,11 +317,6 @@ export class ImageSpirit extends BeamSpirit {
     return section
   }
 
-  //updateLayout(layout: number) {
-  ////throw new Error('Method not implemented.')
-  //this.layout = layout
-  //this.uniforms.set('layout', this.layout)
-  //}
   draw(shader: Shader, input: TexturesResource) {
     this.beam
       .depth()
@@ -356,7 +329,7 @@ export class ImageSpirit extends BeamSpirit {
       )
   }
   setIsLarged(isLarged: boolean) {
-    this.isLarged = isLarged
+    this.isZoomed = isLarged
   }
   render() {
     //this.beam.clear()
@@ -384,7 +357,7 @@ type Buffers = {
   }
 }
 type RectLikeShape = Exclude<Shape, 'circle'>
-export class MarkSpirit extends BeamSpirit {
+export class MarkSpirit extends RectModel {
   private uColor: number[]
   private shape: RectLikeShape
   private buffers: Buffers
@@ -397,13 +370,10 @@ export class MarkSpirit extends BeamSpirit {
     this.buffers = this.getBuffersByShape()
     this.vertexBuffers = this.beam.resource(VertexBuffers, this.buffers.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, this.buffers.index)
-    this.rotateMat = createRotateMat(0)
-    this.scaleMat = createScaleMat(1)
-    const w = this.canvas.width / 2
-    const h = this.canvas.height / 2
-    //this.projectionMat = createProjectionMatInShader(-w, w, h, -h)
+
     this.projectionMat = createProjectionMatInShader(getCanvasEdge(canvas))
     this.uniforms = this.beam.resource(Uniforms, {
+			transMat:this.transMat,
       uColor: this.uColor,
       rotateMat: this.rotateMat,
       scaleMat: this.scaleMat,
@@ -412,27 +382,7 @@ export class MarkSpirit extends BeamSpirit {
     })
     this.shader = this.getShaderByShape()
     this.position = this.buffers.vertex.position
-    this.rotate = 0
-    this.scale = 1
     this.updateGuidRect()
-  }
-  updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    const scaleedDis = {
-      left: distance.left / this.scale,
-      top: distance.top / this.scale,
-    }
-    this.position = this.position.map((pos, index) => {
-      const remainder = index % 4
-      if (remainder === 0) return pos + scaleedDis.left
-      // changing y to be negtive since the canvs2d's y positive axis is downward
-      else if (remainder === 1) return pos + scaleedDis.top
-      else return pos
-    })
-    this.updateGuidRect()
-    this.updateRotateMat(this.rotate)
-    this.updateScaleMat(this.scale)
-    this.vertexBuffers.set('position', this.position)
-    //this.updateTransMat(distance.left, distance.top)
   }
   getBuffersByShape(): Buffers {
     if (this.shape === 'line') {
@@ -452,34 +402,7 @@ export class MarkSpirit extends BeamSpirit {
     this.uColor = color
     this.uniforms.set('uColor', color)
   }
-  updateGuidRect() {
-    this.guidRect = fUpdateGuidRect(this.position, (position: Float32Array) => {
-      return {
-        x: position[0] * this.scale,
-        y: position[1] * this.scale,
-        width: Math.abs(position[0] - position[8]) * this.scale,
-        height: Math.abs(position[1] - position[5]) * this.scale,
-      }
-    })
-  }
-  updateScaleMat(scale: number) {
-    if (this.scale === scale) {
-      return
-    }
-    this.scale = scale
-    this.scaleMat = createScaleMat(scale)
-    this.uniforms.set('scaleMat', this.scaleMat)
-  }
-  updateRotateMat(rotate: number) {
-    //if(this.rotate === rotate) return
-    const origin: Pos = {
-      left: this.guidRect.x + this.guidRect.width / 2,
-      top: this.guidRect.y + this.guidRect.height / 2,
-    }
-    this.rotate = rotate
-    this.rotateMat = createRotateMat(rotate, origin)
-    this.uniforms.set('rotateMat', this.rotateMat)
-  }
+
   private draw() {
     this.beam
       .depth()
@@ -494,14 +417,54 @@ export class MarkSpirit extends BeamSpirit {
     this.draw()
   }
 }
-type CircleCenter = {
-  x: number
-  y: number
+
+export class MosaicSpirit extends RectModel {
+  constructor(canvas: HTMLCanvasElement, type: MosaicType, id: number) {
+    super(canvas, id)
+    this.spiritType = 'Mark'
+    const buffers = this.getBuffersByShape(type)
+    this.position = buffers.vertex.position
+    console.log(this.position)
+    this.vertexBuffers = this.beam.resource(VertexBuffers, buffers.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, buffers.index)
+    this.shader = this.beam.shader(this.getShaderByShape(type))
+    this.uniforms = this.beam.resource(Uniforms, {
+			transMat:this.transMat,
+      rotateMat: this.rotateMat,
+      scaleMat: this.scaleMat,
+      projectionMat: this.projectionMat,
+      layout: this.layout,
+    })
+    this.updateGuidRect()
+  }
+  getShaderByShape(type: MosaicType) {
+    let shader: any
+    if (type === 'multi') {
+      shader = MosaicMultiShader
+    }
+    return shader
+  }
+  getBuffersByShape(type: MosaicType): Buffers {
+    let buffers: any
+    if (type === 'multi') {
+      buffers = createMosaic(300, 300)
+    }
+    return buffers
+  }
+  render() {
+    this.beam
+      .depth()
+      .draw(
+        this.shader,
+        this.vertexBuffers as any,
+        this.indexBuffer as any,
+        this.uniforms as any,
+      )
+  }
 }
 export class CircleSpirit extends BeamSpirit {
   protected radius: number
   protected uColor: number[]
-  protected center: CircleCenter
   protected projectionX: number
   protected projectionY: number
   constructor(canvas: HTMLCanvasElement, id: number) {
@@ -513,14 +476,13 @@ export class CircleSpirit extends BeamSpirit {
     this.projectionX = xy.x
     this.projectionY = xy.y
     const circle = createCircle()
-    this.center = { x: 0.0, y: 0.0 }
     this.vertexBuffers = this.beam.resource(VertexBuffers, circle.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, circle.index)
     this.uniforms = this.beam.resource(Uniforms, {
       radius: this.radius,
       scale: this.scale,
-      centerX: this.center.x,
-      centerY: this.center.y,
+      centerX: this.offset.left,
+      centerY: this.offset.top,
       uColor: [1.0, 1.0, 1.0, 1.0],
       projectionX: this.projectionX,
       projectionY: this.projectionY,
@@ -529,10 +491,10 @@ export class CircleSpirit extends BeamSpirit {
     this.updateGuidRect()
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    this.center.x += distance.left
-    this.center.y += distance.top
-    this.uniforms.set('centerX', this.center.x)
-    this.uniforms.set('centerY', this.center.y)
+    this.offset.left += distance.left
+    this.offset.top += distance.top
+    this.uniforms.set('centerX', this.offset.left)
+    this.uniforms.set('centerY', this.offset.top)
     this.updateGuidRect()
   }
   updateScaleMat(scale: number) {
@@ -540,15 +502,7 @@ export class CircleSpirit extends BeamSpirit {
     this.uniforms.set('scale', scale)
   }
   updateGuidRect() {
-    const circleBase = { center: this.center, radius: this.radius }
-    this.guidRect = fUpdateGuidRect(circleBase, (circleArgs) => {
-      return {
-        x: circleArgs.center.x - circleArgs.radius * this.scale,
-        y: circleArgs.center.y - circleArgs.radius * this.scale,
-        width: circleArgs.radius * 2 * this.scale,
-        height: circleArgs.radius * 2 * this.scale,
-      }
-    })
+    this.guidRect = updateCircle(this.radius, this.offset, this.scale)
   }
   updateColor(color: number[]) {
     this.uColor = color
@@ -591,102 +545,6 @@ export class TheW extends BeamSpirit {
   }
 }
 
-export class MosaicSpirit extends BeamSpirit {
-  constructor(canvas: HTMLCanvasElement, type: MosaicType, id: number) {
-    super(canvas, id)
-    this.spiritType = 'Mark'
-    const buffers = this.getBuffersByShape(type)
-    this.position = buffers.vertex.position
-    console.log(this.position)
-    this.vertexBuffers = this.beam.resource(VertexBuffers, buffers.vertex)
-    this.indexBuffer = this.beam.resource(IndexBuffer, buffers.index)
-    this.shader = this.beam.shader(this.getShaderByShape(type))
-    this.rotateMat = createRotateMat(0)
-    this.scaleMat = createScaleMat(1)
-    this.scale = 1
-    this.rotate = 0
-    this.projectionMat = createProjectionMatInShader(getCanvasEdge(canvas))
-    this.uniforms = this.beam.resource(Uniforms, {
-      rotateMat: this.rotateMat,
-      scaleMat: this.scaleMat,
-      projectionMat: this.projectionMat,
-      layout: this.layout,
-    })
-    this.updateGuidRect()
-  }
-  getShaderByShape(type: MosaicType) {
-    let shader: any
-    if (type === 'multi') {
-      shader = MosaicMultiShader
-    }
-    return shader
-  }
-  getBuffersByShape(type: MosaicType): Buffers {
-    let buffers: any
-    if (type === 'multi') {
-      buffers = createMosaic(300, 300)
-    }
-    return buffers
-  }
-  updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    const scaleedDis = {
-      left: distance.left / this.scale,
-      top: distance.top / this.scale,
-    }
-    this.position = this.position.map((pos, index) => {
-      const remainder = index % 4
-      if (remainder === 0) return pos + scaleedDis.left
-      // changing y to be negtive since the canvs2d's y positive axis is downward
-      else if (remainder === 1) return pos + scaleedDis.top
-      else return pos
-    })
-    this.updateGuidRect()
-    this.updateRotateMat(this.rotate)
-    this.updateScaleMat(this.scale)
-    this.vertexBuffers.set('position', this.position)
-    //this.updateTransMat(distance.left, distance.top)
-  }
-  updateGuidRect() {
-    this.guidRect = fUpdateGuidRect(this.position, (position: Float32Array) => {
-      return {
-        x: position[0] * this.scale,
-        y: position[1] * this.scale,
-        width: Math.abs(position[0] - position[8]) * this.scale,
-        height: Math.abs(position[1] - position[5]) * this.scale,
-      }
-    })
-    console.log(this.guidRect)
-  }
-  updateScaleMat(scale: number) {
-    if (this.scale === scale) {
-      return
-    }
-    this.scale = scale
-    this.scaleMat = createScaleMat(scale)
-    this.uniforms.set('scaleMat', this.scaleMat)
-  }
-  updateRotateMat(rotate: number) {
-    //if(this.rotate === rotate) return
-    const origin: Pos = {
-      left: this.guidRect.x + this.guidRect.width / 2,
-      top: this.guidRect.y + this.guidRect.height / 2,
-    }
-    this.rotate = rotate
-    this.rotateMat = createRotateMat(rotate, origin)
-    this.uniforms.set('rotateMat', this.rotateMat)
-  }
-
-  render() {
-    this.beam
-      .depth()
-      .draw(
-        this.shader,
-        this.vertexBuffers as any,
-        this.indexBuffer as any,
-        this.uniforms as any,
-      )
-  }
-}
 export class GuidLine {
   protected beam: Beam
   protected id: number
@@ -749,14 +607,43 @@ export class BackSpirit extends BeamSpirit {
   }
 }
 
-const fUpdateGuidRect = <T>(position: T, fn: (args: T) => Rect): Rect => {
-  return fn(position)
+const fUpdateGuidRect = <T>(
+  fn: (base: T, offset: Pos, scale: number) => Rect,
+  base: T,
+  offset: Pos,
+  scale: number,
+): Rect => {
+  return fn(base, offset, scale)
 }
-const fUpdatePosition = (
-  position: Float32Array,
-  fn: (position: Float32Array) => Float32Array,
-) => {
-  return fn(position)
+const updateRectLike = (position: Float32Array, offset: Pos, scale: number) => {
+  return fUpdateGuidRect(
+    (position, offset, scale) => {
+      return {
+        x: (position[0] + offset.left)*scale,
+        y: (position[1] + offset.top)*scale,
+        width: Math.abs(position[0] - position[4]) * scale,
+        height: Math.abs(position[1] - position[3]) * scale,
+      }
+    },
+    position,
+    offset,
+    scale,
+  )
+}
+const updateCircle = (radius: number, offset: Pos, scale: number) => {
+  return fUpdateGuidRect(
+    (radius, offset, scale) => {
+      return {
+        x: offset.left - radius * scale,
+        y: offset.top - radius * scale,
+        width: radius * 2 * scale,
+        height: radius * 2 * scale,
+      }
+    },
+    radius,
+    offset,
+    scale,
+  )
 }
 const getCanvasEdge = (canvas: HTMLCanvasElement) => {
   const w = canvas.width / 2
