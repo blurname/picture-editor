@@ -1,6 +1,6 @@
 import { Button, Collapse, Input, Slider } from 'antd'
 import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
-import React, { ChangeEvent, useContext } from 'react'
+import React, { ChangeEvent, useContext, useState } from 'react'
 import { globalContext } from '../../context'
 import { ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
 import { editorSchema } from './editorSchema'
@@ -36,18 +36,67 @@ export function Editor() {
     spiritCanvas.spirits[selectNum].updateLayout(1 - value)
     setAdjustNum(adjustNum + 1)
   }
+	const [value, setValue] = useState(0);
+	const [desc, setDesc] = useState('');
+	const [old, setOld] = useState({} as any);
+	const onMouseDown = (desc:string)=>() => {
+      const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
+      if (desc === 'rotate') {
+				setOld(chosenImage.getRotate())
+        //chosenImage.updateRotateMat(curValue)
+				//operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:curValue})
+      } else if (desc === 'scale') {
+				setOld(chosenImage.getScale())
+        //chosenImage.updateScaleMat(curValue)
+				//operationHistory.commit(chosenImage.getModel(), {scale:chosenImage.getScale()}, {scale:curValue})
+      } else if (desc === 'Hue') {
+        //chosenImage.updateHue(curValue)
+      } else if (desc === 'Saturation') {
+        //chosenImage.updateSaturation(curValue)
+      } else if (desc === 'Contrast') {
+        //chosenImage.updateContrast(curValue)
+      } else if (desc === 'Brightness') {
+        //chosenImage.updateBrightness(curValue)
+      } else if (desc === 'Vignette') {
+        //chosenImage.updateVignette(curValue)
+      }
+	}
   const onChangeInput =
     (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
-      const value = parseFloat(e.target.value)
+      const curValue = parseFloat(e.target.value)
       const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
 
       // can functional optimze
       if (desc === 'rotate') {
+        chosenImage.updateRotateMat(curValue)
+				//operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:curValue})
+      } else if (desc === 'scale') {
+        chosenImage.updateScaleMat(curValue)
+				//operationHistory.commit(chosenImage.getModel(), {scale:chosenImage.getScale()}, {scale:curValue})
+      } else if (desc === 'Hue') {
+        chosenImage.updateHue(curValue)
+      } else if (desc === 'Saturation') {
+        chosenImage.updateSaturation(curValue)
+      } else if (desc === 'Contrast') {
+        chosenImage.updateContrast(curValue)
+      } else if (desc === 'Brightness') {
+        chosenImage.updateBrightness(curValue)
+      } else if (desc === 'Vignette') {
+        chosenImage.updateVignette(curValue)
+      }
+      setAdjustNum(adjustNum + 1)
+			setValue(curValue)
+			setDesc(desc)
+    }
+	const afterChange = () => {
+			const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
+      if (desc === 'rotate') {
         chosenImage.updateRotateMat(value)
-				operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:value})
+				console.log('old:', old)
+				operationHistory.commit(chosenImage.getModel(), {rotate:old}, {rotate:value})
       } else if (desc === 'scale') {
         chosenImage.updateScaleMat(value)
-				operationHistory.commit(chosenImage.getModel(), {scale:chosenImage.getScale()}, {scale:value})
+				operationHistory.commit(chosenImage.getModel(), {scale:old}, {scale:value})
       } else if (desc === 'Hue') {
         chosenImage.updateHue(value)
       } else if (desc === 'Saturation') {
@@ -60,7 +109,7 @@ export function Editor() {
         chosenImage.updateVignette(value)
       }
       setAdjustNum(adjustNum + 1)
-    }
+	}
   const filters = editorSchema.children[1]
   const onEnlargeable = () => {
 	//appRef.current.style.cursor='zoom-in'
@@ -109,6 +158,8 @@ export function Editor() {
                     defaultValue={cur.props.value}
                     onInput={onChangeInput(cur.desc)}
                     id={cur.desc}
+										onMouseUp={afterChange}
+										onMouseDown={onMouseDown(cur.desc)}
                   />
                   <label htmlFor={cur.desc}>{cur.desc}</label>
                 </div>

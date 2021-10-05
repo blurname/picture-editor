@@ -138,10 +138,10 @@ export class OperationHistory {
 			id:spirit.id,
 			from,to
 		}
-		console.log("operation.id",operation.id)
+		//console.log("operation.id",operation.id)
 		this.histories.push(operation)
 		this.lens = this.histories.length
-		this.tail+=1
+		this.tail = this.lens
   }
   undo() {
     if (this.tail > 0) {
@@ -168,14 +168,14 @@ export class OperationHistory {
 			dir = to
 		}
     const key = Object.keys(dir)[0]
-		console.log('operation:', operation)
+		//console.log('operation:', operation)
     const spirit = this.spiritCanvas.spirits[id]
-		console.log('spirit:', spirit)
+		//console.log('spirit:', spirit)
     if (key === 'trans') {
-			console.log('trans')
-			console.log('dir:',dir)
+			//console.log('trans')
+			//console.log('dir:',dir)
       spirit.updatePosition(dir.trans)
-			spirit.render()
+			//spirit.render()
     } else if (key === 'scale') {
       spirit.updateScaleMat(dir.scale)
       // func from to

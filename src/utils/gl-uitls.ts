@@ -168,7 +168,7 @@ export class RectModel extends BeamSpirit{
       left: offset.left / this.scale,
       top: offset.top / this.scale,
     }
-		this.model.trans = this.offset
+		this.model.trans = offset
 		//const guidRect = this.getGuidRect()
 		//const center:Pos = {left:guidRect.x+guidRect.width/2,top:guidRect.y+guidRect.height/2}
     this.transMat = createTranslateMat({
