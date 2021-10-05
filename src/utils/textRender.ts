@@ -13,7 +13,7 @@ export const textRneder = () => {
   ctx.fillText(text, width / 2, height / 2)
   let image = ctx.getImageData(0, 0, width, height)
 
-	console.log(image.data.filter((data) => data!==0))
+	//console.log(image.data.filter((data) => data!==0))
   //console.log(image.data)
 }
 

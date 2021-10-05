@@ -61,6 +61,8 @@ export class BeamSpirit {
   protected offset: Pos
   protected scale: number
   protected rotate: number
+	protected model: Model
+
   protected guidRectPosition: Float32Array
   protected isToggle: boolean
   protected spiritType: SpiritType
@@ -75,6 +77,12 @@ export class BeamSpirit {
 		this.scale = 1
 		this.rotate = 0
 		this.offset = {left:0,top:0}
+		this.model = {
+			id:this.id,
+			scale:this.scale,
+			rotate:this.rotate,
+			trans:this.offset
+		}
   }
   updateGuidRect() {
     throw new Error('Method not implemented.')
@@ -102,6 +110,9 @@ export class BeamSpirit {
   getScale() {
     return this.scale
   }
+  getRotate() {
+    return this.rotate
+  }
   getIsToggle() {
     return this.isToggle
   }
@@ -111,6 +122,12 @@ export class BeamSpirit {
   getLayout() {
     return this.layout
   }
+	getModel(){
+		return this.model
+	}
+	getPos(){
+		return this.offset
+	}
   render() {}
 }
 export class RectModel extends BeamSpirit{
@@ -129,11 +146,13 @@ export class RectModel extends BeamSpirit{
 	}
   updateScaleMat(scale: number) {
     this.scale = scale
+		this.model.scale = this.scale
     this.scaleMat = createScaleMat(scale)
     this.uniforms.set('scaleMat', this.scaleMat)
   }
   updateRotateMat(rotate: number) {
     this.rotate = rotate
+		this.model.rotate = this.rotate
     this.rotateMat = createRotateMat(rotate)
     this.uniforms.set('rotateMat', this.rotateMat)
   }
@@ -149,6 +168,7 @@ export class RectModel extends BeamSpirit{
       left: offset.left / this.scale,
       top: offset.top / this.scale,
     }
+		this.model.trans = this.offset
 		//const guidRect = this.getGuidRect()
 		//const center:Pos = {left:guidRect.x+guidRect.width/2,top:guidRect.y+guidRect.height/2}
     this.transMat = createTranslateMat({

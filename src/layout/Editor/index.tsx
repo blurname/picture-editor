@@ -13,7 +13,8 @@ export function Editor() {
     selectNum,
     zoomable,
     setZoomable,
-		appRef
+		appRef,
+		operationHistory,
   } = useContext(globalContext)
   const shaping = editorSchema.children[0]
   const onColorChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -43,8 +44,10 @@ export function Editor() {
       // can functional optimze
       if (desc === 'rotate') {
         chosenImage.updateRotateMat(value)
+				operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:value})
       } else if (desc === 'scale') {
         chosenImage.updateScaleMat(value)
+				operationHistory.commit(chosenImage.getModel(), {scale:chosenImage.getScale()}, {scale:value})
       } else if (desc === 'Hue') {
         chosenImage.updateHue(value)
       } else if (desc === 'Saturation') {

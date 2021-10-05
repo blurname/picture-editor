@@ -26,7 +26,22 @@ interface CanvasPos extends Pos {
 interface GuidRect extends Rect{
 	id:number
 }
+interface Model  {
+	id:number
+	trans:Pos
+	scale:number
+	rotate:number
+}
+interface Mark extends Model{
+	color:number[]
+}
+interface Image extends Model{
+	zoom:boolean
+}
+type Mosaic = Model
 type Shape = 'line' | 'hollowRect'|'circle'|'theW'
 type SpiritType = 'Image'| 'Mark'|'Mosaic'
 type MosaicType = 'multi'| 'fract'
 type Point = { x: number; y: number }
+
+type SpiritsAction = Image | Mark | Mosaic

@@ -1,3 +1,4 @@
+import { Button } from 'antd'
 import { Beam, ResourceTypes } from 'beam-gl'
 import React, {
   MouseEvent,
@@ -7,6 +8,7 @@ import React, {
   useState,
 } from 'react'
 import { globalContext } from '../../context'
+import { operationHistory } from '../../store/globalCanvas'
 import {
   drawRectBorder,
   getCursorIsInQuad,
@@ -30,9 +32,11 @@ export function Canvas(props: Props) {
     selectNum,
     setSelectNum,
     adjustNum,
+    setAdjustNum,
     cmpCount,
     zoomable,
     appRef,
+    operationHistory,
   } = useContext(globalContext)
   let canvas: CanvasPos = {
     width: 1300,
@@ -41,6 +45,7 @@ export function Canvas(props: Props) {
     top: 110,
   }
   const [images, setImages] = useState([] as BeamSpirit[])
+  //const [oldPos, setOldPos] = useState({} as Pos);
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
@@ -64,6 +69,7 @@ export function Canvas(props: Props) {
   }
 
   let curImage: number
+  let oldPos: Pos
 
   const handleOnMouseMove = (e: MouseEvent) => {
     if (!isMoveable || zoomable) return
@@ -81,7 +87,7 @@ export function Canvas(props: Props) {
     //spiritCanvas.spirits[curImage].render()
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
-				images[i].render()
+        images[i].render()
         if (curImage === i) {
           drawRectBorder(canvas2dRef.current, images[curImage].getGuidRect())
           //if (!zoomable && !isMoveable)
@@ -127,59 +133,58 @@ export function Canvas(props: Props) {
       }
       isMoveable = true
       //setIsMoveable(true)
+      oldPos = images[curImage].getPos()
       canvas3dRef.current.style.cursor = 'move'
     }
   }
 
   const thandleOnMouseUp = (e: MouseEvent) => {
     isMoveable = false
+    console.log('oldPos:', oldPos)
+    if (oldPos !== undefined) {
+      const spirit = spiritCanvas.spirits[curImage]
+      operationHistory.commit(
+        spirit.getModel(),
+        { trans: oldPos },
+        { trans: spirit.getModel().trans },
+      )
+		console.log(spiritCanvas.spirits[curImage])
+			console.log('spirit.getModel():', spirit.getModel())
+    }
+    console.log('operationHistory.lens:', operationHistory.lens)
+    //operationHistory.commit(s, from, wto)
     if (!zoomable) canvas3dRef.current.style.cursor = 'default'
     renderImages()
+    setAdjustNum(adjustNum + 1)
   }
-  //const handleOnMouseUp = (e: MouseEvent) => {
-  //e.preventDefault()
-  //if (preCursor !== undefined) {
-  //const distance = getCursorMovDistance(preCursor, e, canvas)
-  ////console.log(maxZOffset)
-  ////images[curImage].zOffset = maxZOffset
-  //images[curImage].updatePosition(distance)
-  //spiritCanvas.updateGuidRect(
-  //images[curImage].getGuidRect(),
-  //images[curImage].getId(),
-  //)
-  //spiritCanvas.setChosenType(images[curImage].getSpiritType())
-  //setSelectNum(curImage)
-  ////setMaxZOffset(maxZOffset - 0.000001)
-  //for (let i = 0; i < images.length; i++) {
-  //if (images[i] !== null) {
-  //images[i].render()
-  //if (curImage === i) {
-  //preCursor = e
-  //drawRectBorder(canvas2dRef.current, images[i].getGuidRect())
-  //if (!zoomable) canvas3dRef.current.style.cursor = 'default'
-  //}
-  //}
-  //}
-  //spiritCanvas.renderAllLine()
-  //}
-  //}
   const renderImages = () => {
     //spiritCanvas.renderBackground()
     for (const image of images) {
       if (image !== null) image.render()
     }
   }
+  const handleBack = () => {
+    operationHistory.undo()
+    renderImages()
+    setAdjustNum(adjustNum + 1)
+  }
+  const handleNext = () => {
+    operationHistory.redo()
+    renderImages()
+    setAdjustNum(adjustNum + 1)
+  }
+  //console.log('operationHistory.tail:', operationHistory.tail)
+  //console.log('operationHistory.lens:', operationHistory.lens)
 
   useEffect(() => {
     //the z position more big,the view more far
     spiritCanvas.setCanvas3d(canvas3dRef.current)
     spiritCanvas.spirits = images
-		//images.push(new CircleSpirit(canvas3dRef.current,19))
-		const image = new Image()
-		image.src = '../../../public/t5.jpeg'
-		
-		images.push(new ImageSpirit(canvas3dRef.current,image,19))
+    //images.push(new CircleSpirit(canvas3dRef.current,19))
+    //const image = new Image()
+    //image.src = '../../../public/t5.jpeg'
 
+    //images.push(new ImageSpirit(canvas3dRef.current, image, 0))
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
     //spiritCanvas.renderAllLine()
@@ -200,6 +205,15 @@ export function Canvas(props: Props) {
 
   return (
     <div className="w-12/12 h-12/12">
+      <Button onClick={handleBack} disabled={!(operationHistory.tail > 0)}>
+        undo
+      </Button>
+      <Button
+        onClick={handleNext}
+        disabled={!(operationHistory.tail < operationHistory.lens)}
+      >
+        redo
+      </Button>
       <canvas
         className="bg-gray-100"
         ref={canvas2dRef}

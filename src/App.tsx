@@ -4,7 +4,7 @@ import { Editor } from './layout/Editor'
 import { Canvas } from './layout/Canvas'
 import { Components } from './layout/Components'
 import { globalContext } from './context'
-import { spiritCanvas } from './store/globalCanvas'
+import { spiritCanvas,operationHistory } from './store/globalCanvas'
 import Layout, { Content, Footer, Header } from 'antd/lib/layout/layout'
 function App() {
   const [cmpCount, setCmpCount] = useState(0)
@@ -34,7 +34,8 @@ function App() {
             spiritCanvas,
             appRef,
 						zoomable,
-						setZoomable
+						setZoomable,
+						operationHistory
           }}
         >
           <Components />
