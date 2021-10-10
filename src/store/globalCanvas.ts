@@ -1,3 +1,4 @@
+import { AxiosInstance } from 'axios'
 import { Beam } from 'beam-gl'
 import { theWShader } from '../filter/shader'
 import {
@@ -11,7 +12,17 @@ import {
   TheW,
 } from '../utils/gl-uitls'
 
-export class SpiritsCanvas{
+type canvas = {
+  id: number
+  ownerId: number
+}
+enum eSpiType {
+  image = 1,
+  mark,
+  mosaic,
+}
+export class SpiritsCanvas {
+  id: number
   spirits: BeamSpirit[]
   curSpirit: ImageSpirit | null
   canvas3d: HTMLCanvasElement
@@ -22,10 +33,25 @@ export class SpiritsCanvas{
   background: BackSpirit
   chosenType: SpiritType
   isLarged: boolean
-  constructor() {
+  ax: AxiosInstance
+  ownerId: number
+  constructor(ownerId: number, ax: AxiosInstance) {
     this.spirits = []
     this.guidLines = []
     this.curSpirit = null
+    this.ownerId = ownerId
+    this.ax = ax
+    this.create()
+  }
+  async create() {
+    const res = await ax.post(
+      '/canvas/create',
+      JSON.stringify({ ownerId: this.ownerId }),
+    )
+    const json = res.data
+    const id = JSON.parse(json).id
+    this.id = Number.parseInt(id)
+    console.log(this.id)
   }
 
   addImage(imgSrc: string, id: number) {
@@ -37,6 +63,7 @@ export class SpiritsCanvas{
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
     )
+    this.spiritCommit(spirit.getModel(), eSpiType.image)
   }
 
   addMark(shape: Shape, id: number) {
@@ -76,6 +103,13 @@ export class SpiritsCanvas{
         }
       }
     }
+  }
+  async spiritCommit<T extends Model>(model: T, spiritType: eSpiType) {
+    const res = await ax.post(
+      `/canvas/add/?canvasid=${this.id}&spirittype=${spiritType}&canvas_spirit_id=${model.id}`,
+      JSON.stringify(model),
+    )
+    console.log(res.data)
   }
   renderAllLine() {
     //this.beamClener.clear()
@@ -122,60 +156,62 @@ export class OperationHistory {
   histories: LinearActions[]
   lens: number
   tail: number
+  ax: AxiosInstance
   spiritCanvas: SpiritsCanvas
-  constructor(spiritCanvas: SpiritsCanvas) {
+  constructor(spiritCanvas: SpiritsCanvas, ax: AxiosInstance) {
     this.histories = []
     this.tail = 0
     this.lens = 0
     this.spiritCanvas = spiritCanvas
+    this.ax = ax
   }
   commit<T extends SpiritsAction, U extends Partial<T>, V extends U>(
     spirit: T,
     from: U,
     to: V,
   ) {
-		const operation = {
-			id:spirit.id,
-			from,to
-		}
-		//console.log("operation.id",operation.id)
-		this.histories.push(operation)
-		this.lens = this.histories.length
-		this.tail = this.lens
+    const operation = {
+      id: spirit.id,
+      from,
+      to,
+    }
+    //console.log("operation.id",operation.id)
+    this.histories.push(operation)
+    this.lens = this.histories.length
+    this.tail = this.lens
+		this.updateRemote(operation.id)
   }
   undo() {
     if (this.tail > 0) {
-			this.mapOperation(this.histories[this.tail-1], true)
+      this.mapOperation(this.histories[this.tail - 1], true)
       this.tail -= 1
     }
   }
   redo() {
     if (this.tail < this.lens) {
       //const { id, from, to } = this.histories[this.tail]
-			this.mapOperation(this.histories[this.tail], false)
+      this.mapOperation(this.histories[this.tail], false)
       this.tail += 1
     }
   }
-  mapOperation(
-    operation: LinearActions,
-		back:boolean
-  ) {
+  async mapOperation(operation: LinearActions, back: boolean) {
     const { id, from, to } = operation
-		let dir:any
-		if (back) {
-			dir = from
-		}else{
-			dir = to
-		}
+    let dir: any
+    if (back) {
+      dir = from
+    } else {
+      dir = to
+    }
     const key = Object.keys(dir)[0]
-		//console.log('operation:', operation)
+
+    //console.log('operation:', operation)
     const spirit = this.spiritCanvas.spirits[id]
-		//console.log('spirit:', spirit)
+    //console.log('spirit:', spirit)
     if (key === 'trans') {
-			//console.log('trans')
-			//console.log('dir:',dir)
+      //console.log('trans')
+      //console.log('dir:',dir)
       spirit.updatePosition(dir.trans)
-			//spirit.render()
+      //spirit.render()
     } else if (key === 'scale') {
       spirit.updateScaleMat(dir.scale)
       // func from to
@@ -183,12 +219,23 @@ export class OperationHistory {
       spirit.updateRotateMat(dir.rotate)
       // func from to
     } else if (key === 'color') {
-			const mark = spirit as MarkSpirit
-			mark.updateColor(dir)
+      const mark = spirit as MarkSpirit
+      mark.updateColor(dir)
       // func from to
-    } 
+    }
+		this.updateRemote(id)
     spiritCanvas.updateGuidRect(spirit)
   }
+  async updateRemote(id: number) {
+    const AFModel = this.spiritCanvas.spirits[id].getModel()
+    const res = await ax.post(
+      `/canvas/update/?canvasid=${this.spiritCanvas.id}&canvas_spirit_id=${AFModel.id}`,
+      JSON.stringify(AFModel),
+    )
+    console.log('res:', res)
+  }
 }
-export const spiritCanvas = new SpiritsCanvas()
-export const operationHistory = new OperationHistory(spiritCanvas)
+
+import { ax } from '../utils/http'
+export const spiritCanvas = new SpiritsCanvas(24, ax)
+export const operationHistory = new OperationHistory(spiritCanvas, ax)
