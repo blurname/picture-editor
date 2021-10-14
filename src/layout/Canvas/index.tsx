@@ -8,7 +8,6 @@ import React, {
   useState,
 } from 'react'
 import { globalContext } from '../../context'
-import { operationHistory } from '../../store/globalCanvas'
 import {
   drawRectBorder,
   getCursorIsInQuad,
@@ -35,7 +34,6 @@ export function Canvas(props: Props) {
     setAdjustNum,
     cmpCount,
     zoomable,
-    appRef,
     operationHistory,
   } = useContext(globalContext)
   let canvas: CanvasPos = {
@@ -178,8 +176,8 @@ export function Canvas(props: Props) {
 
   useEffect(() => {
     //the z position more big,the view more far
-    spiritCanvas.setCanvas3d(canvas3dRef.current)
-    spiritCanvas.spirits = images
+    spiritCanvas?.setCanvas3d(canvas3dRef.current)
+		spiritCanvas.spirits = images
     //images.push(new CircleSpirit(canvas3dRef.current,19))
     //const image = new Image()
     //image.src = '../../../public/t5.jpeg'
@@ -188,7 +186,6 @@ export function Canvas(props: Props) {
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
     //spiritCanvas.renderAllLine()
-    console.log('appRef:', appRef.current)
     textRneder()
   }, [])
   useEffect(() => {
@@ -201,6 +198,8 @@ export function Canvas(props: Props) {
 
   useEffect(() => {
     renderImages()
+    console.log('reanderAll')
+
   }, [adjustNum, cmpCount])
 
   return (

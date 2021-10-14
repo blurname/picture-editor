@@ -13,7 +13,6 @@ export function Editor() {
     selectNum,
     zoomable,
     setZoomable,
-		appRef,
 		operationHistory,
   } = useContext(globalContext)
   const shaping = editorSchema.children[0]
@@ -132,6 +131,8 @@ export function Editor() {
         <Button onClick={onDeleteClik} className="bg-pink-200 text-red-500 text-lg mb-4">delete element</Button>
       </div>
       <Collapse className="w-12/12" defaultActiveKey={[1, 2, 3]}>
+
+			{selectNum!==1 &&(
         <CollapsePanel header="shaping" key="1">
           <div>
             {shaping.children.map((cur, index) => {
@@ -167,7 +168,9 @@ export function Editor() {
             })}
           </div>
         </CollapsePanel>
-        {spiritCanvas.chosenType === 'Image' && (
+				)
+				}
+        {spiritCanvas?.chosenType === 'Image' && (
           <CollapsePanel header="filters" key="2">
             <div>
               {filters.children.map((cur, index) => {
@@ -189,7 +192,7 @@ export function Editor() {
             </div>
           </CollapsePanel>
         )}
-        {spiritCanvas.chosenType === 'Mark' && (
+        {spiritCanvas?.chosenType === 'Mark' && (
           <CollapsePanel header="Mark" key="3">
             <div>
               <label htmlFor="">color adjust</label>

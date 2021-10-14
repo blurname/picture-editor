@@ -1,5 +1,6 @@
 import { AxiosInstance } from 'axios'
 import { Beam } from 'beam-gl'
+import {ax} from '../utils/http'
 import { theWShader } from '../filter/shader'
 import {
   BackSpirit,
@@ -11,6 +12,7 @@ import {
   MosaicSpirit,
   TheW,
 } from '../utils/gl-uitls'
+import {createCanvas} from '../utils/http'
 
 type canvas = {
   id: number
@@ -41,18 +43,13 @@ export class SpiritsCanvas {
     this.curSpirit = null
     this.ownerId = ownerId
     this.ax = ax
-    this.create()
+		//console.log('lasdkjf;laskdjf;lsakdfj')
+		//this.create()
   }
-  async create() {
-    const res = await ax.post(
-      '/canvas/create',
-      JSON.stringify({ ownerId: this.ownerId }),
-    )
-    const json = res.data
-    const id = JSON.parse(json).id
-    this.id = Number.parseInt(id)
-    console.log(this.id)
-  }
+	async setCanvas(){
+		console.log('asldfkjsad;lfjk')
+		this.id = await createCanvas(this.ownerId)
+	}
 
   addImage(imgSrc: string, id: number) {
     console.log('addImage:', id)
@@ -105,7 +102,7 @@ export class SpiritsCanvas {
     }
   }
   async spiritCommit<T extends Model>(model: T, spiritType: eSpiType) {
-    const res = await ax.post(
+    const res = await this.ax.post(
       `/canvas/add/?canvasid=${this.id}&spirittype=${spiritType}&canvas_spirit_id=${model.id}`,
       JSON.stringify(model),
     )
@@ -224,11 +221,11 @@ export class OperationHistory {
       // func from to
     }
 		this.updateRemote(id)
-    spiritCanvas.updateGuidRect(spirit)
+    this.spiritCanvas.updateGuidRect(spirit)
   }
   async updateRemote(id: number) {
     const AFModel = this.spiritCanvas.spirits[id].getModel()
-    const res = await ax.post(
+    const res = await this.ax.post(
       `/canvas/update/?canvasid=${this.spiritCanvas.id}&canvas_spirit_id=${AFModel.id}`,
       JSON.stringify(AFModel),
     )
@@ -236,6 +233,6 @@ export class OperationHistory {
   }
 }
 
-import { ax } from '../utils/http'
 export const spiritCanvas = new SpiritsCanvas(24, ax)
+spiritCanvas.setCanvas()
 export const operationHistory = new OperationHistory(spiritCanvas, ax)

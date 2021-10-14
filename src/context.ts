@@ -11,6 +11,5 @@ type globalCanvasType = {
 	zoomable:boolean
 	setZoomable:Dispatch<SetStateAction<boolean>>
   setAdjustNum: React.Dispatch<React.SetStateAction<number>>
-	appRef:React.MutableRefObject<HTMLDivElement>
 }
 export const globalContext = React.createContext({} as globalCanvasType)
