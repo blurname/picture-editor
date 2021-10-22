@@ -12,6 +12,7 @@ export function CanvasEditor() {
   const [selectNum, setSelectNum] = useState(-1)
   const [adjustNum, setAdjustNum] = useState(0)
   const [zoomable, setZoomable] = useState(false)
+	const [, set] = useState();
   //const spiritCanvas = useCanvas(24)
   //const spiritCanvasRef = useRef(new SpiritsCanvas(24,ax));
   //const spiritCanvas = spiritCanvasRef.current

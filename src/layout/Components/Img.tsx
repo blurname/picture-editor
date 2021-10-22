@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { menu } from './menuSchema'
 import './index.css'
 import { globalContext } from '../../context'
@@ -47,6 +47,9 @@ export function Img() {
     spiritCanvas.addImage(imgSrc,cmpCount)
     setCmpCount(cmpCount + 1)
   }
+	useEffect(() => {
+		//addToSpirits(imgs[1].value)()
+	}, []);
   return (
     <div className="">
       {imgs.map((img, index) => {

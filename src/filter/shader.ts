@@ -277,17 +277,17 @@ void main() {
 }
 `
 
-export const BasicImage = {
-  vs: defaultVS,
-  fs: defaultFS,
-  buffers: {
-    position: { type: vec4, n: 3 },
-    texCoord: { type: vec2 },
-  },
-  textures: {
-    img: { type: tex2D },
-  },
-}
+//export const BasicImage = {
+  //vs: defaultVS,
+  //fs: defaultFS,
+  //buffers: {
+    //position: { type: vec4, n: 3 },
+    //texCoord: { type: vec2 },
+  //},
+  //textures: {
+    //img: { type: tex2D },
+  //},
+//}
 
 const saturationVS = `
 	attribute vec4 position;
@@ -337,24 +337,30 @@ uniform sampler2D img;
 uniform float brightness;
 uniform float contrast;
 
+uniform vec3 zoomSection;
 varying highp vec2 vTexCoord;
 
 void main() {
-  vec4 color = texture2D(img, vTexCoord);
+	vec2 uv = vTexCoord/zoomSection.z;
+	uv.x+=zoomSection.x;
+	uv.y+=zoomSection.y;
+  vec4 color = texture2D(img, uv);
   color.rgb += brightness;
   if (contrast > 0.0) {
     color.rgb = (color.rgb - 0.5) / (1.0 - contrast) + 0.5;
   } else {
     color.rgb = (color.rgb - 0.5) * (1.0 + contrast) + 0.5;
   }
+	gl_FragColor = texture2D(img,uv);
   gl_FragColor = color;
 }
 `
 
 export const BrightnessContrast = {
-  ...BasicImage,
+	...basicImageShader,
   fs: brighnessContrastFS,
   uniforms: {
+		...basicImageShader.uniforms,
     brightness: { type: float, default: 0 },
     contrast: { type: float, default: 0 },
   },
@@ -394,9 +400,10 @@ void main() {
 `
 
 export const HueSaturation = {
-  ...BasicImage,
+  ...basicImageShader,
   fs: hueSaturationFS,
   uniforms: {
+		...basicImageShader.uniforms,
     hue: { type: float, default: 0 },
     saturation: { type: float, default: 0 },
   },
@@ -426,9 +433,10 @@ void main() {
 `
 
 export const Vignette = {
-  ...BasicImage,
+	...basicImageShader,
   fs: vignetteFS,
   uniforms: {
+		...basicImageShader.uniforms,
     vignette: { type: float, default: 0 },
   },
 }

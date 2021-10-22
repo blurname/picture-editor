@@ -132,7 +132,7 @@ export function Editor() {
       </div>
       <Collapse className="w-12/12" defaultActiveKey={[1, 2, 3]}>
 
-			{selectNum!==1 &&(
+			{selectNum!==-1 &&(
         <CollapsePanel header="shaping" key="1">
           <div>
             {shaping.children.map((cur, index) => {

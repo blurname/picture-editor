@@ -14,6 +14,7 @@ import {
   getCursorMovDistance,
   getCursorPosInCanvas,
 } from '../../utils/geo-utils'
+
 import {
   BeamSpirit,
   CircleSpirit,
@@ -179,10 +180,10 @@ export function Canvas(props: Props) {
     spiritCanvas?.setCanvas3d(canvas3dRef.current)
 		spiritCanvas.spirits = images
     //images.push(new CircleSpirit(canvas3dRef.current,19))
-    //const image = new Image()
-    //image.src = '../../../public/t5.jpeg'
+		const image = new Image()
+		image.src = '../../../public/t2.jpg'
 
-    //images.push(new ImageSpirit(canvas3dRef.current, image, 0))
+		images.push(new ImageSpirit(canvas3dRef.current, image, 0))
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
     //spiritCanvas.renderAllLine()
