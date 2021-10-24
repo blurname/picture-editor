@@ -6,24 +6,19 @@ import React, {
   useMemo,
   useRef,
 } from 'react'
-import { SpiritsCanvas } from '../store/globalCanvas'
+import { SpiritCanvas } from '../store/globalCanvas'
 import { ax } from '../utils/http'
-export function useCanvas(id: number) {
-	//const [spiritCanvas, setSpiritCanvas] = useState({}as SpiritsCanvas);
+export function useCanvas(user: number,canvas:number):SpiritCanvas {
+  //const [spiritCanvas, setSpiritCanvas] = useState({}as SpiritsCanvas);
   const spiritCanvasRef = useRef(undefined)
-	//spiritCanvasRef.current = spiritCanvas
-	console.log('usecanvas')
-	if (spiritCanvasRef.current === undefined){
-		console.log('current')
-		spiritCanvasRef.current = new SpiritsCanvas(id, ax)
-		console.log('setCanvas')
-		spiritCanvasRef.current.setCanvas()
-	}
+  if (spiritCanvasRef.current === undefined) {
+    spiritCanvasRef.current = new SpiritCanvas(user,canvas, ax)
+  }
   useEffect(() => {
-		if(!spiritCanvasRef.current){
-			const spir =  new SpiritsCanvas(id,ax)
-		spiritCanvasRef.current = spir 
-		}
-  }, [id])
+    if (!spiritCanvasRef.current) {
+      const spir = new SpiritCanvas(user,canvas, ax)
+      spiritCanvasRef.current = spir
+    }
+  }, [user])
   return spiritCanvasRef.current
 }

@@ -350,7 +350,7 @@ export class ImageSpirit extends RectModel {
   draw(shader: Shader, input: TexturesResource) {
     this.beam
 		//.clear()
-      //.depth()
+			.depth()
       .draw(
         shader,
         this.vertexBuffers as any,
@@ -363,16 +363,16 @@ export class ImageSpirit extends RectModel {
     this.isZoomed = isLarged
   }
   render() {
-		this.beam
-		.offscreen2D(this.targets[0], () => {
-			this.draw(this.brightnessContrastShader, this.textures)
-		})
+		//this.beam
+		//.offscreen2D(this.targets[0], () => {
+			//this.draw(this.brightnessContrastShader, this.textures)
+		//})
 		////.offscreen2D(this.targets[1], () => {
-		this.draw(this.hueSaturationShader, this.outputTextures[0])
+		//this.draw(this.hueSaturationShader, this.outputTextures[0])
 		////})
 		//this.draw(this.hueSaturationShader, this.textures)
 
-    //this.draw(this.shader, this.textures)
+		this.draw(this.shader, this.textures)
   }
 }
 

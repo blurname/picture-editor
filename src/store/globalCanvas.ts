@@ -23,7 +23,7 @@ enum eSpiType {
   mark,
   mosaic,
 }
-export class SpiritsCanvas {
+export class SpiritCanvas {
   id: number
   spirits: BeamSpirit[]
   curSpirit: ImageSpirit | null
@@ -37,14 +37,14 @@ export class SpiritsCanvas {
   isLarged: boolean
   ax: AxiosInstance
   ownerId: number
-  constructor(ownerId: number, ax: AxiosInstance) {
+  constructor(ownerId: number,id:number, ax: AxiosInstance) {
     this.spirits = []
     this.guidLines = []
     this.curSpirit = null
     this.ownerId = ownerId
     this.ax = ax
-		//console.log('lasdkjf;laskdjf;lsakdfj')
-		//this.create()
+		this.id = id
+		console.log('constructor: '+this.id)
   }
 	async setCanvas(){
 		console.log('asldfkjsad;lfjk')
@@ -154,8 +154,8 @@ export class OperationHistory {
   lens: number
   tail: number
   ax: AxiosInstance
-  spiritCanvas: SpiritsCanvas
-  constructor(spiritCanvas: SpiritsCanvas, ax: AxiosInstance) {
+  spiritCanvas: SpiritCanvas
+  constructor(spiritCanvas: SpiritCanvas, ax: AxiosInstance) {
     this.histories = []
     this.tail = 0
     this.lens = 0
@@ -233,6 +233,6 @@ export class OperationHistory {
   }
 }
 
-export const spiritCanvas = new SpiritsCanvas(24, ax)
-spiritCanvas.setCanvas()
-export const operationHistory = new OperationHistory(spiritCanvas, ax)
+//export const spiritCanvas = new SpiritsCanvas(24, ax)
+//spiritCanvas.setCanvas()
+//export const operationHistory = new OperationHistory(spiritCanvas, ax)

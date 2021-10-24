@@ -1,7 +1,7 @@
 import React, {Dispatch, SetStateAction} from 'react'
-import {OperationHistory, SpiritsCanvas } from './store/globalCanvas'
+import {OperationHistory, SpiritCanvas } from './store/globalCanvas'
 type globalCanvasType = {
-	spiritCanvas:SpiritsCanvas
+	spiritCanvas:SpiritCanvas
 	operationHistory:OperationHistory
   cmpCount: number
   setCmpCount: React.Dispatch<React.SetStateAction<number>>
