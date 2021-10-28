@@ -2,40 +2,35 @@ import React, { useContext, useEffect, useState } from 'react'
 import { menu } from './menuSchema'
 import './index.css'
 import { globalContext } from '../../context'
+import {baseUrl} from '../../utils/http'
 type ImgType = {
   id: number
-  style: { width: number; height: number }
   value: string
 }
+const imgUrl = baseUrl+'/image/get_single/'
 const imgs: ImgType[] = [
   {
     id: 1,
-    style: { width: 80, height: 140 },
-    value: '../../../../public/test.jpg',
+    value: imgUrl+'test.jpg',
   },
   {
     id: 2,
-    style: { width: 20, height: 190 },
-    value: '../../../../public/t2.jpg',
+    value: imgUrl+'t2.jpg',
   },
   {
     id: 3,
-    style: { width: 30, height: 180 },
-    value: '../../../../public/t3.jpg',
+    value: imgUrl+'t3.jpg',
   },
   {
     id: 4,
-    style: { width: 40, height: 180 },
-    value: '../../../../public/t1.jpeg',
+    value: imgUrl+'t1.jpeg',
   },
   {
     id: 5,
-    style: { width: 50, height: 190 },
-    value: '../../../../public/t4.jpeg',
+    value: imgUrl+'t4.jpeg',
   },{
     id: 5,
-    style: { width: 50, height: 190 },
-    value: '../../../../public/t5.jpeg',
+    value: imgUrl+'t5.jpeg',
   },
 ]
 

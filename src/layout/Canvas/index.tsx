@@ -22,9 +22,17 @@ import {
   MosaicSpirit,
   TheW,
 } from '../../utils/gl-uitls'
+import { getIsHavingSpirits, getSpirits } from '../../utils/http'
 import { textRneder } from '../../utils/textRender'
 
 type Props = {}
+type remoteModel = {
+  id: number
+  canvas_id: number
+  canvas_spirit_id: number
+  spirit_type: string
+  model: string
+}
 
 export function Canvas(props: Props) {
   const {
@@ -44,6 +52,9 @@ export function Canvas(props: Props) {
     top: 110,
   }
   const [images, setImages] = useState([] as BeamSpirit[])
+  const [initCount, setInitCount] = useState(-1)
+  const [initImages, setInitImages] = useState([] as remoteModel[])
+
   //const [oldPos, setOldPos] = useState({} as Pos);
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
@@ -147,8 +158,8 @@ export function Canvas(props: Props) {
         { trans: oldPos },
         { trans: spirit.getModel().trans },
       )
-		console.log(spiritCanvas.spirits[curImage])
-			console.log('spirit.getModel():', spirit.getModel())
+      console.log(spiritCanvas.spirits[curImage])
+      console.log('spirit.getModel():', spirit.getModel())
     }
     console.log('operationHistory.lens:', operationHistory.lens)
     //operationHistory.commit(s, from, wto)
@@ -177,14 +188,34 @@ export function Canvas(props: Props) {
 
   useEffect(() => {
     //the z position more big,the view more far
-		
+
     spiritCanvas?.setCanvas3d(canvas3dRef.current)
-		spiritCanvas.spirits = images
+    spiritCanvas.spirits = images
+    const getCount = async () => {
+      const count = await getIsHavingSpirits(spiritCanvas.id)
+      setInitCount(count)
+    }
+    getCount()
+    //console.log("incanvas:"+spiritCanvas.id)
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
-    textRneder()
+    //textRneder()
   }, [])
+  useEffect(() => {
+    const getInit = async () => {
+      const init = await getSpirits(spiritCanvas.id)
+      setInitImages(init)
+    }
+    if (initCount > 0) {
+      getInit()
+    }
+  }, [initCount])
+  useEffect(() => {
+    if (initImages.length > 0) {
+      console.log(JSON.parse(initImages[0].model))
+    }
+  }, [initImages])
   useEffect(() => {
     if (zoomable) canvas3dRef.current.style.cursor = 'zoom-in'
     else canvas3dRef.current.style.cursor = 'default'
@@ -196,7 +227,6 @@ export function Canvas(props: Props) {
   useEffect(() => {
     renderImages()
     console.log('reanderAll')
-
   }, [adjustNum, cmpCount])
 
   return (

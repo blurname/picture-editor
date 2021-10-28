@@ -1,4 +1,4 @@
-import { Button, Card, Col, Row } from 'antd'
+import { Button, Card, Col, Row, Upload } from 'antd'
 import Meta from 'antd/lib/card/Meta'
 import React, {
   useState,
@@ -9,8 +9,8 @@ import React, {
 } from 'react'
 import useSWR from 'swr'
 import { useHistory } from 'react-router-dom'
-import {createCanvas,getSpirits} from '../../utils/http'
-import {createW} from '../../utils/geo-utils'
+import { baseUrl, createCanvas, getSpirits } from '../../utils/http'
+import { createW } from '../../utils/geo-utils'
 const fetcher = (url: string) => fetch(url, {}).then((res) => res.json())
 const url = 'http://localhost:30001/canvas/get/?ownerid=24'
 type CanvasDB = {
@@ -26,16 +26,34 @@ export function Boxes() {
   const goCanvas = (id: number) => () => {
     history.push(`/canvas/${id}`)
   }
-	const createNewCanvas = async () => {
-		const id = await createCanvas(24)
-		console.log('id:', id)
-		goCanvas(id)()
-	}
-	console.log(getSpirits(829))
-	const canvases = JSON.parse(data)
+  const createNewCanvas = async () => {
+    const id = await createCanvas(24)
+    console.log('id:', id)
+    goCanvas(id)()
+  }
+  const uploadImage = () => {
+    return
+  }
+  const uploadProps = {
+    name: 'img',
+    action: baseUrl + '/image/upload',
+  }
+  const canvases = JSON.parse(data)
   return (
     <div>
-      <Button type="primary" onClick={createNewCanvas}>new</Button>
+      <Button type="primary" onClick={createNewCanvas}>
+        new
+      </Button>
+      <Button type="primary" onClick={() => getSpirits(829)}>
+        get
+      </Button>
+      <Upload>
+        <div>
+          <Button type="primary" onClick={() => getSpirits(829)}>
+            upload Imag
+          </Button>
+        </div>
+      </Upload>
       <Row>
         {canvases.map((item: CanvasDB, index: number) => (
           <Col span={8} key={index}>
@@ -44,12 +62,7 @@ export function Boxes() {
               hoverable
               className="mt-4"
               style={{ width: 240, height: 160 }}
-              cover={
-                <img
-                  alt="example"
-                  src="../../../public/test.jpg"
-                />
-              }
+              cover={<img alt="example" src="../../../public/test.jpg" />}
             >
               <h1>{item.id}</h1>
             </Card>

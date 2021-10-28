@@ -1,6 +1,7 @@
 import axios from 'axios'
+export const baseUrl = 'http://localhost:30001'
 export const ax = axios.create({
-  baseURL: 'http://localhost:30001',
+  baseURL: baseUrl,
   headers: {
     'Content-Type': 'application/json',
 
@@ -27,7 +28,18 @@ export const getSpirits = async (id:number) => {
 			`/canvas/get_spirits/?canvas_id=${id}`,
 		)
 			const data = res.data
-			console.log('data:', data)
+			return data
+	} catch (err) {
+		
+	}
+}
+export const getIsHavingSpirits = async (id:number):Promise<number> => {
+	try {
+		const res = await ax.get(
+			`/canvas/get_is_having_spirits/?canvas_id=${id}`
+		)
+		const data = res.data
+		return data
 	} catch (err) {
 		
 	}
