@@ -145,8 +145,8 @@ export class RectModel extends BeamSpirit {
 			this.scale = model.scale
 		}
     this.transMat = createTranslateMat(this.offset)
-    this.rotateMat = createRotateMat(0)
-    this.scaleMat = createScaleMat(1)
+    this.rotateMat = createRotateMat(this.rotate)
+    this.scaleMat = createScaleMat(this.scale)
     this.projectionMat = createProjectionMatInShader(getCanvasEdge(this.canvas))
   }
   updateScaleMat(scale: number) {
@@ -206,6 +206,7 @@ export class ImageSpirit extends RectModel {
   defaultZoom: number[]
 
   constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number,model?:Model) {
+		console.log("canvas",model)
     super(canvas, id,model)
     this.isZoomed = false
     this.spiritType = 'Image'
@@ -396,6 +397,7 @@ export class MarkSpirit extends RectModel {
   private shape: RectLikeShape
   private buffers: Buffers
   constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number,model?:Model) {
+		console.log("Mark",model)
     super(canvas, id,model)
     this.spiritType = 'Mark'
     this.uColor = [1.0, 1.0, 1.0, 1.0]
