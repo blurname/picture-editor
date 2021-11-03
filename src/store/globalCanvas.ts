@@ -24,6 +24,16 @@ enum eSpiType {
   mark,
   mosaic,
 }
+function loadImage(url:string) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+		img.crossOrigin=""
+  });
+}
+
 const binarySearch = <T extends BeamSpirit>(
   target: unknown,
   sortedArray: T[],
@@ -73,17 +83,22 @@ export class SpiritCanvas {
     console.log('asldfkjsad;lfjk')
     this.id = await createCanvas(this.ownerId)
   }
-  updateFromRemote(model: Model) {
+  updateFromRemote(typeId: number, model: Model) {
     const result = binarySearch(model.id, this.spirits)
-    console.log(`searchresult:${result}`)
+    //console.log(`searchresult:${result}`)
     if (result === -1) {
-      this.addImage('../../public/t2.jpg', model.id, true,model)
+      if (typeId === 1)
+        //this.addImage('../../public/t1.jpeg', model.id, true, model)
+        this.addImage(imgUrl+'test.jpg', model.id, true, model)
+      else if (typeId === 2) this.addMark('hollowRect', model.id)
     }
   }
-  addImage(imgSrc: string, id: number, exist: boolean = false, model?: Model) {
+ async addImage(imgSrc: string, id: number, exist: boolean = false, model?: Model) {
     console.log('addImage:', id)
-    const image = new Image()
-    image.src = imgSrc
+    const image = await loadImage(imgSrc) as HTMLImageElement
+		//image.src = await imgSrc
+		//image.src = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5c398beb-2a83-4401-99e0-3804dcd13546/d8pdyky-0b8ce4a7-e6b1-4ef4-9dc3-891396a9124b.png/v1/fill/w_800,h_1000,q_70,strp/fate_zero__saber_by_tekkkadan_d8pdyky-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzVjMzk4YmViLTJhODMtNDQwMS05OWUwLTM4MDRkY2QxMzU0NlwvZDhwZHlreS0wYjhjZTRhNy1lNmIxLTRlZjQtOWRjMy04OTEzOTZhOTEyNGIucG5nIiwid2lkdGgiOiI8PTEwMjQifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.YdwKEtao9N9kTsSGIGV-8fjhLdR_BjbBFjCfakRtHdI"
+		//image.crossOrigin="anonymous"
     let spirit: ImageSpirit
     if (model) {
       spirit = new ImageSpirit(this.canvas3d, image, id, model)
@@ -98,19 +113,31 @@ export class SpiritCanvas {
     if (!exist) this.spiritCommit(spirit.getModel(), eSpiType.image)
   }
 
-  addMark(shape: Shape, id: number) {
+  addMark(shape: Shape, id: number, exist: boolean = false, model?: Model) {
     let mark: BeamSpirit
-    if (shape === 'circle') {
-      mark = new CircleSpirit(this.canvas3d, id)
-    } else if (shape === 'theW') {
-      mark = new TheW(this.canvas3d, id)
+    if (model) {
+      if (shape === 'circle') {
+        mark = new CircleSpirit(this.canvas3d, id)
+      } else if (shape === 'theW') {
+        mark = new TheW(this.canvas3d, id)
+      } else {
+        mark = new MarkSpirit(this.canvas3d, shape, id)
+      }
     } else {
-      mark = new MarkSpirit(this.canvas3d, shape, id)
+      if (shape === 'circle') {
+        mark = new CircleSpirit(this.canvas3d, id)
+      } else if (shape === 'theW') {
+        mark = new TheW(this.canvas3d, id)
+      } else {
+        mark = new MarkSpirit(this.canvas3d, shape, id)
+      }
     }
+
     this.spirits.push(mark)
     this.guidLines.push(
       new GuidLine(this.canvas3d, mark.getGuidRect(), mark.getId()),
     )
+    if (!exist) this.spiritCommit(mark.getModel(), eSpiType.mark)
   }
 
   addMosaic(mosaicType: MosaicType, id: number) {

@@ -395,8 +395,8 @@ export class MarkSpirit extends RectModel {
   private uColor: number[]
   private shape: RectLikeShape
   private buffers: Buffers
-  constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number) {
-    super(canvas, id)
+  constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number,model?:Model) {
+    super(canvas, id,model)
     this.spiritType = 'Mark'
     this.uColor = [1.0, 1.0, 1.0, 1.0]
     this.shape = shape

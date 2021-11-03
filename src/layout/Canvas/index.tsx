@@ -30,7 +30,7 @@ type remoteModel = {
   id: number
   canvas_id: number
   canvas_spirit_id: number
-  spirit_type: string
+  spirit_type: number
   model: string
 }
 
@@ -217,12 +217,20 @@ export function Canvas(props: Props) {
   //initImages.map((img) => spiritCanvas.updateFromRemote(img.model))
   //}
   //}, [initImages]);
-
+  type CModel = {
+    spiritType: number
+    model: Model
+  }
   useEffect(() => {
     if (initImages.length > 0) {
-      const models: Model[] = initImages.map((img) => JSON.parse(img.model))
-			models.map((img) => spiritCanvas.updateFromRemote(img))
-renderImages()
+      const models: CModel[] = initImages.map((img) => {
+        return {
+          spiritType: img.spirit_type,
+          model: JSON.parse(img.model),
+        }
+      })
+      models.map((img) => spiritCanvas.updateFromRemote(img.spiritType,img.model))
+
       console.log(models)
     }
   }, [initImages])
