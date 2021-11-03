@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios'
 import { Beam } from 'beam-gl'
-import {ax} from '../utils/http'
+import { ax } from '../utils/http'
 import { theWShader } from '../filter/shader'
 import {
   BackSpirit,
@@ -12,7 +12,8 @@ import {
   MosaicSpirit,
   TheW,
 } from '../utils/gl-uitls'
-import {createCanvas} from '../utils/http'
+import { createCanvas } from '../utils/http'
+import { imgUrl } from '../layout/Components/Img'
 
 type canvas = {
   id: number
@@ -23,6 +24,28 @@ enum eSpiType {
   mark,
   mosaic,
 }
+const binarySearch = <T extends BeamSpirit>(
+  target: unknown,
+  sortedArray: T[],
+) => {
+  let l = 0
+  let r = sortedArray.length
+  let m = Math.floor((l + r) / 2)
+  if (r === 0) return -1
+  while (l >= r) {
+    if (sortedArray[m].getId() === target) {
+      return m
+    } else {
+      if (sortedArray[m].getId() > target) {
+        r = m
+      } else {
+        l = m
+      }
+    }
+  }
+  return -1
+}
+
 export class SpiritCanvas {
   id: number
   spirits: BeamSpirit[]
@@ -37,30 +60,42 @@ export class SpiritCanvas {
   isLarged: boolean
   ax: AxiosInstance
   ownerId: number
-  constructor(ownerId: number,id:number, ax: AxiosInstance) {
+  constructor(ownerId: number, id: number, ax: AxiosInstance) {
     this.spirits = []
     this.guidLines = []
     this.curSpirit = null
     this.ownerId = ownerId
     this.ax = ax
-		this.id = id
-		console.log('constructor: '+this.id)
+    this.id = id
+    console.log('constructor: ' + this.id)
   }
-	async setCanvas(){
-		console.log('asldfkjsad;lfjk')
-		this.id = await createCanvas(this.ownerId)
-	}
-
-  addImage(imgSrc: string, id: number) {
+  async setCanvas() {
+    console.log('asldfkjsad;lfjk')
+    this.id = await createCanvas(this.ownerId)
+  }
+  updateFromRemote(model: Model) {
+    const result = binarySearch(model.id, this.spirits)
+    console.log(`searchresult:${result}`)
+    if (result === -1) {
+      this.addImage('../../public/t2.jpg', model.id, true,model)
+    }
+  }
+  addImage(imgSrc: string, id: number, exist: boolean = false, model?: Model) {
     console.log('addImage:', id)
     const image = new Image()
     image.src = imgSrc
-    const spirit = new ImageSpirit(this.canvas3d, image, id)
+    let spirit: ImageSpirit
+    if (model) {
+      spirit = new ImageSpirit(this.canvas3d, image, id, model)
+    } else {
+      spirit = new ImageSpirit(this.canvas3d, image, id)
+    }
+
     this.spirits.push(spirit)
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
     )
-    this.spiritCommit(spirit.getModel(), eSpiType.image)
+    if (!exist) this.spiritCommit(spirit.getModel(), eSpiType.image)
   }
 
   addMark(shape: Shape, id: number) {
@@ -176,7 +211,7 @@ export class OperationHistory {
     this.histories.push(operation)
     this.lens = this.histories.length
     this.tail = this.lens
-		this.updateRemote(operation.id)
+    this.updateRemote(operation.id)
   }
   undo() {
     if (this.tail > 0) {
@@ -220,7 +255,7 @@ export class OperationHistory {
       mark.updateColor(dir)
       // func from to
     }
-		this.updateRemote(id)
+    this.updateRemote(id)
     this.spiritCanvas.updateGuidRect(spirit)
   }
   async updateRemote(id: number) {

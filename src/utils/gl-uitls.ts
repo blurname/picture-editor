@@ -137,8 +137,13 @@ export class RectModel extends BeamSpirit {
   //transMat:number[]
   //rotateMat:number[]
   //scaleMat:number[]
-  constructor(canvas: HTMLCanvasElement, id: number) {
+  constructor(canvas: HTMLCanvasElement, id: number,model?:Model) {
     super(canvas, id)
+		if(model){
+			this.offset = model.trans
+			this.rotate = model.rotate
+			this.scale = model.scale
+		}
     this.transMat = createTranslateMat(this.offset)
     this.rotateMat = createRotateMat(0)
     this.scaleMat = createScaleMat(1)
@@ -200,8 +205,8 @@ export class ImageSpirit extends RectModel {
   zoomSection: number[]
   defaultZoom: number[]
 
-  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number) {
-    super(canvas, id)
+  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number,model?:Model) {
+    super(canvas, id,model)
     this.isZoomed = false
     this.spiritType = 'Image'
     this.image = image
@@ -241,7 +246,7 @@ export class ImageSpirit extends RectModel {
     })
 
     this.textures.set('img', { image: this.image, flip: true })
-    this.setFilterChain()
+    //this.setFilterChain()
     this.updateGuidRect()
   }
   setFilterChain() {

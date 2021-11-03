@@ -183,9 +183,7 @@ export function Canvas(props: Props) {
     renderImages()
     setAdjustNum(adjustNum + 1)
   }
-  //console.log('operationHistory.tail:', operationHistory.tail)
-  //console.log('operationHistory.lens:', operationHistory.lens)
-
+  // init canvas
   useEffect(() => {
     //the z position more big,the view more far
 
@@ -196,12 +194,14 @@ export function Canvas(props: Props) {
       setInitCount(count)
     }
     getCount()
-    //console.log("incanvas:"+spiritCanvas.id)
+    console.log('incanvas:' + spiritCanvas.id)
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
     //textRneder()
   }, [])
+
+  //there if has existed
   useEffect(() => {
     const getInit = async () => {
       const init = await getSpirits(spiritCanvas.id)
@@ -211,15 +211,27 @@ export function Canvas(props: Props) {
       getInit()
     }
   }, [initCount])
+
+  //useEffect(() => {
+  //if(initImages.length>0){
+  //initImages.map((img) => spiritCanvas.updateFromRemote(img.model))
+  //}
+  //}, [initImages]);
+
   useEffect(() => {
     if (initImages.length > 0) {
-      console.log(JSON.parse(initImages[0].model))
+      const models: Model[] = initImages.map((img) => JSON.parse(img.model))
+			models.map((img) => spiritCanvas.updateFromRemote(img))
+renderImages()
+      console.log(models)
     }
   }, [initImages])
+
   useEffect(() => {
     if (zoomable) canvas3dRef.current.style.cursor = 'zoom-in'
     else canvas3dRef.current.style.cursor = 'default'
   }, [zoomable])
+
   useEffect(() => {
     console.log('canvas changed the selectNum')
   }, [selectNum])

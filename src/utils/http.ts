@@ -45,3 +45,12 @@ export const getIsHavingSpirits = async (id:number):Promise<number> => {
 	}
 }
 
+export const getCanvasUrl = (img:any) => {
+	const canvas = document.createElement('canvas')
+	canvas.width = img.width
+	canvas.height = img.height
+	const ctx = canvas.getContext('2d')
+	ctx.drawImage(img,0,0)
+	const dataurl = canvas.toDataURL()
+	return dataurl
+}

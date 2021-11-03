@@ -7,7 +7,7 @@ type ImgType = {
   id: number
   value: string
 }
-const imgUrl = baseUrl+'/image/get_single/'
+export const imgUrl = baseUrl+'/image/get_single/'
 const imgs: ImgType[] = [
   {
     id: 1,
