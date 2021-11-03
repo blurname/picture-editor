@@ -6,13 +6,20 @@ import { Boxes } from './layout/Boxes'
 import { CanvasEditor } from './layout/CanvasEditor'
 function App() {
   return (
-      <div className="App h-max">
-        <Header className="bg-green-100">
-          <h1 className="text-blue-gray-900 font-large">picture editor</h1>
-        </Header>
-            <CanvasEditor />
-        <Footer className="bg-green-200" />
-      </div>
+    <div className="App h-max">
+      <Header className="bg-green-100">
+        <h1 className="text-blue-gray-900 font-large">picture editor</h1>
+      </Header>
+      <Router>
+        <Route exact path="/canvas/:id">
+          <CanvasEditor />
+        </Route>
+        <Route exact path="/">
+          <Boxes />
+        </Route>
+      </Router>
+      <Footer className="bg-green-200" />
+    </div>
   )
 }
 export default App

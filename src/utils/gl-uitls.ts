@@ -61,7 +61,7 @@ export class BeamSpirit {
   protected offset: Pos
   protected scale: number
   protected rotate: number
-	protected model: Model
+  protected model: Model
 
   protected guidRectPosition: Float32Array
   protected isToggle: boolean
@@ -74,15 +74,15 @@ export class BeamSpirit {
     this.layout = 0.7
     this.id = id
     this.isToggle = true
-		this.scale = 1
-		this.rotate = 0
-		this.offset = {left:0,top:0}
-		this.model = {
-			id:this.id,
-			scale:this.scale,
-			rotate:this.rotate,
-			trans:this.offset
-		}
+    this.scale = 1
+    this.rotate = 0
+    this.offset = { left: 0, top: 0 }
+    this.model = {
+      id: this.id,
+      scale: this.scale,
+      rotate: this.rotate,
+      trans: this.offset,
+    }
   }
   updateGuidRect() {
     throw new Error('Method not implemented.')
@@ -122,37 +122,42 @@ export class BeamSpirit {
   getLayout() {
     return this.layout
   }
-	getModel(){
-		return this.model
-	}
-	getPos(){
-		return this.offset
-	}
+  getModel() {
+    return this.model
+  }
+  getPos() {
+    return this.offset
+  }
   render() {}
 }
-export class RectModel extends BeamSpirit{
-	//rotate:number
-	//scale:number
-	//offset:Pos
-	//transMat:number[]
-	//rotateMat:number[]
-	//scaleMat:number[]
-	constructor (canvas:HTMLCanvasElement,id:number) {
-		super(canvas,id)
+export class RectModel extends BeamSpirit {
+  //rotate:number
+  //scale:number
+  //offset:Pos
+  //transMat:number[]
+  //rotateMat:number[]
+  //scaleMat:number[]
+  constructor(canvas: HTMLCanvasElement, id: number,model?:Model) {
+    super(canvas, id)
+		if(model){
+			this.offset = model.trans
+			this.rotate = model.rotate
+			this.scale = model.scale
+		}
     this.transMat = createTranslateMat(this.offset)
     this.rotateMat = createRotateMat(0)
     this.scaleMat = createScaleMat(1)
     this.projectionMat = createProjectionMatInShader(getCanvasEdge(this.canvas))
-	}
+  }
   updateScaleMat(scale: number) {
     this.scale = scale
-		this.model.scale = this.scale
+    this.model.scale = this.scale
     this.scaleMat = createScaleMat(scale)
     this.uniforms.set('scaleMat', this.scaleMat)
   }
   updateRotateMat(rotate: number) {
     this.rotate = rotate
-		this.model.rotate = this.rotate
+    this.model.rotate = this.rotate
     this.rotateMat = createRotateMat(rotate)
     this.uniforms.set('rotateMat', this.rotateMat)
   }
@@ -168,13 +173,13 @@ export class RectModel extends BeamSpirit{
       left: offset.left / this.scale,
       top: offset.top / this.scale,
     }
-		this.model.trans = offset
-		//const guidRect = this.getGuidRect()
-		//const center:Pos = {left:guidRect.x+guidRect.width/2,top:guidRect.y+guidRect.height/2}
+    this.model.trans = offset
+    //const guidRect = this.getGuidRect()
+    //const center:Pos = {left:guidRect.x+guidRect.width/2,top:guidRect.y+guidRect.height/2}
     this.transMat = createTranslateMat({
       left: offset.left,
-			top: offset.top,
-		})
+      top: offset.top,
+    })
     this.uniforms.set('transMat', this.transMat)
   }
 }
@@ -200,8 +205,8 @@ export class ImageSpirit extends RectModel {
   zoomSection: number[]
   defaultZoom: number[]
 
-  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number) {
-    super(canvas, id)
+  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number,model?:Model) {
+    super(canvas, id,model)
     this.isZoomed = false
     this.spiritType = 'Image'
     this.image = image
@@ -216,6 +221,7 @@ export class ImageSpirit extends RectModel {
     this.beam.define(Offscreen2DCommand)
 
     this.shader = this.beam.shader(basicImageShader)
+
     this.brightnessContrastShader = this.beam.shader(BrightnessContrast)
     this.hueSaturationShader = this.beam.shader(HueSaturation)
     this.vignetteShader = this.beam.shader(Vignette)
@@ -233,21 +239,28 @@ export class ImageSpirit extends RectModel {
       projectionMat: this.projectionMat,
       layout: this.layout,
       zoomSection: this.zoomSection,
+      brightness: 0,
+      contrast: 0,
+      hue: 0,
+      saturation: 0,
     })
 
     this.textures.set('img', { image: this.image, flip: true })
-    //this.inputTextures = this.textures
-    //this.outputTextures = [
-    //this.beam.resource(Textures),
-    //this.beam.resource(Textures),
-    //]
-    //this.targets = [
-    //this.beam.resource(OffscreenTarget),
-    //this.beam.resource(OffscreenTarget),
-    //]
-    //this.outputTextures[0].set('img', this.targets[0])
-    //this.outputTextures[1].set('img', this.targets[1])
+    //this.setFilterChain()
     this.updateGuidRect()
+  }
+  setFilterChain() {
+    //this.inputTextures = this.textures
+    this.outputTextures = [
+      this.beam.resource(Textures),
+      this.beam.resource(Textures),
+    ]
+    this.targets = [
+      this.beam.resource(OffscreenTarget),
+      this.beam.resource(OffscreenTarget),
+    ]
+    this.outputTextures[0].set('img', this.targets[0])
+    this.outputTextures[1].set('img', this.targets[1])
   }
 
   updateContrast(contrast: number) {
@@ -341,7 +354,8 @@ export class ImageSpirit extends RectModel {
 
   draw(shader: Shader, input: TexturesResource) {
     this.beam
-      .depth()
+		//.clear()
+			.depth()
       .draw(
         shader,
         this.vertexBuffers as any,
@@ -354,18 +368,16 @@ export class ImageSpirit extends RectModel {
     this.isZoomed = isLarged
   }
   render() {
-    //this.beam.clear()
-    //this.beam
-    //.offscreen2D(this.targets[0], () => {
-    //this.draw(this.brightnessContrastShader, this.textures)
-    //})
-    //.offscreen2D(this.targets[1], () => {
-    //this.draw(this.hueSaturationShader, this.outputTextures[0])
-    //}
-    //)
-    //this.draw(this.vignetteShader, this.outputTextures[0])
+		//this.beam
+		//.offscreen2D(this.targets[0], () => {
+			//this.draw(this.brightnessContrastShader, this.textures)
+		//})
+		////.offscreen2D(this.targets[1], () => {
+		//this.draw(this.hueSaturationShader, this.outputTextures[0])
+		////})
+		//this.draw(this.hueSaturationShader, this.textures)
 
-    this.draw(this.shader, this.textures)
+		this.draw(this.shader, this.textures)
   }
 }
 
@@ -383,8 +395,8 @@ export class MarkSpirit extends RectModel {
   private uColor: number[]
   private shape: RectLikeShape
   private buffers: Buffers
-  constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number) {
-    super(canvas, id)
+  constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number,model?:Model) {
+    super(canvas, id,model)
     this.spiritType = 'Mark'
     this.uColor = [1.0, 1.0, 1.0, 1.0]
     this.shape = shape
@@ -395,7 +407,7 @@ export class MarkSpirit extends RectModel {
 
     this.projectionMat = createProjectionMatInShader(getCanvasEdge(canvas))
     this.uniforms = this.beam.resource(Uniforms, {
-			transMat:this.transMat,
+      transMat: this.transMat,
       uColor: this.uColor,
       rotateMat: this.rotateMat,
       scaleMat: this.scaleMat,
@@ -451,7 +463,7 @@ export class MosaicSpirit extends RectModel {
     this.indexBuffer = this.beam.resource(IndexBuffer, buffers.index)
     this.shader = this.beam.shader(this.getShaderByShape(type))
     this.uniforms = this.beam.resource(Uniforms, {
-			transMat:this.transMat,
+      transMat: this.transMat,
       rotateMat: this.rotateMat,
       scaleMat: this.scaleMat,
       projectionMat: this.projectionMat,
@@ -641,8 +653,8 @@ const updateRectLike = (position: Float32Array, offset: Pos, scale: number) => {
   return fUpdateGuidRect(
     (position, offset, scale) => {
       return {
-        x: (position[0] + offset.left)*scale,
-        y: (position[1] + offset.top)*scale,
+        x: (position[0] + offset.left) * scale,
+        y: (position[1] + offset.top) * scale,
         width: Math.abs(position[0] - position[4]) * scale,
         height: Math.abs(position[1] - position[3]) * scale,
       }

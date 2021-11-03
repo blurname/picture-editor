@@ -5,11 +5,11 @@ import React, {
   Dispatch,
   SetStateAction,
 } from 'react'
-import { SpiritsCanvas } from '../../store/globalCanvas'
+import { SpiritCanvas } from '../../store/globalCanvas'
 import { ImageSpirit } from '../../utils/gl-uitls'
 import { editorSchema } from './editorSchema'
 type Props = {
-  spiritCanvas: SpiritsCanvas
+  spiritCanvas: SpiritCanvas
   selectNum: number
   adjustNum: number
   setAdjustNum: Dispatch<SetStateAction<Number>>

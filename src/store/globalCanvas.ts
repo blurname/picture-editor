@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios'
 import { Beam } from 'beam-gl'
-import {ax} from '../utils/http'
+import { ax } from '../utils/http'
 import { theWShader } from '../filter/shader'
 import {
   BackSpirit,
@@ -12,7 +12,8 @@ import {
   MosaicSpirit,
   TheW,
 } from '../utils/gl-uitls'
-import {createCanvas} from '../utils/http'
+import { createCanvas } from '../utils/http'
+import { imgUrl } from '../layout/Components/Img'
 
 type canvas = {
   id: number
@@ -23,7 +24,39 @@ enum eSpiType {
   mark,
   mosaic,
 }
-export class SpiritsCanvas {
+function loadImage(url:string) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+		img.crossOrigin=""
+  });
+}
+
+const binarySearch = <T extends BeamSpirit>(
+  target: unknown,
+  sortedArray: T[],
+) => {
+  let l = 0
+  let r = sortedArray.length
+  let m = Math.floor((l + r) / 2)
+  if (r === 0) return -1
+  while (l >= r) {
+    if (sortedArray[m].getId() === target) {
+      return m
+    } else {
+      if (sortedArray[m].getId() > target) {
+        r = m
+      } else {
+        l = m
+      }
+    }
+  }
+  return -1
+}
+
+export class SpiritCanvas {
   id: number
   spirits: BeamSpirit[]
   curSpirit: ImageSpirit | null
@@ -37,45 +70,74 @@ export class SpiritsCanvas {
   isLarged: boolean
   ax: AxiosInstance
   ownerId: number
-  constructor(ownerId: number, ax: AxiosInstance) {
+  constructor(ownerId: number, id: number, ax: AxiosInstance) {
     this.spirits = []
     this.guidLines = []
     this.curSpirit = null
     this.ownerId = ownerId
     this.ax = ax
-		//console.log('lasdkjf;laskdjf;lsakdfj')
-		//this.create()
+    this.id = id
+    console.log('constructor: ' + this.id)
   }
-	async setCanvas(){
-		console.log('asldfkjsad;lfjk')
-		this.id = await createCanvas(this.ownerId)
-	}
-
-  addImage(imgSrc: string, id: number) {
+  async setCanvas() {
+    console.log('asldfkjsad;lfjk')
+    this.id = await createCanvas(this.ownerId)
+  }
+  updateFromRemote(typeId: number, model: Model) {
+    const result = binarySearch(model.id, this.spirits)
+    //console.log(`searchresult:${result}`)
+    if (result === -1) {
+      if (typeId === 1)
+        //this.addImage('../../public/t1.jpeg', model.id, true, model)
+        this.addImage(imgUrl+'test.jpg', model.id, true, model)
+      else if (typeId === 2) this.addMark('hollowRect', model.id)
+    }
+  }
+ async addImage(imgSrc: string, id: number, exist: boolean = false, model?: Model) {
     console.log('addImage:', id)
-    const image = new Image()
-    image.src = imgSrc
-    const spirit = new ImageSpirit(this.canvas3d, image, id)
+    const image = await loadImage(imgSrc) as HTMLImageElement
+		//image.src = await imgSrc
+		//image.src = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5c398beb-2a83-4401-99e0-3804dcd13546/d8pdyky-0b8ce4a7-e6b1-4ef4-9dc3-891396a9124b.png/v1/fill/w_800,h_1000,q_70,strp/fate_zero__saber_by_tekkkadan_d8pdyky-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzVjMzk4YmViLTJhODMtNDQwMS05OWUwLTM4MDRkY2QxMzU0NlwvZDhwZHlreS0wYjhjZTRhNy1lNmIxLTRlZjQtOWRjMy04OTEzOTZhOTEyNGIucG5nIiwid2lkdGgiOiI8PTEwMjQifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.YdwKEtao9N9kTsSGIGV-8fjhLdR_BjbBFjCfakRtHdI"
+		//image.crossOrigin="anonymous"
+    let spirit: ImageSpirit
+    if (model) {
+      spirit = new ImageSpirit(this.canvas3d, image, id, model)
+    } else {
+      spirit = new ImageSpirit(this.canvas3d, image, id)
+    }
+
     this.spirits.push(spirit)
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
     )
-    this.spiritCommit(spirit.getModel(), eSpiType.image)
+    if (!exist) this.spiritCommit(spirit.getModel(), eSpiType.image)
   }
 
-  addMark(shape: Shape, id: number) {
+  addMark(shape: Shape, id: number, exist: boolean = false, model?: Model) {
     let mark: BeamSpirit
-    if (shape === 'circle') {
-      mark = new CircleSpirit(this.canvas3d, id)
-    } else if (shape === 'theW') {
-      mark = new TheW(this.canvas3d, id)
+    if (model) {
+      if (shape === 'circle') {
+        mark = new CircleSpirit(this.canvas3d, id)
+      } else if (shape === 'theW') {
+        mark = new TheW(this.canvas3d, id)
+      } else {
+        mark = new MarkSpirit(this.canvas3d, shape, id)
+      }
     } else {
-      mark = new MarkSpirit(this.canvas3d, shape, id)
+      if (shape === 'circle') {
+        mark = new CircleSpirit(this.canvas3d, id)
+      } else if (shape === 'theW') {
+        mark = new TheW(this.canvas3d, id)
+      } else {
+        mark = new MarkSpirit(this.canvas3d, shape, id)
+      }
     }
+
     this.spirits.push(mark)
     this.guidLines.push(
       new GuidLine(this.canvas3d, mark.getGuidRect(), mark.getId()),
     )
+    if (!exist) this.spiritCommit(mark.getModel(), eSpiType.mark)
   }
 
   addMosaic(mosaicType: MosaicType, id: number) {
@@ -154,8 +216,8 @@ export class OperationHistory {
   lens: number
   tail: number
   ax: AxiosInstance
-  spiritCanvas: SpiritsCanvas
-  constructor(spiritCanvas: SpiritsCanvas, ax: AxiosInstance) {
+  spiritCanvas: SpiritCanvas
+  constructor(spiritCanvas: SpiritCanvas, ax: AxiosInstance) {
     this.histories = []
     this.tail = 0
     this.lens = 0
@@ -176,7 +238,7 @@ export class OperationHistory {
     this.histories.push(operation)
     this.lens = this.histories.length
     this.tail = this.lens
-		this.updateRemote(operation.id)
+    this.updateRemote(operation.id)
   }
   undo() {
     if (this.tail > 0) {
@@ -220,7 +282,7 @@ export class OperationHistory {
       mark.updateColor(dir)
       // func from to
     }
-		this.updateRemote(id)
+    this.updateRemote(id)
     this.spiritCanvas.updateGuidRect(spirit)
   }
   async updateRemote(id: number) {
@@ -233,6 +295,6 @@ export class OperationHistory {
   }
 }
 
-export const spiritCanvas = new SpiritsCanvas(24, ax)
-spiritCanvas.setCanvas()
-export const operationHistory = new OperationHistory(spiritCanvas, ax)
+//export const spiritCanvas = new SpiritsCanvas(24, ax)
+//spiritCanvas.setCanvas()
+//export const operationHistory = new OperationHistory(spiritCanvas, ax)

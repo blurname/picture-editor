@@ -21,7 +21,7 @@ export const depthCommand = {
 }
 const beforeWithColor = (gl, resource) => {
   const { state, colorTexture, fbo, rbo } = resource
-  const { size } = state
+  let { size } = state
   gl.viewport(0, 0, size, size)
   gl.bindFramebuffer(gl.FRAMEBUFFER, fbo)
   gl.bindRenderbuffer(gl.RENDERBUFFER, rbo)
@@ -33,7 +33,7 @@ const beforeWithColor = (gl, resource) => {
     colorTexture,
     0,
   )
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 }
 
 const beforeWithDepth = (gl: WebGLRenderingContext, resource) => {
@@ -41,7 +41,7 @@ const beforeWithDepth = (gl: WebGLRenderingContext, resource) => {
   const { size } = state
 	gl.viewport(0, 0, size, size)
   gl.bindFramebuffer(gl.FRAMEBUFFER, fbo)
-  gl.clear(gl.DEPTH_BUFFER_BIT)
+	gl.clear(gl.DEPTH_BUFFER_BIT)
 }
 
 export const Offscreen2DCommand = {
@@ -52,6 +52,6 @@ export const Offscreen2DCommand = {
   },
   onAfter(gl: WebGLRenderingContext) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+		gl.viewport(0,0,gl.canvas.width,gl.canvas.height)
   },
 }

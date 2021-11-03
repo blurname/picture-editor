@@ -1,6 +1,7 @@
 import axios from 'axios'
+export const baseUrl = 'http://localhost:30001'
 export const ax = axios.create({
-  baseURL: 'http://localhost:30001',
+  baseURL: baseUrl,
   headers: {
     'Content-Type': 'application/json',
 
@@ -8,35 +9,48 @@ export const ax = axios.create({
 	//timeout:1000
 })
 export const createCanvas = async (ownerId: number) => {
-  console.log('createpost')
-  //try {
-  console.log('posting')
+	try {
 		const res = await ax.post(
 			'/canvas/create',
 			JSON.stringify({ ownerId: ownerId }),
 		)
 		//const res = await postData('http://localhost:30001/canvas/create',{ownerId:ownerId})
-    console.log('afterpost')
-		console.log(res)
-
 		const json = res.data
 		const id = JSON.parse(json).id
-    console.log(id)
     return id
-  //} catch (err) {
-		//console.error(err);
-	//}
+	} catch (err) {
+		console.error(err);
+	}
 }
-async function postData(url = '', data = {}) {
-  // Default options are marked with *
-  const response = await fetch(url, {
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
-    mode: 'cors', // no-cors, *cors, same-origin
-    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data) // body data type must match "Content-Type" header
-  });
-  return response.json(); // parses JSON response into native JavaScript objects
+export const getSpirits = async (id:number) => {
+	try {
+		const res = await ax.get(
+			`/canvas/get_spirits/?canvas_id=${id}`,
+		)
+			const data = res.data
+			return data
+	} catch (err) {
+		
+	}
+}
+export const getIsHavingSpirits = async (id:number):Promise<number> => {
+	try {
+		const res = await ax.get(
+			`/canvas/get_is_having_spirits/?canvas_id=${id}`
+		)
+		const data = res.data
+		return data
+	} catch (err) {
+		
+	}
+}
+
+export const getCanvasUrl = (img:any) => {
+	const canvas = document.createElement('canvas')
+	canvas.width = img.width
+	canvas.height = img.height
+	const ctx = canvas.getContext('2d')
+	ctx.drawImage(img,0,0)
+	const dataurl = canvas.toDataURL()
+	return dataurl
 }
