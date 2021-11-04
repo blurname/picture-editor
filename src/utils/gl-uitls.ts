@@ -21,6 +21,7 @@ import {
   theWShader,
   backgourndShader,
   MosaicMultiShader,
+	MonolithicShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {
@@ -221,11 +222,12 @@ export class ImageSpirit extends RectModel {
 
     this.beam.define(Offscreen2DCommand)
 
-    this.shader = this.beam.shader(basicImageShader)
+		//this.shader = this.beam.shader(basicImageShader)
+		this.shader = this.beam.shader(MonolithicShader)
 
-    this.brightnessContrastShader = this.beam.shader(BrightnessContrast)
-    this.hueSaturationShader = this.beam.shader(HueSaturation)
-    this.vignetteShader = this.beam.shader(Vignette)
+		//this.brightnessContrastShader = this.beam.shader(BrightnessContrast)
+		//this.hueSaturationShader = this.beam.shader(HueSaturation)
+    //this.vignetteShader = this.beam.shader(Vignette)
 
     this.position = quad.vertex.position
 
@@ -244,6 +246,7 @@ export class ImageSpirit extends RectModel {
       contrast: 0,
       hue: 0,
       saturation: 0,
+			vignette:0
     })
 
     this.textures.set('img', { image: this.image, flip: true })
@@ -274,6 +277,7 @@ export class ImageSpirit extends RectModel {
   }
   updateHue(hue: number) {
     this.hue = hue
+		console.log(console.log('this.hue:', this.hue))
     this.uniforms.set('hue', this.hue)
   }
   updateSaturation(saturation: number) {
@@ -377,7 +381,6 @@ export class ImageSpirit extends RectModel {
 		//this.draw(this.hueSaturationShader, this.outputTextures[0])
 		////})
 		//this.draw(this.hueSaturationShader, this.textures)
-
 		this.draw(this.shader, this.textures)
   }
 }

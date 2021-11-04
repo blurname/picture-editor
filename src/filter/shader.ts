@@ -39,7 +39,7 @@ export const basicImageShader = {
   vs: imageVS,
   fs: imageFS,
   buffers: {
-    position: { type: vec4,n:2 },
+    position: { type: vec4, n: 2 },
     texCoord: { type: vec2 },
   },
   textures: {
@@ -52,7 +52,7 @@ export const basicImageShader = {
     projectionMat: { type: mat4 },
     layout: { type: float },
     zoomSection: { type: vec3 },
-		offset:{type:vec2}
+    offset: { type: vec2 },
   },
 }
 
@@ -92,7 +92,7 @@ export const shapeShader = {
   vs: shapeVS,
   fs: shapeFS,
   buffers: {
-    position: { type: vec4,n:2 },
+    position: { type: vec4, n: 2 },
     color: { type: vec4, n: 3 },
   },
 }
@@ -278,15 +278,15 @@ void main() {
 `
 
 //export const BasicImage = {
-  //vs: defaultVS,
-  //fs: defaultFS,
-  //buffers: {
-    //position: { type: vec4, n: 3 },
-    //texCoord: { type: vec2 },
-  //},
-  //textures: {
-    //img: { type: tex2D },
-  //},
+//vs: defaultVS,
+//fs: defaultFS,
+//buffers: {
+//position: { type: vec4, n: 3 },
+//texCoord: { type: vec2 },
+//},
+//textures: {
+//img: { type: tex2D },
+//},
 //}
 
 const saturationVS = `
@@ -357,10 +357,10 @@ void main() {
 `
 
 export const BrightnessContrast = {
-	...basicImageShader,
+  ...basicImageShader,
   fs: brighnessContrastFS,
   uniforms: {
-		...basicImageShader.uniforms,
+    ...basicImageShader.uniforms,
     brightness: { type: float, default: 0 },
     contrast: { type: float, default: 0 },
   },
@@ -403,7 +403,7 @@ export const HueSaturation = {
   ...basicImageShader,
   fs: hueSaturationFS,
   uniforms: {
-		...basicImageShader.uniforms,
+    ...basicImageShader.uniforms,
     hue: { type: float, default: 0 },
     saturation: { type: float, default: 0 },
   },
@@ -433,13 +433,104 @@ void main() {
 `
 
 export const Vignette = {
-	...basicImageShader,
+  ...basicImageShader,
   fs: vignetteFS,
   uniforms: {
-		...basicImageShader.uniforms,
+    ...basicImageShader.uniforms,
     vignette: { type: float, default: 0 },
   },
 }
+const PartHueSaturation = `
+	if(hue !=0.0 || saturation !=0.0 ){
+		float angle = hue * 3.14159265;
+		float s = sin(angle), c = cos(angle);
+		vec3 weights = (vec3(2.0 * c, -sqrt(3.0) * s - c, sqrt(3.0) * s - c) + 1.0) / 3.0;
+		float len = length(color.rgb);
+		color.rgb = vec3(
+			dot(color.rgb, weights.xyz),
+			dot(color.rgb, weights.zxy),
+			dot(color.rgb, weights.yzx)
+		);
+
+		/* saturation adjustment */
+			float average = (color.r + color.g + color.b) / 3.0;
+		if (saturation > 0.0) {
+			color.rgb += (average - color.rgb) * (1.0 - 1.0 / (1.001 - saturation));
+		} else {
+			color.rgb += (average - color.rgb) * (-saturation);
+		}
+	}
+`
+const PartBrightnessContrast = `
+	if(brightness!=0.0 || contrast!=0.0){
+		color.rgb += brightness;
+		if (contrast > 0.0) {
+			color.rgb = (color.rgb - 0.5) / (1.0 - contrast) + 0.5;
+		} else {
+			color.rgb = (color.rgb - 0.5) * (1.0 + contrast) + 0.5;
+		}
+	}
+`
+const PartVignetee =`
+if(vignette!=0.0){
+  float innerVig = 1.0 - vignette;
+  float outerVig = 1.0001; // Position for the outer vignette
+  // float innerVig = 0.4; // Position for the inner vignette ring
+
+  vec2 center = vec2(0.5, 0.5); // center of screen
+  // Distance between center and the current uv. Multiplyed by 1.414213 to fit in the range of 0.0 to 1.0.
+  float dist = distance(center, vTexCoord) * 1.414213;
+  // Generate the vignette with clamp which go from outer ring to inner ring with smooth steps.
+  float vig = clamp((outerVig - dist) / (outerVig - innerVig), 0.0, 1.0);
+  color *= vig; // Multiply the vignette with the texture color
+}
+`
+//const ExShaderUniforms = ['float hue', 'float saturation', 'float brightness', 'float contrast']
+
+//const UniformsInShader = (ex:string[])=>{
+	//return ex.map((uniform) => "uniform "+uniform+";")
+//}
+const MonolithicFS = `
+
+
+precision highp float;
+uniform sampler2D img;
+
+uniform float hue;
+uniform float saturation;
+uniform float brightness;
+uniform float contrast;
+uniform float vignette;
+
+uniform vec3 zoomSection;
+varying vec2 vTexCoord;
+
+void main(){
+	vec2 uv = vTexCoord/zoomSection.z;
+	uv.x+=zoomSection.x;
+	uv.y+=zoomSection.y;
+  vec4 color = texture2D(img, uv);
+	
+	${PartHueSaturation}
+	${PartBrightnessContrast}
+	${PartVignetee}
+
+  gl_FragColor = color;
+}
+`
+export const MonolithicShader = {
+  ...basicImageShader,
+  fs: MonolithicFS,
+  uniforms: {
+    ...basicImageShader.uniforms,
+    hue: { type: float, default: 0 },
+    saturation: { type: float, default: 0 },
+    brightness: { type: float, default: 0 },
+    contrast: { type: float, default: 0 },
+    vignette: { type: float, default: 0 },
+  },
+}
+
 const basicMosaicVS = `
 precision highp float;
 attribute vec4 position;
@@ -481,7 +572,7 @@ export const MosaicMultiShader = {
   vs: basicMosaicVS,
   fs: mosaicMultiVS,
   buffers: {
-    position: { type: vec4,n:2 },
+    position: { type: vec4, n: 2 },
     texCoord: { type: vec4, n: 2 },
   },
   uniforms: {
