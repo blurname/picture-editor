@@ -10,10 +10,6 @@ import {
   VertexBuffersResource,
 } from 'beam-gl'
 import {
-  basicImageShader,
-  BrightnessContrast,
-  Vignette,
-  HueSaturation,
   hollowRectShader,
   lineRectShader,
   lineShader,
@@ -21,7 +17,7 @@ import {
   theWShader,
   backgourndShader,
   MosaicMultiShader,
-	MonolithicShader,
+  MonolithicShader,
 } from '../filter/shader'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {
@@ -63,7 +59,7 @@ export class BeamSpirit {
   protected scale: number
   protected rotate: number
   protected model: Model
-
+  protected uniqueProps: UniqueProps
   protected guidRectPosition: Float32Array
   protected isToggle: boolean
   protected spiritType: SpiritType
@@ -129,6 +125,9 @@ export class BeamSpirit {
   getPos() {
     return this.offset
   }
+  getUniqueProps() {
+    return this.uniqueProps
+  }
   render() {}
 }
 export class RectModel extends BeamSpirit {
@@ -138,13 +137,8 @@ export class RectModel extends BeamSpirit {
   //transMat:number[]
   //rotateMat:number[]
   //scaleMat:number[]
-  constructor(canvas: HTMLCanvasElement, id: number,model?:Model) {
+  constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
-		if(model){
-			this.offset = model.trans
-			this.rotate = model.rotate
-			this.scale = model.scale
-		}
     this.transMat = createTranslateMat(this.offset)
     this.rotateMat = createRotateMat(this.rotate)
     this.scaleMat = createScaleMat(this.scale)
@@ -198,17 +192,25 @@ export class ImageSpirit extends RectModel {
   brightness: number
   contrast: number
 
-  brightnessContrastShader: Shader
-  hueSaturationShader: Shader
-  vignetteShader: Shader
+  uniqueProps: ImageProps = {
+    id: -1,
+    brightness: 0,
+    contrast: 0,
+    hue: 0,
+    saturation: 0,
+    vignette: 0,
+  }
 
   isZoomed: boolean
   zoomSection: number[]
   defaultZoom: number[]
 
-  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number,model?:Model) {
-		console.log("canvas",model)
-    super(canvas, id,model)
+  constructor(
+    canvas: HTMLCanvasElement,
+    image: HTMLImageElement,
+    id: number,
+  ) {
+    super(canvas, id)
     this.isZoomed = false
     this.spiritType = 'Image'
     this.image = image
@@ -219,16 +221,8 @@ export class ImageSpirit extends RectModel {
     this.zoomSection = this.defaultZoom
 
     const quad = createRectangleByProjection(image.width, image.height)
-
     this.beam.define(Offscreen2DCommand)
-
-		//this.shader = this.beam.shader(basicImageShader)
-		this.shader = this.beam.shader(MonolithicShader)
-
-		//this.brightnessContrastShader = this.beam.shader(BrightnessContrast)
-		//this.hueSaturationShader = this.beam.shader(HueSaturation)
-    //this.vignetteShader = this.beam.shader(Vignette)
-
+    this.shader = this.beam.shader(MonolithicShader)
     this.position = quad.vertex.position
 
     this.vertexBuffers = this.beam.resource(VertexBuffers, quad.vertex)
@@ -246,8 +240,9 @@ export class ImageSpirit extends RectModel {
       contrast: 0,
       hue: 0,
       saturation: 0,
-			vignette:0
+      vignette: 0,
     })
+		this.uniqueProps.id = this.id
 
     this.textures.set('img', { image: this.image, flip: true })
     //this.setFilterChain()
@@ -266,9 +261,27 @@ export class ImageSpirit extends RectModel {
     this.outputTextures[0].set('img', this.targets[0])
     this.outputTextures[1].set('img', this.targets[1])
   }
+	updateModel(model:Model){
+		this.model = model
+		this.updateTransMat(this.model.trans)
+		this.updateRotateMat(this.model.rotate)
+		this.updateScaleMat(this.model.scale)
+	}
+
+	updateUniqueProps(uniqueProps:ImageProps){
+
+	}
+	updateUniqueProp<T extends Exclude<Partial<UniqueProps>,{id:number}>>(prop:T){
+		prop.id
+	}
+
+	updateFromRemote<T extends SpiritsAction>(action:T,actionType:SpiritsActionLiteral){
+
+	}
 
   updateContrast(contrast: number) {
     this.contrast = contrast
+		this.uniqueProps.contrast = this.contrast
     this.uniforms.set('contrast', this.contrast)
   }
   updateBrightness(brightness: number) {
@@ -277,7 +290,7 @@ export class ImageSpirit extends RectModel {
   }
   updateHue(hue: number) {
     this.hue = hue
-		console.log(console.log('this.hue:', this.hue))
+    console.log(console.log('this.hue:', this.hue))
     this.uniforms.set('hue', this.hue)
   }
   updateSaturation(saturation: number) {
@@ -359,8 +372,8 @@ export class ImageSpirit extends RectModel {
 
   draw(shader: Shader, input: TexturesResource) {
     this.beam
-		//.clear()
-			.depth()
+      //.clear()
+      .depth()
       .draw(
         shader,
         this.vertexBuffers as any,
@@ -373,15 +386,30 @@ export class ImageSpirit extends RectModel {
     this.isZoomed = isLarged
   }
   render() {
-		//this.beam
-		//.offscreen2D(this.targets[0], () => {
-			//this.draw(this.brightnessContrastShader, this.textures)
-		//})
-		////.offscreen2D(this.targets[1], () => {
-		//this.draw(this.hueSaturationShader, this.outputTextures[0])
-		////})
-		//this.draw(this.hueSaturationShader, this.textures)
-		this.draw(this.shader, this.textures)
+    //this.beam
+    //.offscreen2D(this.targets[0], () => {
+    //this.draw(this.brightnessContrastShader, this.textures)
+    //})
+    ////.offscreen2D(this.targets[1], () => {
+    //this.draw(this.hueSaturationShader, this.outputTextures[0])
+    ////})
+    //this.draw(this.hueSaturationShader, this.textures)
+    this.draw(this.shader, this.textures)
+  }
+  getHue() {
+    return this.hue
+  }
+  getSaturation() {
+    return this.saturation
+  }
+  getContrast() {
+    return this.contrast
+  }
+  getBrightness() {
+    return this.brightness
+  }
+  getVignette() {
+    return this.vignette
   }
 }
 
@@ -399,9 +427,14 @@ export class MarkSpirit extends RectModel {
   private uColor: number[]
   private shape: RectLikeShape
   private buffers: Buffers
-  constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number,model?:Model) {
-		console.log("Mark",model)
-    super(canvas, id,model)
+  constructor(
+    canvas: HTMLCanvasElement,
+    shape: RectLikeShape,
+    id: number,
+    model?: Model,
+  ) {
+    console.log('Mark', model)
+    super(canvas, id, model)
     this.spiritType = 'Mark'
     this.uColor = [1.0, 1.0, 1.0, 1.0]
     this.shape = shape

@@ -13,9 +13,10 @@ export function Editor() {
     selectNum,
     zoomable,
     setZoomable,
-		operationHistory,
+    operationHistory,
   } = useContext(globalContext)
   const shaping = editorSchema.children[0]
+
   const onColorChange = (e: ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value)
     const hex: string = e.target.value
@@ -26,6 +27,7 @@ export function Editor() {
     mark.updateColor([r, g, b, 1.0])
     setAdjustNum(adjustNum + 1)
   }
+
   const onDeleteClik = () => {
     spiritCanvas.deleteElement(selectNum)
     setAdjustNum(adjustNum + 1)
@@ -35,84 +37,139 @@ export function Editor() {
     spiritCanvas.spirits[selectNum].updateLayout(1 - value)
     setAdjustNum(adjustNum + 1)
   }
-	const [value, setValue] = useState(0);
-	const [desc, setDesc] = useState('');
-	const [old, setOld] = useState({} as any);
-	const onMouseDown = (desc:string)=>() => {
-      const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
-      if (desc === 'rotate') {
-				setOld(chosenImage.getRotate())
-        //chosenImage.updateRotateMat(curValue)
-				//operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:curValue})
-      } else if (desc === 'scale') {
-				setOld(chosenImage.getScale())
-        //chosenImage.updateScaleMat(curValue)
-				//operationHistory.commit(chosenImage.getModel(), {scale:chosenImage.getScale()}, {scale:curValue})
-      } else if (desc === 'Hue') {
-        //chosenImage.updateHue(curValue)
-      } else if (desc === 'Saturation') {
-        //chosenImage.updateSaturation(curValue)
-      } else if (desc === 'Contrast') {
-        //chosenImage.updateContrast(curValue)
-      } else if (desc === 'Brightness') {
-        //chosenImage.updateBrightness(curValue)
-      } else if (desc === 'Vignette') {
-        //chosenImage.updateVignette(curValue)
-      }
-	}
+
+  const [value, setValue] = useState(0)
+  const [desc, setDesc] = useState('')
+  const [old, setOld] = useState({} as any)
+
+  const storeOld = (desc: string) => () => {
+    const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
+    if (desc === 'rotate') {
+      setOld(chosenImage.getRotate())
+      //chosenImage.updateRotateMat(curValue)
+      //operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:curValue})
+    } else if (desc === 'scale') {
+      setOld(chosenImage.getScale())
+    } else if (desc === 'Hue') {
+      //chosenImage.updateHue(curValue)
+      setOld(chosenImage.getHue())
+      //} else if (desc === 'Saturation') {
+      //setOld(chosenImage.getSaturation())
+    } else if (desc === 'Contrast') {
+      setOld(chosenImage.getContrast())
+    }
+    //} else if (desc === 'Brightness') {
+    //setOld(chosenImage.getBrightness())
+    //} else if (desc === 'Vignette') {
+    //setOld(chosenImage.getVignette())
+    //}
+  }
   const onChangeInput =
     (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
       const curValue = parseFloat(e.target.value)
-      const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
-
-      // can functional optimze
-      if (desc === 'rotate') {
-        chosenImage.updateRotateMat(curValue)
-				//operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:curValue})
-      } else if (desc === 'scale') {
-        chosenImage.updateScaleMat(curValue)
-				//operationHistory.commit(chosenImage.getModel(), {scale:chosenImage.getScale()}, {scale:curValue})
-      } else if (desc === 'Hue') {
-        chosenImage.updateHue(curValue)
-      } else if (desc === 'Saturation') {
-        chosenImage.updateSaturation(curValue)
-      } else if (desc === 'Contrast') {
-        chosenImage.updateContrast(curValue)
-      } else if (desc === 'Brightness') {
-        chosenImage.updateBrightness(curValue)
-      } else if (desc === 'Vignette') {
-        chosenImage.updateVignette(curValue)
-      }
-      setAdjustNum(adjustNum + 1)
-			setValue(curValue)
-			setDesc(desc)
+      updateValue(desc, curValue)
     }
-	const afterChange = () => {
-			const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
-      if (desc === 'rotate') {
-        chosenImage.updateRotateMat(value)
-				console.log('old:', old)
-				operationHistory.commit(chosenImage.getModel(), {rotate:old}, {rotate:value})
-      } else if (desc === 'scale') {
-        chosenImage.updateScaleMat(value)
-				operationHistory.commit(chosenImage.getModel(), {scale:old}, {scale:value})
-      } else if (desc === 'Hue') {
-        chosenImage.updateHue(value)
+
+  const resetValue = (desc: string) => () => {
+    console.log('desc:', desc)
+    updateValue(desc, 0)
+  }
+  const updateValue = (desc: string, curValue: number) => {
+    console.log('curValue:', curValue)
+    let chosen = spiritCanvas.spirits[selectNum]
+    // can functional optimze
+    if (desc === 'rotate') {
+      chosen.updateRotateMat(curValue)
+      //operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:curValue})
+    } else if (desc === 'scale') {
+      chosen.updateScaleMat(curValue)
+    } else if (chosen.getSpiritType() === 'Image') {
+      const image = chosen as ImageSpirit
+      if (desc === 'Hue') {
+        image.updateHue(curValue)
       } else if (desc === 'Saturation') {
-        chosenImage.updateSaturation(value)
+        image.updateSaturation(curValue)
       } else if (desc === 'Contrast') {
-        chosenImage.updateContrast(value)
+        image.updateContrast(curValue)
       } else if (desc === 'Brightness') {
-        chosenImage.updateBrightness(value)
+        console.log('brightness')
+        image.updateSaturation(curValue)
       } else if (desc === 'Vignette') {
-        chosenImage.updateVignette(value)
+        image.updateVignette(curValue)
       }
-      setAdjustNum(adjustNum + 1)
-	}
+    }
+    setAdjustNum(adjustNum + 1)
+    setValue(curValue)
+    setDesc(desc)
+    return
+  }
+  const commitHistory = () => {
+    const chosen = spiritCanvas.spirits[selectNum]
+    if (desc === 'rotate') {
+      chosen.updateRotateMat(value)
+      console.log('old:', old)
+      operationHistory.commit(
+        chosen.getModel(),
+        { rotate: old },
+        { rotate: value },
+        'Model',
+      )
+    } else if (desc === 'scale') {
+      chosen.updateScaleMat(value)
+      operationHistory.commit(
+        chosen.getModel(),
+        { scale: old },
+        { scale: value },
+        'Model',
+      )
+    } else if (chosen.getSpiritType() === 'Image') {
+		console.log('unique here')
+      const image = chosen as ImageSpirit
+      if (desc === 'Contrast') {
+        image.updateContrast(value)
+        operationHistory.commit(
+          image.getUniqueProps() as ImageProps,
+          { contrast: old },
+          { contrast: value },
+          'UniqueProps',
+        )
+      }
+      //} else if (desc === 'Hue') {
+      //chosenImage.updateHue(value)
+      //operationHistory.commit(
+      //chosenImage.getModel(),
+      //{ scale: old },
+      //{ scale: value },
+      //)
+      //} else if (desc === 'Saturation') {
+      //chosenImage.updateSaturation(value)
+      //operationHistory.commit(
+      //chosenImage.getModel(),
+      //{ scale: old },
+      //{ scale: value },
+      //)
+      //} else if (desc === 'Brightness') {
+      //chosenImage.updateBrightness(value)
+      //operationHistory.commit(
+      //chosenImage.getModel(),
+      //{ scale: old },
+      //{ scale: value },
+      //)
+      //} else if (desc === 'Vignette') {
+      //chosenImage.updateVignette(value)
+      //operationHistory.commit(
+      //chosenImage.getModel(),
+      //{ scale: old },
+      //{ scale: value },
+      //)
+      //}
+    }
+    setAdjustNum(adjustNum + 1)
+  }
   const filters = editorSchema.children[1]
   const onEnlargeable = () => {
-	//appRef.current.style.cursor='zoom-in'
-		setZoomable(!zoomable)
+    //appRef.current.style.cursor='zoom-in'
+    setZoomable(!zoomable)
   }
 
   return (
@@ -120,62 +177,51 @@ export function Editor() {
       Editor
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
       <div>
-        {zoomable && <Button onClick={onEnlargeable}  className="bg-green-200 text-dark-500 text-lg mb-4">
-				zoom-out
-        </Button>}
-        {!zoomable && <Button onClick={onEnlargeable}  className="bg-green-200 text-dark-500 text-lg mb-4">
-				zoom-in
-        </Button>}
+        {zoomable && (
+          <Button
+            onClick={onEnlargeable}
+            className="bg-green-200 text-dark-500 text-lg mb-4"
+          >
+            zoom-out
+          </Button>
+        )}
+        {!zoomable && (
+          <Button
+            onClick={onEnlargeable}
+            className="bg-green-200 text-dark-500 text-lg mb-4"
+          >
+            zoom-in
+          </Button>
+        )}
       </div>
       <div>
-        <Button onClick={onDeleteClik} className="bg-pink-200 text-red-500 text-lg mb-4">delete element</Button>
+        <Button
+          onClick={onDeleteClik}
+          className="bg-pink-200 text-red-500 text-lg mb-4"
+        >
+          delete element
+        </Button>
       </div>
       <Collapse className="w-12/12" defaultActiveKey={[1, 2, 3]}>
-
-			{selectNum!==-1 &&(
-        <CollapsePanel header="shaping" key="1">
-          <div>
-            {shaping.children.map((cur, index) => {
-              if (cur.desc === 'layout') {
-                return (
-                  <Slider
-                    key={index}
-                    min={cur.props.range.min}
-                    max={cur.props.range.max}
-                    step={cur.props.step}
-                    marks={cur.props.marks}
-                    defaultValue={cur.props.value}
-                    onChange={onLayoutChange}
-                  ></Slider>
-                )
-              }
-              return (
-                <div className="w-5/12 h-5/12 mb-3" key={index}>
-                  <Input
-                    type="range"
-                    step={cur.props.step}
-                    min={cur.props.range.min}
-                    max={cur.props.range.max}
-                    defaultValue={cur.props.value}
-                    onInput={onChangeInput(cur.desc)}
-                    id={cur.desc}
-										onMouseUp={afterChange}
-										onMouseDown={onMouseDown(cur.desc)}
-                  />
-                  <label htmlFor={cur.desc}>{cur.desc}</label>
-                </div>
-              )
-            })}
-          </div>
-        </CollapsePanel>
-				)
-				}
-        {spiritCanvas?.chosenType === 'Image' && (
-          <CollapsePanel header="filters" key="2">
+        {selectNum !== -1 && (
+          <CollapsePanel header="shaping" key="1">
             <div>
-              {filters.children.map((cur, index) => {
+              {shaping.children.map((cur, index) => {
+                if (cur.desc === 'layout') {
+                  return (
+                    <Slider
+                      key={index}
+                      min={cur.props.range.min}
+                      max={cur.props.range.max}
+                      step={cur.props.step}
+                      marks={cur.props.marks}
+                      defaultValue={cur.props.value}
+                      onChange={onLayoutChange}
+                    ></Slider>
+                  )
+                }
                 return (
-                  <div className="w-5/12 h-5/12 mb-3" key={index}>
+                  <div className="w-12/12 h-5/12 mb-3" key={index}>
                     <Input
                       type="range"
                       step={cur.props.step}
@@ -184,8 +230,42 @@ export function Editor() {
                       defaultValue={cur.props.value}
                       onInput={onChangeInput(cur.desc)}
                       id={cur.desc}
+                      onMouseUp={commitHistory}
+                      onMouseDown={storeOld(cur.desc)}
                     />
                     <label htmlFor={cur.desc}>{cur.desc}</label>
+                  </div>
+                )
+              })}
+            </div>
+          </CollapsePanel>
+        )}
+        {spiritCanvas?.chosenType === 'Image' && (
+          <CollapsePanel header="filters" key="2">
+            <div>
+              {filters.children.map((cur, index) => {
+                return (
+                  <div key={index}>
+                    <div className="w-7/12 h-5/12 mb-3">
+                      <Input
+                        type="range"
+                        step={cur.props.step}
+                        min={cur.props.range.min}
+                        max={cur.props.range.max}
+                        defaultValue={cur.props.value}
+                        onInput={onChangeInput(cur.desc)}
+                        onMouseUp={commitHistory}
+                        onMouseDown={storeOld(cur.desc)}
+                        id={cur.desc}
+                      />
+                      <label htmlFor={cur.desc}>{cur.desc}</label>
+                    </div>
+                    <Button
+                      className="w-5/12 h-5/12"
+                      onClick={resetValue(cur.desc)}
+                    >
+                      reset
+                    </Button>
                   </div>
                 )
               })}

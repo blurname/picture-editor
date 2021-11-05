@@ -12,22 +12,6 @@ export const editorSchema = {
             step: 1,
           },
         },
-        //{
-        //desc: 'translateX',
-        //props: {
-        //value: 0.0,
-        //range: { min: -1, max: 1 },
-        //step: 0.01,
-        //},
-        //},
-        //{
-        //desc: 'translateY',
-        //props: {
-        //value: 0.0,
-        //range: { min: -1, max: 1 },
-        //step: 0.01,
-        //},
-        //},
         {
           desc: 'scale',
           props: {
@@ -36,14 +20,6 @@ export const editorSchema = {
             step: 0.1,
           },
         },
-        //{
-        //desc: 'scaleY',
-        //props: {
-        //value: 0.0,
-        //range: { min: -1, max: 1 },
-        //step: 0.01,
-        //},
-        //},
         {
           desc: 'layout',
           props: {
