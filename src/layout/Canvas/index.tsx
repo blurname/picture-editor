@@ -110,7 +110,7 @@ export function Canvas(props: Props) {
         }
       }
     }
-    //spiritCanvas.renderAllLine()
+		spiritCanvas.renderAllLine()
   }
   const handleOnMouseDown = (e: MouseEvent) => {
     e.preventDefault()
@@ -238,7 +238,6 @@ export function Canvas(props: Props) {
         }
       })
       console.log('models:', models)
-      //models.map(async (img) => await spiritCanvas.updateFromRemote(img.spiritType,img.model,img.element))
       for (let i = 0; i < models.length; i++) {
         spiritCanvas.updateFromRemote(
           models[i].spiritType,

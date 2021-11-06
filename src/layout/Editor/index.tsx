@@ -4,7 +4,6 @@ import React, { ChangeEvent, useContext, useState } from 'react'
 import { globalContext } from '../../context'
 import { ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
 import { editorSchema } from './editorSchema'
-import { ImageEditor } from './ImageEditor'
 export function Editor() {
   const {
     spiritCanvas,
@@ -44,20 +43,10 @@ export function Editor() {
 
   const storeOld = (desc: string) => () => {
     const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
-    if (desc === 'rotate') {
-      setOld(chosenImage.getRotate())
-    } else if (desc === 'scale') {
-      setOld(chosenImage.getScale())
-    } else if (desc === 'Hue') {
-      setOld(chosenImage.getHue())
-    } else if (desc === 'Saturation') {
-      setOld(chosenImage.getSaturation())
-    } else if (desc === 'Contrast') {
-      setOld(chosenImage.getScale())
-    } else if (desc === 'Brightness') {
-      setOld(chosenImage.getBrightness())
-    } else if (desc === 'Vignette') {
-      setOld(chosenImage.getVignette())
+    if (desc === 'rotate' || desc === 'scale') {
+      setOld(chosenImage.getModel()[desc])
+    } else {
+      setOld(chosenImage.getUniqueProps()[desc])
     }
   }
   const onChangeInput =
@@ -71,27 +60,14 @@ export function Editor() {
     updateValue(desc, 0.00001)
   }
   const updateValue = (desc: string, curValue: number) => {
-    console.log('curValue:', curValue)
     let chosen = spiritCanvas.spirits[selectNum]
-    // can functional optimze
     if (desc === 'rotate') {
       chosen.updateRotateMat(curValue)
-      //operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:curValue})
     } else if (desc === 'scale') {
       chosen.updateScaleMat(curValue)
     } else if (chosen.getSpiritType() === 'Image') {
       const image = chosen as ImageSpirit
-      if (desc === 'Hue') {
-        image.updateHue(curValue)
-      } else if (desc === 'Saturation') {
-        image.updateSaturation(curValue)
-      } else if (desc === 'Contrast') {
-        image.updateContrast(curValue)
-      } else if (desc === 'Brightness') {
-        image.updateSaturation(curValue)
-      } else if (desc === 'Vignette') {
-        image.updateVignette(curValue)
-      }
+      image.updateUniform(desc, curValue)
     }
     setAdjustNum(adjustNum + 1)
     setValue(curValue)
@@ -100,71 +76,27 @@ export function Editor() {
   }
   const commitHistory = () => {
     const chosen = spiritCanvas.spirits[selectNum]
-    if (desc === 'rotate') {
-      chosen.updateRotateMat(value)
-      console.log('old:', old)
-      operationHistory.commit(
-        chosen.getModel(),
-        { rotate: old },
-        { rotate: value },
-        'Model',
-      )
-    } else if (desc === 'scale') {
-      chosen.updateScaleMat(value)
-      operationHistory.commit(
-        chosen.getModel(),
-        { scale: old },
-        { scale: value },
-        'Model',
-      )
+    if (desc === 'rotate' || desc === 'scale') {
+      if (chosen.getSpiritType() === 'Image'|| chosen.getSpiritType()==='Mark') {
+        const image = chosen as ImageSpirit
+        image.updateRectModel({ [desc]: value })
+        console.log('old:', old)
+        operationHistory.commit(
+          image.getModel(),
+          { [desc]: old },
+          { [desc]: value },
+          'Model',
+        )
+      }
     } else if (chosen.getSpiritType() === 'Image') {
-      console.log('unique here')
       const image = chosen as ImageSpirit
-      if (desc === 'Contrast') {
-        image.updateContrast(value)
-        operationHistory.commit(
-          image.getUniqueProps() as ImageProps,
-          { contrast: old },
-          { contrast: value },
-          'UniqueProps',
-        )
-      }
-      if (desc === 'Hue') {
-        image.updateHue(value)
-        operationHistory.commit(
-          image.getUniqueProps() as ImageProps,
-          { hue: old },
-          { hue: value },
-          'UniqueProps',
-        )
-      }
-      if (desc === 'Saturation') {
-        image.updateSaturation(value)
-        operationHistory.commit(
-          image.getUniqueProps() as ImageProps,
-          { saturation: old },
-          { saturation: value },
-          'UniqueProps',
-        )
-      }
-      if (desc === 'Brightness') {
-        image.updateBrightness(value)
-        operationHistory.commit(
-          image.getUniqueProps() as ImageProps,
-          { brightness: old },
-          { brightness: value },
-          'UniqueProps',
-        )
-      }
-      if (desc === 'Vignette') {
-        image.updateVignette(value)
-        operationHistory.commit(
-          image.getUniqueProps() as ImageProps,
-          {vignette: old },
-          {vignette: value },
-          'UniqueProps',
-        )
-      }
+      image.updateUniform(desc, value)
+      operationHistory.commit(
+        image.getUniqueProps() as ImageProps,
+        { [desc]: old },
+        { [desc]: value },
+        'UniqueProps',
+      )
     }
     setAdjustNum(adjustNum + 1)
   }

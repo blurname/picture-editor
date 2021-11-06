@@ -125,15 +125,6 @@ export class SpiritCanvas {
     model?: Model,
   ) {
     let mark: BeamSpirit
-    if (model) {
-      if (shape === 'circle') {
-        //mark = new CircleSpirit(this.canvas3d, id,model)
-      } else if (shape === 'theW') {
-        //mark = new TheW(this.canvas3d, id,model)
-      } else {
-        mark = new MarkSpirit(this.canvas3d, shape, id, model)
-      }
-    } else {
       if (shape === 'circle') {
         mark = new CircleSpirit(this.canvas3d, id)
       } else if (shape === 'theW') {
@@ -141,8 +132,13 @@ export class SpiritCanvas {
       } else {
         mark = new MarkSpirit(this.canvas3d, shape, id)
       }
-    }
 
+    if (model) {
+      //mark.updateFromRemote(model, 'Model')
+    }
+		//if(uniqueProps){
+			//spirit.updateFromRemote(uniqueProps as ImageProps, 'UniqueProps')
+		//}
     //this.spirits.push(mark)
     this.spirits[id] = mark
     this.guidLines.push(

@@ -43,7 +43,7 @@ export const editorSchema = {
       desc: 'filters',
       children: [
         {
-          desc: 'Brightness',
+          desc: 'brightness',
           props: {
             value: 0.0,
             range: { min: -0.5, max: 0.5 },
@@ -51,7 +51,7 @@ export const editorSchema = {
           },
         },
         {
-          desc: 'Contrast',
+          desc: 'contrast',
           props: {
             value: 0.0,
             range: { min: -0.3, max: 0.3 },
@@ -59,7 +59,7 @@ export const editorSchema = {
           },
         },
         {
-          desc: 'Hue',
+          desc: 'hue',
           props: {
             value: 0.0,
             range: { min: -1, max: 1 },
@@ -67,7 +67,7 @@ export const editorSchema = {
           },
         },
         {
-          desc: 'Saturation',
+          desc: 'saturation',
           props: {
             value: 0.0,
             range: { min: -0.5, max: 0.5 },
@@ -75,7 +75,7 @@ export const editorSchema = {
           },
         },
         {
-          desc: 'Vignette',
+          desc: 'vignette',
           props: {
             value: 0.0,
             range: { min: 0, max: 10 },

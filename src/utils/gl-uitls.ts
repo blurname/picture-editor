@@ -1,4 +1,3 @@
-import FormItemInput from 'antd/lib/form/FormItemInput'
 import {
   Beam,
   IndexBufferResource,
@@ -10,7 +9,6 @@ import {
   UniformsResource,
   VertexBuffersResource,
 } from 'beam-gl'
-import { object } from 'superstruct'
 import {
   hollowRectShader,
   lineRectShader,
@@ -133,12 +131,6 @@ export class BeamSpirit {
   render() {}
 }
 export class RectModel extends BeamSpirit {
-  //rotate:number
-  //scale:number
-  //offset:Pos
-  //transMat:number[]
-  //rotateMat:number[]
-  //scaleMat:number[]
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
     this.transMat = createTranslateMat(this.offset)
@@ -178,6 +170,13 @@ export class RectModel extends BeamSpirit {
       top: offset.top,
     })
     this.uniforms.set('transMat', this.transMat)
+  }
+
+  updateRectModel<T extends Partial<Model>>(model: T) {
+    if (model.trans) this.updateTransMat(model.trans)
+    if (model.rotate) this.updateRotateMat(model.rotate)
+    if (model.scale) this.updateScaleMat(model.scale)
+    this.updateGuidRect()
   }
 }
 export class ImageSpirit extends RectModel {
@@ -260,27 +259,19 @@ export class ImageSpirit extends RectModel {
     this.outputTextures[0].set('img', this.targets[0])
     this.outputTextures[1].set('img', this.targets[1])
   }
-  updateModel<T extends Model>(model: T) {
-    this.updateTransMat(model.trans)
-    this.updateRotateMat(model.rotate)
-    this.updateScaleMat(model.scale)
-    this.updateGuidRect()
-  }
 
-  private updateUniform(uniform: string, value: number) {
+  updateUniform(uniform: string, value: number) {
     this[uniform] = value
-		this.uniqueProps[uniform] = value
+    this.uniqueProps[uniform] = value
     this.uniforms.set(uniform, this[uniform])
-    console.log('contrast:', uniform)
   }
-
 
   updateImageProps<T extends Omit<Partial<ImageProps>, 'id'>>(props: T) {
     for (const key in props) {
       const element = props[key]
       if (key !== 'id') {
         console.log('key:', element)
-				this.updateUniform(key, element as any)
+        this.updateUniform(key, element as any)
       }
     }
   }
@@ -290,10 +281,8 @@ export class ImageSpirit extends RectModel {
     actionType: SpiritsActionLiteral,
   ) {
     if (actionType === 'Model') {
-      console.log('Model')
-      this.updateModel(action as Model)
+      this.updateRectModel(action as Model)
     } else {
-      console.log('UniquePropsslakjfsaldkfj')
       this.updateImageProps(action as ImageProps)
     }
   }
@@ -305,22 +294,22 @@ export class ImageSpirit extends RectModel {
   }
   updateBrightness(brightness: number) {
     this.brightness = brightness
-		this.uniqueProps.brightness = this.brightness
+    this.uniqueProps.brightness = this.brightness
     this.uniforms.set('brightness', this.brightness)
   }
   updateHue(hue: number) {
     this.hue = hue
-		this.uniqueProps.hue = this.hue
+    this.uniqueProps.hue = this.hue
     this.uniforms.set('hue', this.hue)
   }
   updateSaturation(saturation: number) {
     this.saturation = saturation
-		this.uniqueProps.saturation = this.saturation
+    this.uniqueProps.saturation = this.saturation
     this.uniforms.set('saturation', this.saturation)
   }
   updateVignette(vignette: number) {
     this.vignette = vignette
-		this.uniqueProps.vignette = this.vignette
+    this.uniqueProps.vignette = this.vignette
     this.uniforms.set('vignette', this.vignette)
   }
   getIsZoomed() {
@@ -433,6 +422,9 @@ export class ImageSpirit extends RectModel {
   getVignette() {
     return this.vignette
   }
+  getUniqueProps() {
+    return this.uniqueProps
+  }
 }
 
 type Buffers = {
@@ -449,14 +441,8 @@ export class MarkSpirit extends RectModel {
   private uColor: number[]
   private shape: RectLikeShape
   private buffers: Buffers
-  constructor(
-    canvas: HTMLCanvasElement,
-    shape: RectLikeShape,
-    id: number,
-    model?: Model,
-  ) {
-    console.log('Mark', model)
-    super(canvas, id, model)
+  constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number) {
+    super(canvas, id)
     this.spiritType = 'Mark'
     this.uColor = [1.0, 1.0, 1.0, 1.0]
     this.shape = shape
@@ -496,7 +482,24 @@ export class MarkSpirit extends RectModel {
     this.uColor = color
     this.uniforms.set('uColor', color)
   }
-
+  updateMarkProps<T extends Omit<Partial<MarkProps>, 'id'>>(props:T) {
+    for (const key in props) {
+      const element = props[key]
+      if (key !== 'id') {
+        console.log('key:', element)
+        //this.updateUniform(key, element as any)
+      }
+    }
+	}
+  updateFromRemote<T extends SpiritsAction>(
+    action: T,
+    actionType: SpiritsActionLiteral,
+  ) {
+    if (actionType === 'Model') {
+      this.updateRectModel(action as Model)
+    } else {
+    }
+  }
   private draw() {
     this.beam
       .depth()
