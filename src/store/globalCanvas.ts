@@ -84,12 +84,12 @@ export class SpiritCanvas {
     typeId: number,
     model: Model,
     element: T,
+		uniqueProps:Partial<UniqueProps>
   ) {
     const result = binarySearch(model.id, this.spirits)
     if (result === -1) {
       if (typeId === 1)
-        //this.addImage('../../public/t1.jpeg', model.id, true, model)
-        this.addImage(element, model.id, true, model)
+        this.addImage(element, model.id, true, model,uniqueProps)
       else if (typeId === 2)
         this.addMark(element as Shape, model.id, true, model)
     }
@@ -99,11 +99,17 @@ export class SpiritCanvas {
     id: number,
     exist: boolean = false,
     model?: Model,
+		uniqueProps?:Partial<UniqueProps>
   ) {
     const image = (await loadImage(imgSrc)) as HTMLImageElement
     let spirit: ImageSpirit
-      spirit = new ImageSpirit(this.canvas3d, image, id)
-    if (model) {}
+    spirit = new ImageSpirit(this.canvas3d, image, id)
+    if (model) {
+      spirit.updateFromRemote(model, 'Model')
+    }
+		if(uniqueProps){
+			spirit.updateFromRemote(uniqueProps as ImageProps, 'UniqueProps')
+		}
     this.spirits[id] = spirit
     //this.spirits.push(spirit)
     this.guidLines.push(

@@ -244,6 +244,7 @@ export function Canvas(props: Props) {
           models[i].spiritType,
           models[i].model,
           models[i].element,
+					models[i].uniqueProps
         )
       }
       setTimeout(() => {

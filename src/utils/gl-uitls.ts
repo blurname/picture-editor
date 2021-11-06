@@ -1,3 +1,4 @@
+import FormItemInput from 'antd/lib/form/FormItemInput'
 import {
   Beam,
   IndexBufferResource,
@@ -9,6 +10,7 @@ import {
   UniformsResource,
   VertexBuffersResource,
 } from 'beam-gl'
+import { object } from 'superstruct'
 import {
   hollowRectShader,
   lineRectShader,
@@ -205,11 +207,7 @@ export class ImageSpirit extends RectModel {
   zoomSection: number[]
   defaultZoom: number[]
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    image: HTMLImageElement,
-    id: number,
-  ) {
+  constructor(canvas: HTMLCanvasElement, image: HTMLImageElement, id: number) {
     super(canvas, id)
     this.isZoomed = false
     this.spiritType = 'Image'
@@ -242,11 +240,12 @@ export class ImageSpirit extends RectModel {
       saturation: 0,
       vignette: 0,
     })
-		this.uniqueProps.id = this.id
+    this.uniqueProps.id = this.id
 
     this.textures.set('img', { image: this.image, flip: true })
     //this.setFilterChain()
     this.updateGuidRect()
+    //this.updateImageProps(this.uniqueProps)
   }
   setFilterChain() {
     //this.inputTextures = this.textures
@@ -261,44 +260,67 @@ export class ImageSpirit extends RectModel {
     this.outputTextures[0].set('img', this.targets[0])
     this.outputTextures[1].set('img', this.targets[1])
   }
-	updateModel(model:Model){
-		this.model = model
-		this.updateTransMat(this.model.trans)
-		this.updateRotateMat(this.model.rotate)
-		this.updateScaleMat(this.model.scale)
-	}
+  updateModel<T extends Model>(model: T) {
+    this.updateTransMat(model.trans)
+    this.updateRotateMat(model.rotate)
+    this.updateScaleMat(model.scale)
+    this.updateGuidRect()
+  }
 
-	updateUniqueProps(uniqueProps:ImageProps){
+  private updateUniform(uniform: string, value: number) {
+    this[uniform] = value
+		this.uniqueProps[uniform] = value
+    this.uniforms.set(uniform, this[uniform])
+    console.log('contrast:', uniform)
+  }
 
-	}
-	updateUniqueProp<T extends Exclude<Partial<UniqueProps>,{id:number}>>(prop:T){
-		prop.id
-	}
 
-	updateFromRemote<T extends SpiritsAction>(action:T,actionType:SpiritsActionLiteral){
+  updateImageProps<T extends Omit<Partial<ImageProps>, 'id'>>(props: T) {
+    for (const key in props) {
+      const element = props[key]
+      if (key !== 'id') {
+        console.log('key:', element)
+				this.updateUniform(key, element as any)
+      }
+    }
+  }
 
-	}
+  updateFromRemote<T extends SpiritsAction>(
+    action: T,
+    actionType: SpiritsActionLiteral,
+  ) {
+    if (actionType === 'Model') {
+      console.log('Model')
+      this.updateModel(action as Model)
+    } else {
+      console.log('UniquePropsslakjfsaldkfj')
+      this.updateImageProps(action as ImageProps)
+    }
+  }
 
   updateContrast(contrast: number) {
     this.contrast = contrast
-		this.uniqueProps.contrast = this.contrast
+    this.uniqueProps.contrast = this.contrast
     this.uniforms.set('contrast', this.contrast)
   }
   updateBrightness(brightness: number) {
     this.brightness = brightness
+		this.uniqueProps.brightness = this.brightness
     this.uniforms.set('brightness', this.brightness)
   }
   updateHue(hue: number) {
     this.hue = hue
-    console.log(console.log('this.hue:', this.hue))
+		this.uniqueProps.hue = this.hue
     this.uniforms.set('hue', this.hue)
   }
   updateSaturation(saturation: number) {
     this.saturation = saturation
+		this.uniqueProps.saturation = this.saturation
     this.uniforms.set('saturation', this.saturation)
   }
   updateVignette(vignette: number) {
     this.vignette = vignette
+		this.uniqueProps.vignette = this.vignette
     this.uniforms.set('vignette', this.vignette)
   }
   getIsZoomed() {

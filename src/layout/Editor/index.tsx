@@ -46,23 +46,19 @@ export function Editor() {
     const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
     if (desc === 'rotate') {
       setOld(chosenImage.getRotate())
-      //chosenImage.updateRotateMat(curValue)
-      //operationHistory.commit(chosenImage.getModel(), {rotate:chosenImage.getRotate()}, {rotate:curValue})
     } else if (desc === 'scale') {
       setOld(chosenImage.getScale())
     } else if (desc === 'Hue') {
-      //chosenImage.updateHue(curValue)
       setOld(chosenImage.getHue())
-      //} else if (desc === 'Saturation') {
-      //setOld(chosenImage.getSaturation())
+    } else if (desc === 'Saturation') {
+      setOld(chosenImage.getSaturation())
     } else if (desc === 'Contrast') {
-      setOld(chosenImage.getContrast())
+      setOld(chosenImage.getScale())
+    } else if (desc === 'Brightness') {
+      setOld(chosenImage.getBrightness())
+    } else if (desc === 'Vignette') {
+      setOld(chosenImage.getVignette())
     }
-    //} else if (desc === 'Brightness') {
-    //setOld(chosenImage.getBrightness())
-    //} else if (desc === 'Vignette') {
-    //setOld(chosenImage.getVignette())
-    //}
   }
   const onChangeInput =
     (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +68,7 @@ export function Editor() {
 
   const resetValue = (desc: string) => () => {
     console.log('desc:', desc)
-    updateValue(desc, 0)
+    updateValue(desc, 0.00001)
   }
   const updateValue = (desc: string, curValue: number) => {
     console.log('curValue:', curValue)
@@ -92,7 +88,6 @@ export function Editor() {
       } else if (desc === 'Contrast') {
         image.updateContrast(curValue)
       } else if (desc === 'Brightness') {
-        console.log('brightness')
         image.updateSaturation(curValue)
       } else if (desc === 'Vignette') {
         image.updateVignette(curValue)
@@ -123,7 +118,7 @@ export function Editor() {
         'Model',
       )
     } else if (chosen.getSpiritType() === 'Image') {
-		console.log('unique here')
+      console.log('unique here')
       const image = chosen as ImageSpirit
       if (desc === 'Contrast') {
         image.updateContrast(value)
@@ -134,35 +129,42 @@ export function Editor() {
           'UniqueProps',
         )
       }
-      //} else if (desc === 'Hue') {
-      //chosenImage.updateHue(value)
-      //operationHistory.commit(
-      //chosenImage.getModel(),
-      //{ scale: old },
-      //{ scale: value },
-      //)
-      //} else if (desc === 'Saturation') {
-      //chosenImage.updateSaturation(value)
-      //operationHistory.commit(
-      //chosenImage.getModel(),
-      //{ scale: old },
-      //{ scale: value },
-      //)
-      //} else if (desc === 'Brightness') {
-      //chosenImage.updateBrightness(value)
-      //operationHistory.commit(
-      //chosenImage.getModel(),
-      //{ scale: old },
-      //{ scale: value },
-      //)
-      //} else if (desc === 'Vignette') {
-      //chosenImage.updateVignette(value)
-      //operationHistory.commit(
-      //chosenImage.getModel(),
-      //{ scale: old },
-      //{ scale: value },
-      //)
-      //}
+      if (desc === 'Hue') {
+        image.updateHue(value)
+        operationHistory.commit(
+          image.getUniqueProps() as ImageProps,
+          { hue: old },
+          { hue: value },
+          'UniqueProps',
+        )
+      }
+      if (desc === 'Saturation') {
+        image.updateSaturation(value)
+        operationHistory.commit(
+          image.getUniqueProps() as ImageProps,
+          { saturation: old },
+          { saturation: value },
+          'UniqueProps',
+        )
+      }
+      if (desc === 'Brightness') {
+        image.updateBrightness(value)
+        operationHistory.commit(
+          image.getUniqueProps() as ImageProps,
+          { brightness: old },
+          { brightness: value },
+          'UniqueProps',
+        )
+      }
+      if (desc === 'Vignette') {
+        image.updateVignette(value)
+        operationHistory.commit(
+          image.getUniqueProps() as ImageProps,
+          {vignette: old },
+          {vignette: value },
+          'UniqueProps',
+        )
+      }
     }
     setAdjustNum(adjustNum + 1)
   }
