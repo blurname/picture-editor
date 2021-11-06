@@ -7,6 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
+import { render } from 'react-dom'
 import { globalContext } from '../../context'
 import {
   drawRectBorder,
@@ -32,6 +33,8 @@ type remoteModel = {
   canvas_spirit_id: number
   spirit_type: number
   model: string
+  element: Shape | string
+  unique_props: string
 }
 
 export function Canvas(props: Props) {
@@ -42,6 +45,7 @@ export function Canvas(props: Props) {
     adjustNum,
     setAdjustNum,
     cmpCount,
+    setCmpCount,
     zoomable,
     operationHistory,
   } = useContext(globalContext)
@@ -54,6 +58,7 @@ export function Canvas(props: Props) {
   const [images, setImages] = useState([] as BeamSpirit[])
   const [initCount, setInitCount] = useState(-1)
   const [initImages, setInitImages] = useState([] as remoteModel[])
+  const [initComplete, setInitComplete] = useState(false)
 
   //const [oldPos, setOldPos] = useState({} as Pos);
   let isMoveable = false
@@ -105,7 +110,7 @@ export function Canvas(props: Props) {
         }
       }
     }
-    //spiritCanvas.renderAllLine()
+		spiritCanvas.renderAllLine()
   }
   const handleOnMouseDown = (e: MouseEvent) => {
     e.preventDefault()
@@ -157,18 +162,18 @@ export function Canvas(props: Props) {
         spirit.getModel(),
         { trans: oldPos },
         { trans: spirit.getModel().trans },
+        'Model',
       )
-      console.log(spiritCanvas.spirits[curImage])
-      console.log('spirit.getModel():', spirit.getModel())
     }
-    console.log('operationHistory.lens:', operationHistory.lens)
     //operationHistory.commit(s, from, wto)
+    console.log('images.length:' + images.length)
     if (!zoomable) canvas3dRef.current.style.cursor = 'default'
     renderImages()
     setAdjustNum(adjustNum + 1)
   }
   const renderImages = () => {
     //spiritCanvas.renderBackground()
+    console.log(spiritCanvas.spirits)
     for (const image of images) {
       if (image !== null) image.render()
     }
@@ -204,36 +209,54 @@ export function Canvas(props: Props) {
   //there if has existed
   useEffect(() => {
     const getInit = async () => {
-      const init = await getSpirits(spiritCanvas.id)
-      setInitImages(init)
+      const init = (await getSpirits(spiritCanvas.id)) as remoteModel[]
+      const sorted = init.sort((a, b) => a.id - b.id)
+      console.log('sorted:', sorted)
+      setInitImages(sorted)
     }
     if (initCount > 0) {
       getInit()
+      setCmpCount(initCount)
     }
   }, [initCount])
 
-  //useEffect(() => {
-  //if(initImages.length>0){
-  //initImages.map((img) => spiritCanvas.updateFromRemote(img.model))
-  //}
-  //}, [initImages]);
   type CModel = {
     spiritType: number
     model: Model
+    element: Shape | string
+    uniqueProps: Partial<UniqueProps>
   }
   useEffect(() => {
     if (initImages.length > 0) {
+      console.log('initImages:', initImages)
       const models: CModel[] = initImages.map((img) => {
         return {
           spiritType: img.spirit_type,
           model: JSON.parse(img.model),
+          element: img.element,
+          uniqueProps: JSON.parse(img.unique_props)
         }
       })
-      models.map((img) => spiritCanvas.updateFromRemote(img.spiritType,img.model))
-
-      console.log(models)
+      console.log('models:', models)
+      for (let i = 0; i < models.length; i++) {
+        spiritCanvas.updateFromRemote(
+          models[i].spiritType,
+          models[i].model,
+          models[i].element,
+					models[i].uniqueProps
+        )
+      }
+      setTimeout(() => {
+        renderImages()
+      }, 500)
     }
   }, [initImages])
+
+  useEffect(() => {
+    if (initComplete) {
+      renderImages()
+    }
+  }, [initComplete])
 
   useEffect(() => {
     if (zoomable) canvas3dRef.current.style.cursor = 'zoom-in'

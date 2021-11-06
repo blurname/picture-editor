@@ -14,7 +14,7 @@ type LinearActions = {
   from: Partial<SpiritActionType>
   to: Partial<SpiritActionType>
 }
-type SpiritActionType = Image | Mark | Mosaic
+type SpiritActionType = ImageProps | MarkProps | Model
 class Histories {
   histories: LinearActions[]
   tail: number
