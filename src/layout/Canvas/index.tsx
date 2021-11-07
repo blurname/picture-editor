@@ -49,7 +49,7 @@ export function Canvas(props: Props) {
   } = useContext(globalContext)
   let canvas: CanvasPos = {
     width: 1300,
-    height: 1300,
+    height: 900,
     left: 320,
     top: 110,
   }
@@ -270,7 +270,7 @@ export function Canvas(props: Props) {
   }, [adjustNum, cmpCount])
 
   return (
-    <div className="w-12/12 h-12/12">
+    <div className="flex-grow w-max h-full bg-blue-400">
       <Button onClick={handleBack} disabled={!(operationHistory.tail > 0)}>
         undo
       </Button>

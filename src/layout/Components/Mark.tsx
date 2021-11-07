@@ -27,10 +27,10 @@ export function Mark() {
     setCmpCount(cmpCount + 1)
   }
   return (
-    <div>
+    <div className="">
       {marks.map((mark, index) => {
         return (
-          <div className="auto mb-6" key={mark.id}>
+          <div className="w-1/12 mb-6" key={mark.id}>
             <Button onClick={addMark(mark.value)}>{mark.value}</Button>
           </div>
         )

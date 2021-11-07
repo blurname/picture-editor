@@ -128,7 +128,7 @@ export function Editor() {
   }
 
   return (
-    <div className="w-2/12 bg-blue-100 object-right">
+    <div className="flex-grow-0 w-50 bg-blue-100 object-right">
       Editor
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
       <div>
