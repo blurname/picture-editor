@@ -268,9 +268,9 @@ export class ImageSpirit extends RectModel {
 
   updateImageProps<T extends Omit<Partial<ImageProps>, 'id'>>(props: T) {
     for (const key in props) {
-      const element = props[key]
+			const element = props[key]
       if (key !== 'id') {
-        console.log('key:', element)
+        //console.log('key:', element)
         this.updateUniform(key, element as any)
       }
     }
@@ -407,21 +407,6 @@ export class ImageSpirit extends RectModel {
     //this.draw(this.hueSaturationShader, this.textures)
     this.draw(this.shader, this.textures)
   }
-  getHue() {
-    return this.hue
-  }
-  getSaturation() {
-    return this.saturation
-  }
-  getContrast() {
-    return this.contrast
-  }
-  getBrightness() {
-    return this.brightness
-  }
-  getVignette() {
-    return this.vignette
-  }
   getUniqueProps() {
     return this.uniqueProps
   }
@@ -441,6 +426,10 @@ export class MarkSpirit extends RectModel {
   private uColor: number[]
   private shape: RectLikeShape
   private buffers: Buffers
+	uniqueProps:MarkProps={
+		id:-1,
+		uColor:[]
+	}
   constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number) {
     super(canvas, id)
     this.spiritType = 'Mark'
@@ -462,6 +451,10 @@ export class MarkSpirit extends RectModel {
     })
     this.shader = this.getShaderByShape()
     this.position = this.buffers.vertex.position
+		this.uniqueProps = {
+			id:this.id,
+			uColor:this.uColor
+		}
     this.updateGuidRect()
   }
   getBuffersByShape(): Buffers {
@@ -482,12 +475,19 @@ export class MarkSpirit extends RectModel {
     this.uColor = color
     this.uniforms.set('uColor', color)
   }
-  updateMarkProps<T extends Omit<Partial<MarkProps>, 'id'>>(props:T) {
+
+  updateUniform(uniform: string, value: any) {
+    this[uniform] = value
+    this.uniqueProps[uniform] = value
+    this.uniforms.set(uniform, this[uniform])
+  }
+
+  updateRectMarkProps<T extends Omit<Partial<MarkProps>, 'id'>>(props:T) {
     for (const key in props) {
       const element = props[key]
       if (key !== 'id') {
         console.log('key:', element)
-        //this.updateUniform(key, element as any)
+				this.updateUniform(key, element as any)
       }
     }
 	}
@@ -498,6 +498,8 @@ export class MarkSpirit extends RectModel {
     if (actionType === 'Model') {
       this.updateRectModel(action as Model)
     } else {
+			this.updateRectMarkProps(action as MarkProps)
+
     }
   }
   private draw() {
@@ -521,7 +523,6 @@ export class MosaicSpirit extends RectModel {
     this.spiritType = 'Mark'
     const buffers = this.getBuffersByShape(type)
     this.position = buffers.vertex.position
-    console.log(this.position)
     this.vertexBuffers = this.beam.resource(VertexBuffers, buffers.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, buffers.index)
     this.shader = this.beam.shader(this.getShaderByShape(type))

@@ -91,7 +91,7 @@ export class SpiritCanvas {
       if (typeId === 1)
         this.addImage(element, model.id, true, model,uniqueProps)
       else if (typeId === 2)
-        this.addMark(element as Shape, model.id, true, model)
+        this.addMark(element as Shape, model.id, true, model,uniqueProps)
     }
   }
   async addImage(
@@ -111,7 +111,6 @@ export class SpiritCanvas {
 			spirit.updateFromRemote(uniqueProps as ImageProps, 'UniqueProps')
 		}
     this.spirits[id] = spirit
-    //this.spirits.push(spirit)
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
     )
@@ -122,24 +121,24 @@ export class SpiritCanvas {
     shape: Shape,
     id: number,
     exist: boolean = false,
-    model?: Model,
+		model?: Model,
+    uniqueProps?: Partial<UniqueProps>,
   ) {
     let mark: BeamSpirit
       if (shape === 'circle') {
         mark = new CircleSpirit(this.canvas3d, id)
-      } else if (shape === 'theW') {
-        mark = new TheW(this.canvas3d, id)
       } else {
         mark = new MarkSpirit(this.canvas3d, shape, id)
       }
 
     if (model) {
-      //mark.updateFromRemote(model, 'Model')
+			if(shape ==='line'|| shape ==='hollowRect'){
+				(mark as MarkSpirit).updateFromRemote(model, 'Model')
+			}
     }
-		//if(uniqueProps){
-			//spirit.updateFromRemote(uniqueProps as ImageProps, 'UniqueProps')
-		//}
-    //this.spirits.push(mark)
+		if(uniqueProps){
+			(mark as MarkSpirit).updateFromRemote(uniqueProps as MarkProps , 'UniqueProps')
+		}
     this.spirits[id] = mark
     this.guidLines.push(
       new GuidLine(this.canvas3d, mark.getGuidRect(), mark.getId()),

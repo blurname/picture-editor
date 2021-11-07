@@ -1,5 +1,4 @@
 import { Button } from 'antd'
-import { Beam, ResourceTypes } from 'beam-gl'
 import React, {
   MouseEvent,
   useContext,
@@ -7,7 +6,6 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { render } from 'react-dom'
 import { globalContext } from '../../context'
 import {
   drawRectBorder,
@@ -60,7 +58,6 @@ export function Canvas(props: Props) {
   const [initImages, setInitImages] = useState([] as remoteModel[])
   const [initComplete, setInitComplete] = useState(false)
 
-  //const [oldPos, setOldPos] = useState({} as Pos);
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
@@ -175,7 +172,7 @@ export function Canvas(props: Props) {
     //spiritCanvas.renderBackground()
     console.log(spiritCanvas.spirits)
     for (const image of images) {
-      if (image !== null) image.render()
+      if (image) image.render()
     }
   }
   const handleBack = () => {

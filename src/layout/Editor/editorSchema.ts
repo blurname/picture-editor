@@ -84,5 +84,32 @@ export const editorSchema = {
         },
       ],
     },
+		{
+			desc:'color',
+			children:[
+				{
+					desc:'R',
+					props:{
+						value:0,
+						range:{min:0,max:255},
+						step:1
+					}
+				},{
+					desc:'G',
+					props:{
+						value:0,
+						range:{min:0,max:255},
+						step:1
+					}
+				},{
+					desc:'B',
+					props:{
+						value:0,
+						range:{min:0,max:255},
+						step:1
+					}
+				}
+			]
+		}
   ],
 }

@@ -54,7 +54,7 @@ type ImageProps = {
 }
 type MarkProps = {
 	id:number
-	color:number[]
+	uColor:number[]
 }
 type UniqueProps = MarkProps|ImageProps
 
