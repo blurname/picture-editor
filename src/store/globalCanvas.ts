@@ -84,14 +84,14 @@ export class SpiritCanvas {
     typeId: number,
     model: Model,
     element: T,
-		uniqueProps:Partial<UniqueProps>
+    uniqueProps: Partial<UniqueProps>,
   ) {
     const result = binarySearch(model.id, this.spirits)
     if (result === -1) {
       if (typeId === 1)
-        this.addImage(element, model.id, true, model,uniqueProps)
+        this.addImage(element, model.id, true, model, uniqueProps)
       else if (typeId === 2)
-        this.addMark(element as Shape, model.id, true, model,uniqueProps)
+        this.addMark(element as Shape, model.id, true, model, uniqueProps)
     }
   }
   async addImage(
@@ -99,7 +99,7 @@ export class SpiritCanvas {
     id: number,
     exist: boolean = false,
     model?: Model,
-		uniqueProps?:Partial<UniqueProps>
+    uniqueProps?: Partial<UniqueProps>,
   ) {
     const image = (await loadImage(imgSrc)) as HTMLImageElement
     let spirit: ImageSpirit
@@ -107,9 +107,9 @@ export class SpiritCanvas {
     if (model) {
       spirit.updateFromRemote(model, 'Model')
     }
-		if(uniqueProps){
-			spirit.updateFromRemote(uniqueProps as ImageProps, 'UniqueProps')
-		}
+    if (uniqueProps) {
+      spirit.updateFromRemote(uniqueProps as ImageProps, 'UniqueProps')
+    }
     this.spirits[id] = spirit
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
@@ -121,24 +121,27 @@ export class SpiritCanvas {
     shape: Shape,
     id: number,
     exist: boolean = false,
-		model?: Model,
+    model?: Model,
     uniqueProps?: Partial<UniqueProps>,
   ) {
     let mark: BeamSpirit
-      if (shape === 'circle') {
-        mark = new CircleSpirit(this.canvas3d, id)
-      } else {
-        mark = new MarkSpirit(this.canvas3d, shape, id)
-      }
+    if (shape === 'circle') {
+      mark = new CircleSpirit(this.canvas3d, id)
+    } else {
+      mark = new MarkSpirit(this.canvas3d, shape, id)
+    }
 
     if (model) {
-			if(shape ==='line'|| shape ==='hollowRect'){
-				(mark as MarkSpirit).updateFromRemote(model, 'Model')
-			}
+      if (shape === 'line' || shape === 'hollowRect') {
+        ;(mark as MarkSpirit).updateFromRemote(model, 'Model')
+      }
     }
-		if(uniqueProps){
-			(mark as MarkSpirit).updateFromRemote(uniqueProps as MarkProps , 'UniqueProps')
-		}
+    if (uniqueProps) {
+      ;(mark as MarkSpirit).updateFromRemote(
+        uniqueProps as MarkProps,
+        'UniqueProps',
+      )
+    }
     this.spirits[id] = mark
     this.guidLines.push(
       new GuidLine(this.canvas3d, mark.getGuidRect(), mark.getId()),
@@ -276,36 +279,17 @@ export class OperationHistory {
       dir = to
     }
     const key = Object.keys(dir)[0]
-    console.log('key:', key)
 
     const spirit = this.spiritCanvas.spirits[id]
-    if (key === 'trans') {
-      spirit.updatePosition(dir.trans)
+    if (key === 'trans' || key==='scale'||key==='rotate') {
+      spirit.updateModel(dir)
       this.spiritCanvas.updateGuidRect(spirit)
-    } else if (key === 'scale') {
-      spirit.updateScaleMat(dir.scale)
-      this.spiritCanvas.updateGuidRect(spirit)
-    } else if (key === 'rotate') {
-      spirit.updateRotateMat(dir.rotate)
-      this.spiritCanvas.updateGuidRect(spirit)
-    } else if (key === 'color') {
+    } else if (spirit.getSpiritType() === 'Image') {
+      const image = spirit as ImageSpirit
+      image.updateImageProps(dir)
+    } else if (spirit.getSpiritType() === 'Mark') {
       const mark = spirit as MarkSpirit
-      mark.updateColor(dir)
-    } else if (key === 'contrast') {
-      const image = spirit as ImageSpirit
-      image.updateContrast(dir)
-    } else if (key === 'hue') {
-      const image = spirit as ImageSpirit
-      image.updateHue(dir)
-    } else if (key === 'brightness') {
-      const image = spirit as ImageSpirit
-      image.updateBrightness(dir)
-    } else if (key === 'saturation') {
-      const image = spirit as ImageSpirit
-      image.updateSaturation(dir)
-    } else if (key === 'vignette') {
-      const image = spirit as ImageSpirit
-      image.updateVignette(dir)
+      mark.updateRectMarkProps(dir)
     }
 
     //this.updateRemote(id)

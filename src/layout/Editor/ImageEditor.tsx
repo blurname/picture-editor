@@ -22,21 +22,21 @@ export function ImageEditor(props: Props) {
       const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
 
       // can functional optimze
-      if (desc === 'rotate') {
-        chosenImage.updateRotateMat(value)
-      } else if (desc === 'scale') {
-        chosenImage.updateScaleMat(value)
-      } else if (desc === 'Hue') {
-        chosenImage.updateHue(value)
-      } else if (desc === 'Saturation') {
-        chosenImage.updateSaturation(value)
-      } else if (desc === 'Contrast') {
-        chosenImage.updateContrast(value)
-      } else if (desc === 'Brightness') {
-        chosenImage.updateBrightness(value)
-      } else if (desc === 'Vignette') {
-        chosenImage.updateVignette(value)
-      }
+      //if (desc === 'rotate') {
+        //chosenImage.updateRotateMat(value)
+      //} else if (desc === 'scale') {
+        //chosenImage.updateScaleMat(value)
+      //} else if (desc === 'Hue') {
+        //chosenImage.updateHue(value)
+      //} else if (desc === 'Saturation') {
+        //chosenImage.updateSaturation(value)
+      //} else if (desc === 'Contrast') {
+        //chosenImage.updateContrast(value)
+      //} else if (desc === 'Brightness') {
+        //chosenImage.updateBrightness(value)
+      //} else if (desc === 'Vignette') {
+        //chosenImage.updateVignette(value)
+      //}
       setAdjustNum(adjustNum + 1)
     }
   const filters = editorSchema.children[1]

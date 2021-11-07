@@ -98,6 +98,9 @@ export class BeamSpirit {
   updateRotateMat(value: number) {
     throw new Error('Method not implemented.')
   }
+	updateModel(model:Partial<Model>){
+    throw new Error('Method not implemented.')
+	}
   getGuidRect() {
     return this.guidRect
   }
@@ -171,7 +174,9 @@ export class RectModel extends BeamSpirit {
     })
     this.uniforms.set('transMat', this.transMat)
   }
-
+	updateModel(model:Partial<Model>){
+		this.updateRectModel(model)
+	}
   updateRectModel<T extends Partial<Model>>(model: T) {
     if (model.trans) this.updateTransMat(model.trans)
     if (model.rotate) this.updateRotateMat(model.rotate)
@@ -285,32 +290,6 @@ export class ImageSpirit extends RectModel {
     } else {
       this.updateImageProps(action as ImageProps)
     }
-  }
-
-  updateContrast(contrast: number) {
-    this.contrast = contrast
-    this.uniqueProps.contrast = this.contrast
-    this.uniforms.set('contrast', this.contrast)
-  }
-  updateBrightness(brightness: number) {
-    this.brightness = brightness
-    this.uniqueProps.brightness = this.brightness
-    this.uniforms.set('brightness', this.brightness)
-  }
-  updateHue(hue: number) {
-    this.hue = hue
-    this.uniqueProps.hue = this.hue
-    this.uniforms.set('hue', this.hue)
-  }
-  updateSaturation(saturation: number) {
-    this.saturation = saturation
-    this.uniqueProps.saturation = this.saturation
-    this.uniforms.set('saturation', this.saturation)
-  }
-  updateVignette(vignette: number) {
-    this.vignette = vignette
-    this.uniqueProps.vignette = this.vignette
-    this.uniforms.set('vignette', this.vignette)
   }
   getIsZoomed() {
     return this.isZoomed
