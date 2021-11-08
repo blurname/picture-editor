@@ -1,6 +1,6 @@
 import { Button, Collapse, Input, Slider } from 'antd'
 import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
-import React, { ChangeEvent, useContext, useState } from 'react'
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { globalContext } from '../../context'
 import { ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
 import { editorSchema } from './editorSchema'
@@ -19,25 +19,40 @@ export function Editor() {
   const [desc, setDesc] = useState('')
   const [old, setOld] = useState({} as any)
 
-  const onColorChange =
-    (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
-      const hex: string = e.target.value
-      const r = parseInt('0x' + hex.slice(1, 3)) / 255.0
-      const g = parseInt('0x' + hex.slice(3, 5)) / 255.0
-      const b = parseInt('0x' + hex.slice(5)) / 255.0
-      const color = [r, g, b, 1]
-      let mark = spiritCanvas.spirits[selectNum] as MarkSpirit
-      mark.updateUniform(desc, color)
-      operationHistory.commit(
-        mark.getUniqueProps() as MarkProps,
-        { [desc]: old },
-        { [desc]: color },
-        'UniqueProps',
-      )
-      setAdjustNum(adjustNum + 1)
-    }
+  //const onColorChange =
+    //(desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
+      //const hex: string = e.target.value
+      //const r = parseInt('0x' + hex.slice(1, 3)) / 255.0
+      //const g = parseInt('0x' + hex.slice(3, 5)) / 255.0
+      //const b = parseInt('0x' + hex.slice(5)) / 255.0
+      //const color = [r, g, b, 1]
+      //let mark = spiritCanvas.spirits[selectNum] as MarkSpirit
+      //mark.updateUniform(desc, color)
+      //operationHistory.commit(
+        //mark.getUniqueProps() as MarkProps,
+        //{ [desc]: old },
+        //{ [desc]: color },
+        //'UniqueProps',
+      //)
+      //setAdjustNum(adjustNum + 1)
+    //}
+  //type RGB = 'R'|'G'|'B'
+  enum RGB {
+    R =0,
+    G,
+    B,
+  }
+  const onChangeRGB = <T extends Partial<keyof typeof RGB>>(rgb: T,cdesc:string)=>(e: ChangeEvent<HTMLInputElement>) => {
+    let mark = spiritCanvas.spirits[selectNum] as MarkSpirit
+		let color = mark.getColor().map((c) => c)
+		const index = RGB[rgb] as number
+		color[index]=parseInt(e.target.value)/255.0
+    mark.updateUniqueProps({ [cdesc]: color })
+		setAdjustNum(adjustNum + 1)
+    setValue(color)
+  }
 
-  const onDeleteClik = () => {
+  const onDeleteClick = () => {
     spiritCanvas.deleteElement(selectNum)
     setAdjustNum(adjustNum + 1)
   }
@@ -47,14 +62,19 @@ export function Editor() {
     setAdjustNum(adjustNum + 1)
   }
 
-  const storeOld = (desc: string) => () => {
-    const chosenImage = spiritCanvas.spirits[selectNum] as ImageSpirit
+  const storeOld = (cdesc: string) => () => {
+    const chosen = spiritCanvas.spirits[selectNum] 
+		setDesc(cdesc)
     if (desc === 'rotate' || desc === 'scale') {
-      setOld(chosenImage.getModel()[desc])
+      setOld(chosen.getModel()[cdesc])
     } else {
-      setOld(chosenImage.getUniqueProps()[desc])
+      setOld(chosen.getUniqueProps()[cdesc])
     }
+		console.log('descStoreOld:', chosen.getUniqueProps())
   }
+	//useEffect(() => {
+		//console.log('ddesc',desc)
+	//}, [desc]);
   const onChangeInput =
     (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
       const curValue = parseFloat(e.target.value)
@@ -62,67 +82,45 @@ export function Editor() {
     }
 
   const resetValue = (desc: string) => () => {
-    console.log('desc:', desc)
     updateValue(desc, 0.00001)
   }
   const updateValue = (desc: string, curValue: number) => {
     let chosen = spiritCanvas.spirits[selectNum]
-    if (desc === 'rotate') {
-      chosen.updateRotateMat(curValue)
-    } else if (desc === 'scale') {
-      chosen.updateScaleMat(curValue)
-    } else if (chosen.getSpiritType() === 'Image') {
-      const image = chosen as ImageSpirit
-      image.updateUniform(desc, curValue)
+    if (desc === 'rotate' || desc === 'scale') {
+      chosen.updateModel({ [desc]: curValue })
+    } else {
+      chosen.updateUniqueProps({ [desc]: curValue })
     }
     setAdjustNum(adjustNum + 1)
     setValue(curValue)
-    setDesc(desc)
     return
   }
   const commitToHistory = () => {
     const chosen = spiritCanvas.spirits[selectNum]
+		console.log('desc:', desc)
+		console.log('descOld:', old)
+		console.log('descValue:', value)
     if (desc === 'rotate' || desc === 'scale') {
-      if (chosen.getSpiritType() === 'Image') {
-        const image = chosen as ImageSpirit
-        image.updateRectModel({ [desc]: value })
-        console.log('old:', old)
-        operationHistory.commit(
-          image.getModel(),
-          { [desc]: old },
-          { [desc]: value },
-          'Model',
-        )
-      }
+      operationHistory.commit(
+        chosen.getModel(),
+        { [desc]: old },
+        { [desc]: value },
+        'Model',
+      )
     } else {
-      if (chosen.getSpiritType() === 'Image') {
-        const image = chosen as ImageSpirit
-        image.updateUniform(desc, value)
-        operationHistory.commit(
-          image.getUniqueProps() as ImageProps,
-          { [desc]: old },
-          { [desc]: value },
-          'UniqueProps',
-        )
-      } else if (chosen.getSpiritType() === 'Mark') {
-        const mark = chosen as MarkSpirit
-        mark.updateUniform(desc, value)
-        console.log('Markold:', old)
-        console.log('markuniqueprops', mark.getUniqueProps())
-        operationHistory.commit(
-          mark.getUniqueProps() as ImageProps,
-          { [desc]: old },
-          { [desc]: value },
-          'UniqueProps',
-        )
-      }
+      operationHistory.commit(
+        chosen.getUniqueProps(),
+        { [desc]: old },
+        { [desc]: value },
+        'UniqueProps',
+      )
     }
     setAdjustNum(adjustNum + 1)
   }
   const shaping = editorSchema.children[0]
   const filters = editorSchema.children[1]
   const color = editorSchema.children[2]
-  const onEnlargeable = () => {
+  const onZoomable = () => {
     //appRef.current.style.cursor='zoom-in'
     setZoomable(!zoomable)
   }
@@ -130,11 +128,13 @@ export function Editor() {
   return (
     <div className="flex-grow-0 w-50 bg-blue-100 object-right">
       Editor
+			<h1>desc:{desc}</h1>
+			<h1>adj:{adjustNum}</h1>
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
       <div>
         {zoomable && (
           <Button
-            onClick={onEnlargeable}
+            onClick={onZoomable}
             className="bg-green-200 text-dark-500 text-lg mb-4"
           >
             zoom-out
@@ -142,7 +142,7 @@ export function Editor() {
         )}
         {!zoomable && (
           <Button
-            onClick={onEnlargeable}
+            onClick={onZoomable}
             className="bg-green-200 text-dark-500 text-lg mb-4"
           >
             zoom-in
@@ -151,7 +151,7 @@ export function Editor() {
       </div>
       <div>
         <Button
-          onClick={onDeleteClik}
+          onClick={onDeleteClick}
           className="bg-pink-200 text-red-500 text-lg mb-4"
         >
           delete element
@@ -239,9 +239,9 @@ export function Editor() {
                       min={cur.props.range.min}
                       max={cur.props.range.max}
                       defaultValue={cur.props.value}
-                      //onInput={onChangeInput(cur.desc)}
-                      //onMouseUp={commitToHistory}
-                      //onMouseDown={storeOld(cur.desc)}
+											onInput={onChangeRGB(cur.desc,'uColor')}
+											onMouseUp={commitToHistory}
+											onMouseDown={storeOld('uColor')}
                       id={cur.desc}
                     />
                     <label htmlFor={cur.desc}>{cur.desc}</label>
@@ -255,8 +255,3 @@ export function Editor() {
     </div>
   )
 }
-//<div>
-//<label htmlFor="">color adjust</label>
-//<input type="color" onChange={onColorChange('uColor')} onMouseDown={storeOld('uColor')} />
-
-//</div>

@@ -101,17 +101,14 @@ export class BeamSpirit {
 	updateModel(model:Partial<Model>){
     throw new Error('Method not implemented.')
 	}
+	updateUniqueProps<T extends Omit<Partial<UniqueProps>,'id'>>(uniqueProps:T){
+    throw new Error('Method not implemented.')
+	}
   getGuidRect() {
     return this.guidRect
   }
   getId() {
     return this.id
-  }
-  getScale() {
-    return this.scale
-  }
-  getRotate() {
-    return this.rotate
   }
   getIsToggle() {
     return this.isToggle
@@ -280,6 +277,9 @@ export class ImageSpirit extends RectModel {
       }
     }
   }
+	updateUniqueProps<T extends Omit<Partial<ImageProps>,'id'>>(uniqueProps:T){
+		this.updateImageProps(uniqueProps)
+	}
 
   updateFromRemote<T extends SpiritsAction>(
     action: T,
@@ -399,7 +399,9 @@ type Buffers = {
   index: {
     array: number[]
   }
+
 }
+
 type RectLikeShape = Exclude<Shape, 'circle'>
 export class MarkSpirit extends RectModel {
   private uColor: number[]
@@ -450,6 +452,9 @@ export class MarkSpirit extends RectModel {
       return this.beam.shader(hollowRectShader)
     }
   }
+	getColor(){
+		return this.uColor
+	}
   updateColor(color: number[]) {
     this.uColor = color
     this.uniforms.set('uColor', color)
@@ -465,10 +470,13 @@ export class MarkSpirit extends RectModel {
     for (const key in props) {
       const element = props[key]
       if (key !== 'id') {
-        console.log('key:', element)
+        //console.log('key:', element)
 				this.updateUniform(key, element as any)
       }
     }
+	}
+	updateUniqueProps<T extends Omit<Partial<MarkProps>,'id'>>(uniqueProps:T){
+		this.updateRectMarkProps(uniqueProps)
 	}
   updateFromRemote<T extends SpiritsAction>(
     action: T,
