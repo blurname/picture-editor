@@ -132,17 +132,11 @@ export class SpiritCanvas {
     } else {
       mark = new MarkSpirit(this.canvas3d, shape, id)
     }
-
     if (model) {
-      if (shape === 'line' || shape === 'hollowRect') {
-        ;(mark as MarkSpirit).updateFromRemote(model, 'Model')
-      }
+      mark.updateFromRemote(model, 'Model')
     }
     if (uniqueProps) {
-      ;(mark as MarkSpirit).updateFromRemote(
-        uniqueProps as MarkProps,
-        'UniqueProps',
-      )
+      mark.updateFromRemote(uniqueProps as any, 'UniqueProps')
     }
     this.spirits[id] = mark
     this.guidLines.push(

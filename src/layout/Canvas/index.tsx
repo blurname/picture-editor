@@ -63,7 +63,7 @@ export function Canvas(props: Props) {
   const canvas3dRef = useRef(null as HTMLCanvasElement)
 
   //}
-  const maxlayer = (indexArray: number[], spirits: BeamSpirit[]) => {
+  const maxLayer = (indexArray: number[], spirits: BeamSpirit[]) => {
     console.log(indexArray)
     let min = 2
     let maxIndex = -1
@@ -128,7 +128,7 @@ export function Canvas(props: Props) {
     }
 
     if (indexArray.length > 0) {
-      const cur = maxlayer(indexArray, images)
+      const cur = maxLayer(indexArray, images)
       curImage = cur
       setSelectNum(curImage)
       spiritCanvas.setChosenType(images[curImage].getSpiritType())

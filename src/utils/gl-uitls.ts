@@ -79,7 +79,7 @@ export class BeamSpirit {
       scale: this.scale,
       rotate: this.rotate,
       trans: this.offset,
-			layer:this.layer
+      layer: this.layer,
     }
   }
   updateGuidRect() {
@@ -91,7 +91,7 @@ export class BeamSpirit {
   updateLayer(layer: number) {
     //throw new Error('Method not implemented.')
     this.layer = layer
-		this.model.layer = this.layer
+    this.model.layer = this.layer
     this.uniforms.set('layer', this.layer)
   }
   updateScaleMat(scale: number) {
@@ -100,12 +100,14 @@ export class BeamSpirit {
   updateRotateMat(value: number) {
     throw new Error('Method not implemented.')
   }
-	updateModel(model:Partial<Model>){
+  updateModel(model: Partial<Model>) {
     throw new Error('Method not implemented.')
-	}
-	updateUniqueProps<T extends Omit<Partial<UniqueProps>,'id'>>(uniqueProps:T){
+  }
+  updateUniqueProps<T extends Omit<Partial<UniqueProps>, 'id'>>(
+    uniqueProps: T,
+  ) {
     throw new Error('Method not implemented.')
-	}
+  }
 
   updateFromRemote<T extends SpiritsAction>(
     action: T,
@@ -180,9 +182,9 @@ export class RectModel extends BeamSpirit {
     })
     this.uniforms.set('transMat', this.transMat)
   }
-	updateModel(model:Partial<Model>){
-		this.updateRectModel(model)
-	}
+  updateModel(model: Partial<Model>) {
+    this.updateRectModel(model)
+  }
   updateRectModel<T extends Partial<Model>>(model: T) {
     if (model.trans) this.updateTransMat(model.trans)
     if (model.rotate) this.updateRotateMat(model.rotate)
@@ -280,16 +282,15 @@ export class ImageSpirit extends RectModel {
 
   updateImageProps<T extends Omit<Partial<ImageProps>, 'id'>>(props: T) {
     for (const key in props) {
-			const element = props[key]
+      const element = props[key]
       if (key !== 'id') {
-        //console.log('key:', element)
         this.updateUniform(key, element as any)
       }
     }
   }
-	updateUniqueProps<T extends Omit<Partial<ImageProps>,'id'>>(uniqueProps:T){
-		this.updateImageProps(uniqueProps)
-	}
+  updateUniqueProps<T extends Omit<Partial<ImageProps>, 'id'>>(uniqueProps: T) {
+    this.updateImageProps(uniqueProps)
+  }
 
   updateFromRemote<T extends SpiritsAction>(
     action: T,
@@ -409,7 +410,6 @@ type Buffers = {
   index: {
     array: number[]
   }
-
 }
 
 type RectLikeShape = Exclude<Shape, 'circle'>
@@ -417,10 +417,10 @@ export class MarkSpirit extends RectModel {
   private uColor: number[]
   private shape: RectLikeShape
   private buffers: Buffers
-	uniqueProps:MarkProps={
-		id:-1,
-		uColor:[]
-	}
+  uniqueProps: MarkProps = {
+    id: -1,
+    uColor: [],
+  }
   constructor(canvas: HTMLCanvasElement, shape: RectLikeShape, id: number) {
     super(canvas, id)
     this.spiritType = 'Mark'
@@ -442,10 +442,10 @@ export class MarkSpirit extends RectModel {
     })
     this.shader = this.getShaderByShape()
     this.position = this.buffers.vertex.position
-		this.uniqueProps = {
-			id:this.id,
-			uColor:this.uColor
-		}
+    this.uniqueProps = {
+      id: this.id,
+      uColor: this.uColor,
+    }
     this.updateGuidRect()
   }
   getBuffersByShape(): Buffers {
@@ -462,9 +462,9 @@ export class MarkSpirit extends RectModel {
       return this.beam.shader(hollowRectShader)
     }
   }
-	getColor(){
-		return this.uColor
-	}
+  getColor() {
+    return this.uColor
+  }
   updateColor(color: number[]) {
     this.uColor = color
     this.uniforms.set('uColor', color)
@@ -476,27 +476,26 @@ export class MarkSpirit extends RectModel {
     this.uniforms.set(uniform, this[uniform])
   }
 
-  updateRectMarkProps<T extends Omit<Partial<MarkProps>, 'id'>>(props:T) {
+  updateRectMarkProps<T extends Omit<Partial<MarkProps>, 'id'>>(props: T) {
     for (const key in props) {
       const element = props[key]
       if (key !== 'id') {
         //console.log('key:', element)
-				this.updateUniform(key, element as any)
+        this.updateUniform(key, element as any)
       }
     }
-	}
-	updateUniqueProps<T extends Omit<Partial<MarkProps>,'id'>>(uniqueProps:T){
-		this.updateRectMarkProps(uniqueProps)
-	}
+  }
+  updateUniqueProps<T extends Omit<Partial<MarkProps>, 'id'>>(uniqueProps: T) {
+    this.updateRectMarkProps(uniqueProps)
+  }
   updateFromRemote<T extends SpiritsAction>(
     action: T,
     actionType: SpiritsActionLiteral,
   ) {
     if (actionType === 'Model') {
-      this.updateRectModel(action as Model)
+      this.updateModel(action as Model)
     } else {
-			this.updateRectMarkProps(action as MarkProps)
-
+      this.updateUniqueProps(action as MarkProps)
     }
   }
   private draw() {
@@ -553,10 +552,9 @@ export class MosaicSpirit extends RectModel {
   ) {
     if (actionType === 'Model') {
       this.updateRectModel(action as Model)
-    //} else {
-			//this.updateRectMarkProps(action as MarkProps)
-
-		}
+      //} else {
+      //this.updateRectMarkProps(action as MarkProps)
+    }
   }
   render() {
     this.beam
@@ -569,16 +567,22 @@ export class MosaicSpirit extends RectModel {
       )
   }
 }
-export class CircleSpirit extends BeamSpirit {
+export class CircleLikeSpirit extends BeamSpirit {
   protected radius: number
   protected uColor: number[]
   protected projectionX: number
   protected projectionY: number
+  protected uniqueProps: CircleProps = {
+    id: -1,
+    radius: 200,
+    uColor: [1, 1, 1, 1],
+    //centerX:0,
+    //centerY:0
+  }
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
     this.spiritType = 'Mark'
     this.radius = 200
-    this.scale = 1
     const xy = createProjectionXY(getCanvasEdge(this.canvas))
     this.projectionX = xy.x
     this.projectionY = xy.y
@@ -597,23 +601,57 @@ export class CircleSpirit extends BeamSpirit {
     this.shader = this.beam.shader(circleShader)
     this.updateGuidRect()
   }
+  updateGuidRect() {
+    this.guidRect = updateCircle(this.radius, this.offset, this.scale)
+  }
+  updateCircleModel<T extends Partial<Model>>(model: T) {
+    if (model.trans) this.updatePosition(model.trans)
+    if (model.rotate) this.updateRotateMat(model.rotate)
+    if (model.scale) this.updateScaleMat(model.scale)
+    if (model.layer) this.updateLayer(model.layer)
+  }
+
+  updateUniform(uniform: string, value: any) {
+    this[uniform] = value
+    this.uniqueProps[uniform] = value
+    this.uniforms.set(uniform, this[uniform])
+  }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
-    this.offset.left = distance.left
-    this.offset.top = distance.top
-    this.uniforms.set('centerX', this.offset.left)
-    this.uniforms.set('centerY', this.offset.top)
+    this.offset = { ...distance }
+		this.model.trans = this.offset
+		this.uniforms.set('centerX', this.offset.left)
+		this.uniforms.set('centerY', this.offset.top)
     this.updateGuidRect()
   }
   updateScaleMat(scale: number) {
     this.scale = scale
-    this.uniforms.set('scale', scale)
+		this.updateUniform('scale', this.scale)
+    this.uniforms.set('rotate', this.rotate)
   }
-  updateGuidRect() {
-    this.guidRect = updateCircle(this.radius, this.offset, this.scale)
+  updateRotateMat(value: number) {
+    this.rotate = value
+    this.uniforms.set('rotate', this.rotate)
   }
-  updateColor(color: number[]) {
-    this.uColor = color
-    this.uniforms.set('uColor', color)
+  updateModel<T extends Partial<Model>>(model: T) {
+    this.updateCircleModel(model)
+  }
+
+  updateUniqueProps<T extends Partial<CircleProps>>(uniqueProps: T) {
+    for (const key in uniqueProps) {
+      const element = uniqueProps[key]
+      this.updateUniform(key, element)
+    }
+  }
+
+  updateFromRemote<T extends SpiritsAction>(
+    action: T,
+    actionType: SpiritsActionLiteral,
+  ) {
+    if (actionType === 'Model') {
+      this.updateModel(action as Model)
+    } else {
+      this.updateUniqueProps(action as CircleProps)
+    }
   }
   render() {
     this.beam.draw(
@@ -622,6 +660,11 @@ export class CircleSpirit extends BeamSpirit {
       this.indexBuffer as any,
       this.uniforms as any,
     )
+  }
+}
+export class CircleSpirit extends CircleLikeSpirit {
+  constructor(canvas: HTMLCanvasElement, id: number) {
+    super(canvas, id)
   }
 }
 export class TheW extends BeamSpirit {
