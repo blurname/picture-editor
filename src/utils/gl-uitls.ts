@@ -186,9 +186,9 @@ export class RectModel extends BeamSpirit {
     this.updateRectModel(model)
   }
   updateRectModel<T extends Partial<Model>>(model: T) {
-    if (model.trans) this.updateTransMat(model.trans)
     if (model.rotate) this.updateRotateMat(model.rotate)
     if (model.scale) this.updateScaleMat(model.scale)
+    if (model.trans) this.updateTransMat(model.trans)
     if (model.layer) this.updateLayer(model.layer)
     this.updateGuidRect()
   }
