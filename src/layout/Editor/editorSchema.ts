@@ -21,7 +21,7 @@ export const editorSchema = {
           },
         },
         {
-          desc: 'layout',
+          desc: 'layer',
           props: {
             value: 0.1,
             range: { min: 0.1, max: 0.7 },

@@ -63,16 +63,16 @@ export function Canvas(props: Props) {
   const canvas3dRef = useRef(null as HTMLCanvasElement)
 
   //}
-  const maxLayout = (indexArray: number[], spirits: BeamSpirit[]) => {
+  const maxlayer = (indexArray: number[], spirits: BeamSpirit[]) => {
     console.log(indexArray)
     let min = 2
     let maxIndex = -1
     for (let i = 0; i < indexArray.length; i++) {
       const j = indexArray[i]
       const element = spirits[j]
-      const elementLayout = element.getLayout()
-      if (elementLayout < min) {
-        min = elementLayout
+      const elementlayer = element.getlayer()
+      if (elementlayer < min) {
+        min = elementlayer
         maxIndex = j
       }
     }
@@ -128,7 +128,7 @@ export function Canvas(props: Props) {
     }
 
     if (indexArray.length > 0) {
-      const cur = maxLayout(indexArray, images)
+      const cur = maxlayer(indexArray, images)
       curImage = cur
       setSelectNum(curImage)
       spiritCanvas.setChosenType(images[curImage].getSpiritType())

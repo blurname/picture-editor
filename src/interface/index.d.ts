@@ -31,6 +31,7 @@ interface Model  {
 	trans:Pos
 	scale:number
 	rotate:number
+	layer:number
 }
 //interface Mark extends Model{
 	//color:number[]

@@ -92,6 +92,8 @@ export class SpiritCanvas {
         this.addImage(element, model.id, true, model, uniqueProps)
       else if (typeId === 2)
         this.addMark(element as Shape, model.id, true, model, uniqueProps)
+      else if (typeId === 3)
+        this.addMosaic(element as MosaicType, model.id, true, model)
     }
   }
   async addImage(
@@ -149,13 +151,21 @@ export class SpiritCanvas {
     if (!exist) this.spiritCommit(mark.getModel(), eSpiType.mark, shape)
   }
 
-  addMosaic(mosaicType: MosaicType, id: number) {
+  addMosaic(
+    mosaicType: MosaicType,
+    id: number,
+    exist: boolean = false,
+    model?: Model,
+  ) {
     let mosaic: MosaicSpirit
     mosaic = new MosaicSpirit(this.canvas3d, mosaicType, id)
-    this.spirits.push(mosaic)
+    if (model) mosaic.updateFromRemote(model, 'Model')
+    this.spirits[id] = mosaic
     this.guidLines.push(
       new GuidLine(this.canvas3d, mosaic.getGuidRect(), mosaic.getId()),
     )
+    if (!exist)
+      this.spiritCommit(mosaic.getModel(), eSpiType.mosaic, mosaicType)
   }
 
   setCanvas3d(canvas: HTMLCanvasElement) {
@@ -254,7 +264,6 @@ export class OperationHistory {
     this.histories.push(operation)
     this.lens = this.histories.length
     this.tail = this.lens
-    console.log('unique is right: ', actionType)
     this.updateRemote(operation.id, actionType)
   }
   undo() {
@@ -281,7 +290,7 @@ export class OperationHistory {
     const key = Object.keys(dir)[0]
 
     const spirit = this.spiritCanvas.spirits[id]
-    if (key === 'trans' || key==='scale'||key==='rotate') {
+    if (key === 'trans' || key === 'scale' || key === 'rotate') {
       spirit.updateModel(dir)
       this.spiritCanvas.updateGuidRect(spirit)
     } else if (spirit.getSpiritType() === 'Image') {

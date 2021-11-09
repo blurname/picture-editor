@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import './App.css'
-import Layout, { Content, Footer, Header } from 'antd/lib/layout/layout'
+import layer, { Content, Footer, Header } from 'antd/lib/layout/layout'
 import { Boxes } from './layout/Boxes'
 import { CanvasEditor } from './layout/CanvasEditor'
 function App() {

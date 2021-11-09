@@ -53,7 +53,7 @@ export class BeamSpirit {
   protected projectionMatInJS: Float32Array
   protected baseResources: Resource[]
   protected shader: Shader
-  protected layout: number
+  protected layer: number
   protected guidRect: Rect
   protected offset: Pos
   protected scale: number
@@ -68,7 +68,7 @@ export class BeamSpirit {
     this.canvas = canvas
     this.beam = new Beam(canvas)
     this.beam.define(depthCommand)
-    this.layout = 0.7
+    this.layer = 0.7
     this.id = id
     this.isToggle = true
     this.scale = 1
@@ -79,6 +79,7 @@ export class BeamSpirit {
       scale: this.scale,
       rotate: this.rotate,
       trans: this.offset,
+			layer:this.layer
     }
   }
   updateGuidRect() {
@@ -87,10 +88,11 @@ export class BeamSpirit {
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     throw new Error('Method not implemented.')
   }
-  updateLayout(layout: number) {
+  updateLayer(layer: number) {
     //throw new Error('Method not implemented.')
-    this.layout = layout
-    this.uniforms.set('layout', this.layout)
+    this.layer = layer
+		this.model.layer = this.layer
+    this.uniforms.set('layer', this.layer)
   }
   updateScaleMat(scale: number) {
     throw new Error('Method not implemented.')
@@ -104,6 +106,13 @@ export class BeamSpirit {
 	updateUniqueProps<T extends Omit<Partial<UniqueProps>,'id'>>(uniqueProps:T){
     throw new Error('Method not implemented.')
 	}
+
+  updateFromRemote<T extends SpiritsAction>(
+    action: T,
+    actionType: SpiritsActionLiteral,
+  ) {
+    throw new Error('Method not implemented.')
+  }
   getGuidRect() {
     return this.guidRect
   }
@@ -116,8 +125,8 @@ export class BeamSpirit {
   getSpiritType() {
     return this.spiritType
   }
-  getLayout() {
-    return this.layout
+  getlayer() {
+    return this.layer
   }
   getModel() {
     return this.model
@@ -178,6 +187,7 @@ export class RectModel extends BeamSpirit {
     if (model.trans) this.updateTransMat(model.trans)
     if (model.rotate) this.updateRotateMat(model.rotate)
     if (model.scale) this.updateScaleMat(model.scale)
+    if (model.layer) this.updateLayer(model.layer)
     this.updateGuidRect()
   }
 }
@@ -233,7 +243,7 @@ export class ImageSpirit extends RectModel {
       transMat: this.transMat,
       rotateMat: this.rotateMat,
       projectionMat: this.projectionMat,
-      layout: this.layout,
+      layer: this.layer,
       zoomSection: this.zoomSection,
       brightness: 0,
       contrast: 0,
@@ -428,7 +438,7 @@ export class MarkSpirit extends RectModel {
       rotateMat: this.rotateMat,
       scaleMat: this.scaleMat,
       projectionMat: this.projectionMat,
-      layout: this.layout,
+      layer: this.layer,
     })
     this.shader = this.getShaderByShape()
     this.position = this.buffers.vertex.position
@@ -507,7 +517,7 @@ export class MarkSpirit extends RectModel {
 export class MosaicSpirit extends RectModel {
   constructor(canvas: HTMLCanvasElement, type: MosaicType, id: number) {
     super(canvas, id)
-    this.spiritType = 'Mark'
+    this.spiritType = 'Mosaic'
     const buffers = this.getBuffersByShape(type)
     this.position = buffers.vertex.position
     this.vertexBuffers = this.beam.resource(VertexBuffers, buffers.vertex)
@@ -518,7 +528,7 @@ export class MosaicSpirit extends RectModel {
       rotateMat: this.rotateMat,
       scaleMat: this.scaleMat,
       projectionMat: this.projectionMat,
-      layout: this.layout,
+      layer: this.layer,
     })
     this.updateGuidRect()
   }
@@ -535,6 +545,18 @@ export class MosaicSpirit extends RectModel {
       buffers = createMosaic(300, 300)
     }
     return buffers
+  }
+
+  updateFromRemote<T extends SpiritsAction>(
+    action: T,
+    actionType: SpiritsActionLiteral,
+  ) {
+    if (actionType === 'Model') {
+      this.updateRectModel(action as Model)
+    //} else {
+			//this.updateRectMarkProps(action as MarkProps)
+
+		}
   }
   render() {
     this.beam

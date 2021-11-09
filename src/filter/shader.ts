@@ -9,14 +9,14 @@ uniform mat4 transMat;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
-uniform float layout;
+uniform float layer;
 uniform vec2 offset;
 
 varying highp vec2 vTexCoord;
 void main(){
 	//vec4 nPosition = vec4(position.x+offset.x,position.y+offset.y,0.0,1.0);
 	gl_Position = projectionMat*transMat*rotateMat*scaleMat*position;
-	gl_Position.z = layout;
+	gl_Position.z = layer;
 	vTexCoord = texCoord;
 }
 
@@ -50,7 +50,7 @@ export const basicImageShader = {
     scaleMat: { type: mat4 },
     rotateMat: { type: mat4 },
     projectionMat: { type: mat4 },
-    layout: { type: float },
+    layer: { type: float },
     zoomSection: { type: vec3 },
     offset: { type: vec2 },
   },
@@ -67,11 +67,11 @@ uniform mat4 transMat;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
-uniform float layout;
+uniform float layer;
 
 void main(){
 	gl_Position = projectionMat*transMat*rotateMat*scaleMat*position;
-	gl_Position.z = layout;
+	gl_Position.z = layer;
 	vColor = color;
 }
 `
@@ -105,7 +105,7 @@ export const lineRectShader = {
     scaleMat: { type: mat4 },
     projectionMat: { type: mat4 },
     uColor: { type: vec4, n: 3 },
-    layout: { type: float },
+    layer: { type: float },
   },
 }
 export const hollowRectShader = {
@@ -116,7 +116,7 @@ export const hollowRectShader = {
     scaleMat: { type: mat4 },
     projectionMat: { type: mat4 },
     uColor: { type: vec4 },
-    layout: { type: float },
+    layer: { type: float },
   },
 }
 export const theWShader = {
@@ -540,12 +540,12 @@ uniform mat4 transMat;
 uniform mat4 rotateMat;
 uniform mat4 scaleMat;
 uniform mat4 projectionMat;
-uniform float layout;
+uniform float layer;
 
 varying vec4 vTexCoord;
 void main(){
 	gl_Position = projectionMat*transMat*rotateMat*scaleMat*position;
-	gl_Position.z = layout;
+	gl_Position.z = layer;
 	vTexCoord = texCoord;
 }
 `
@@ -580,6 +580,6 @@ export const MosaicMultiShader = {
     rotateMat: { type: mat4 },
     scaleMat: { type: mat4 },
     projectionMat: { type: mat4 },
-    layout: { type: float },
+    layer: { type: float },
   },
 }

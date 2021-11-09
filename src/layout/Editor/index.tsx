@@ -57,10 +57,16 @@ export function Editor() {
     setAdjustNum(adjustNum + 1)
   }
 
-  const onLayoutChange = (value: number) => {
-    spiritCanvas.spirits[selectNum].updateLayout(1 - value)
-    setAdjustNum(adjustNum + 1)
+  const onLayerChange = (value: number) => {
+	console.log('layerold',spiritCanvas.spirits[selectNum].getModel())
+		setOld(spiritCanvas.spirits[selectNum].getModel()['layer'])
+    spiritCanvas.spirits[selectNum].updateModel({'layer':1-value})
+		setValue(value)
+		setDesc('layer')
   }
+	const afterLayerChage = () => {
+		commitToHistory()
+	}
 
   const storeOld = (cdesc: string) => () => {
     const chosen = spiritCanvas.spirits[selectNum] 
@@ -97,10 +103,7 @@ export function Editor() {
   }
   const commitToHistory = () => {
     const chosen = spiritCanvas.spirits[selectNum]
-		console.log('desc:', desc)
-		console.log('descOld:', old)
-		console.log('descValue:', value)
-    if (desc === 'rotate' || desc === 'scale') {
+    if (desc === 'rotate' || desc === 'scale'||desc==='layer') {
       operationHistory.commit(
         chosen.getModel(),
         { [desc]: old },
@@ -162,7 +165,7 @@ export function Editor() {
           <CollapsePanel header="shaping" key="1">
             <div>
               {shaping.children.map((cur, index) => {
-                if (cur.desc === 'layout') {
+                if (cur.desc === 'layer') {
                   return (
                     <Slider
                       key={index}
@@ -171,7 +174,8 @@ export function Editor() {
                       step={cur.props.step}
                       marks={cur.props.marks}
                       defaultValue={cur.props.value}
-                      onChange={onLayoutChange}
+                      onChange={onLayerChange}
+											onAfterChange={afterLayerChage}
                     ></Slider>
                   )
                 }
