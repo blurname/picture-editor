@@ -33,7 +33,7 @@ export function Mosaic() {
     setCmpCount(cmpCount + 1)
   }
   return (
-    <div>
+    <div className="w-1/12">
       {mosaics.map((mosaic, index) => {
         return (
           <div className="auto mb-6" key={mosaic.id}>

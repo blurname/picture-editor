@@ -21,7 +21,7 @@ export const editorSchema = {
           },
         },
         {
-          desc: 'layout',
+          desc: 'layer',
           props: {
             value: 0.1,
             range: { min: 0.1, max: 0.7 },
@@ -84,5 +84,32 @@ export const editorSchema = {
         },
       ],
     },
+		{
+			desc:'color',
+			children:[
+				{
+					desc:'R',
+					props:{
+						value:0,
+						range:{min:0,max:255},
+						step:1
+					}
+				},{
+					desc:'G',
+					props:{
+						value:0,
+						range:{min:0,max:255},
+						step:1
+					}
+				},{
+					desc:'B',
+					props:{
+						value:0,
+						range:{min:0,max:255},
+						step:1
+					}
+				}
+			]
+		}
   ],
 }

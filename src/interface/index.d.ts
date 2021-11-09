@@ -8,7 +8,7 @@ interface Cmp {
   image: HTMLImageElement | undefined
 }
 interface Rect {
-	// x and y are in bottom left 
+  // x and y are in bottom left
   x: number
   y: number
 
@@ -23,47 +23,51 @@ interface CanvasPos extends Pos {
   width: number
   height: number
 }
-interface GuidRect extends Rect{
-	id:number
+interface GuidRect extends Rect {
+  id: number
 }
-interface Model  {
-	id:number
-	trans:Pos
-	scale:number
-	rotate:number
+interface Model {
+  id: number
+  trans: Pos
+  scale: number
+  rotate: number
+  layer: number
 }
 //interface Mark extends Model{
-	//color:number[]
+//color:number[]
 //}
 //interface Image extends Model{
-	//zoom:boolean
-	//hue:number
-	//saturation:number
-	//contrast:number
-	//brightness:number
-	//vignette:number
+//zoom:boolean
+//hue:number
+//saturation:number
+//contrast:number
+//brightness:number
+//vignette:number
 //}
 
 type ImageProps = {
-	id:number
-	hue:number
-	saturation:number
-	brightness:number
-	contrast:number
-	vignette:number
+  id: number
+  hue: number
+  saturation: number
+  brightness: number
+  contrast: number
+  vignette: number
 }
 type MarkProps = {
-	id:number
-	color:number[]
+  id: number
+  uColor: number[]
 }
-type UniqueProps = MarkProps|ImageProps
+type CircleProps = MarkProps & {
+  radius: number
+}
+type UniqueProps = MarkProps | ImageProps | CircleProps
 
 type Mosaic = Model
-type Shape = 'line' | 'hollowRect'|'circle'|'theW'
-type SpiritType = 'Image'| 'Mark'|'Mosaic'
-type MosaicType = 'multi'| 'fract'
+type Shape = 'line' | 'hollowRect' | 'circle' | 'theW'
+type SpiritType = 'Image' | 'Mark' | 'Mosaic'
+type MosaicType = 'multi' | 'fract'
 type Point = { x: number; y: number }
 
-type SpiritsAction = UniqueProps| Model
-type SpiritsActionLiteral = 'UniqueProps'| 'Model'
-type UniquePropsLiteral = 'ImagePorps'|'MarkProps'
+type SpiritsAction = UniqueProps | Model
+type SpiritsActionLiteral = 'UniqueProps' | 'Model'
+type UniquePropsLiteral = 'ImagePorps' | 'MarkProps'

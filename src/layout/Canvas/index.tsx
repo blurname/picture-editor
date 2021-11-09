@@ -1,5 +1,4 @@
 import { Button } from 'antd'
-import { Beam, ResourceTypes } from 'beam-gl'
 import React, {
   MouseEvent,
   useContext,
@@ -7,7 +6,6 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { render } from 'react-dom'
 import { globalContext } from '../../context'
 import {
   drawRectBorder,
@@ -51,7 +49,7 @@ export function Canvas(props: Props) {
   } = useContext(globalContext)
   let canvas: CanvasPos = {
     width: 1300,
-    height: 1300,
+    height: 900,
     left: 320,
     top: 110,
   }
@@ -60,22 +58,21 @@ export function Canvas(props: Props) {
   const [initImages, setInitImages] = useState([] as remoteModel[])
   const [initComplete, setInitComplete] = useState(false)
 
-  //const [oldPos, setOldPos] = useState({} as Pos);
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
 
   //}
-  const maxLayout = (indexArray: number[], spirits: BeamSpirit[]) => {
+  const maxLayer = (indexArray: number[], spirits: BeamSpirit[]) => {
     console.log(indexArray)
     let min = 2
     let maxIndex = -1
     for (let i = 0; i < indexArray.length; i++) {
       const j = indexArray[i]
       const element = spirits[j]
-      const elementLayout = element.getLayout()
-      if (elementLayout < min) {
-        min = elementLayout
+      const elementlayer = element.getlayer()
+      if (elementlayer < min) {
+        min = elementlayer
         maxIndex = j
       }
     }
@@ -131,7 +128,7 @@ export function Canvas(props: Props) {
     }
 
     if (indexArray.length > 0) {
-      const cur = maxLayout(indexArray, images)
+      const cur = maxLayer(indexArray, images)
       curImage = cur
       setSelectNum(curImage)
       spiritCanvas.setChosenType(images[curImage].getSpiritType())
@@ -175,7 +172,7 @@ export function Canvas(props: Props) {
     //spiritCanvas.renderBackground()
     console.log(spiritCanvas.spirits)
     for (const image of images) {
-      if (image !== null) image.render()
+      if (image) image.render()
     }
   }
   const handleBack = () => {
@@ -273,7 +270,7 @@ export function Canvas(props: Props) {
   }, [adjustNum, cmpCount])
 
   return (
-    <div className="w-12/12 h-12/12">
+    <div className="flex-grow w-max h-full bg-blue-400">
       <Button onClick={handleBack} disabled={!(operationHistory.tail > 0)}>
         undo
       </Button>
