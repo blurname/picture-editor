@@ -58,7 +58,7 @@ export function Editor() {
   }
 
   const onLayerChange = (value: number) => {
-	console.log('layerold',spiritCanvas.spirits[selectNum].getModel())
+	//console.log('layerold',spiritCanvas.spirits[selectNum].getModel()])
 		setOld(spiritCanvas.spirits[selectNum].getModel()['layer'])
     spiritCanvas.spirits[selectNum].updateModel({'layer':1-value})
 		setValue(value)

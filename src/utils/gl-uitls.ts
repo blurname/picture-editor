@@ -174,8 +174,6 @@ export class RectModel extends BeamSpirit {
       top: offset.top / this.scale,
     }
     this.model.trans = offset
-    //const guidRect = this.getGuidRect()
-    //const center:Pos = {left:guidRect.x+guidRect.width/2,top:guidRect.y+guidRect.height/2}
     this.transMat = createTranslateMat({
       left: offset.left,
       top: offset.top,
@@ -186,8 +184,11 @@ export class RectModel extends BeamSpirit {
     this.updateRectModel(model)
   }
   updateRectModel<T extends Partial<Model>>(model: T) {
+    if (model.scale) {
+      this.updateScaleMat(model.scale)
+			this.updateTransMat(this.model.trans)
+    }
     if (model.rotate) this.updateRotateMat(model.rotate)
-    if (model.scale) this.updateScaleMat(model.scale)
     if (model.trans) this.updateTransMat(model.trans)
     if (model.layer) this.updateLayer(model.layer)
     this.updateGuidRect()
@@ -605,10 +606,11 @@ export class CircleLikeSpirit extends BeamSpirit {
     this.guidRect = updateCircle(this.radius, this.offset, this.scale)
   }
   updateCircleModel<T extends Partial<Model>>(model: T) {
-    if (model.trans) this.updatePosition(model.trans)
-    if (model.rotate) this.updateRotateMat(model.rotate)
     if (model.scale) this.updateScaleMat(model.scale)
+    if (model.rotate) this.updateRotateMat(model.rotate)
+    if (model.trans) this.updatePosition(model.trans)
     if (model.layer) this.updateLayer(model.layer)
+    //this.updateGuidRect()
   }
 
   updateUniform(uniform: string, value: any) {
@@ -618,14 +620,14 @@ export class CircleLikeSpirit extends BeamSpirit {
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.offset = { ...distance }
-		this.model.trans = this.offset
-		this.uniforms.set('centerX', this.offset.left)
-		this.uniforms.set('centerY', this.offset.top)
+    this.model.trans = this.offset
+    this.uniforms.set('centerX', this.offset.left)
+    this.uniforms.set('centerY', this.offset.top)
     this.updateGuidRect()
   }
   updateScaleMat(scale: number) {
     this.scale = scale
-		this.updateUniform('scale', this.scale)
+    this.updateUniform('scale', this.scale)
     this.uniforms.set('rotate', this.rotate)
   }
   updateRotateMat(value: number) {
