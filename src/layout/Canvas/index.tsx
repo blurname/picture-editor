@@ -23,6 +23,9 @@ import {
 } from '../../utils/gl-uitls'
 import { getIsHavingSpirits, getSpirits } from '../../utils/http'
 import { textRneder } from '../../utils/textRender'
+import {screenshot} from '../../utils/saveImage'
+import {useRenderAll} from '../../hooks/useRenderAll'
+
 
 type Props = {}
 type remoteModel = {
@@ -57,6 +60,7 @@ export function Canvas(props: Props) {
   const [initCount, setInitCount] = useState(-1)
   const [initImages, setInitImages] = useState([] as remoteModel[])
   const [initComplete, setInitComplete] = useState(false)
+	const [renderAll] = useRenderAll(spiritCanvas.spirits)
 
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
@@ -165,24 +169,24 @@ export function Canvas(props: Props) {
     //operationHistory.commit(s, from, wto)
     console.log('images.length:' + images.length)
     if (!zoomable) canvas3dRef.current.style.cursor = 'default'
-    renderImages()
+    renderAll()
     setAdjustNum(adjustNum + 1)
   }
-  const renderImages = () => {
-    //spiritCanvas.renderBackground()
-    console.log(spiritCanvas.spirits)
-    for (const image of images) {
-      if (image) image.render()
-    }
-  }
+  //const renderAll = () => {
+    ////spiritCanvas.renderBackground()
+    //console.log(spiritCanvas.spirits)
+    //for (const image of images) {
+      //if (image) image.render()
+    //}
+  //}
   const handleBack = () => {
     operationHistory.undo()
-    renderImages()
+    renderAll()
     setAdjustNum(adjustNum + 1)
   }
   const handleNext = () => {
     operationHistory.redo()
-    renderImages()
+    renderAll()
     setAdjustNum(adjustNum + 1)
   }
   // init canvas
@@ -244,14 +248,14 @@ export function Canvas(props: Props) {
         )
       }
       setTimeout(() => {
-        renderImages()
+        renderAll()
       }, 500)
     }
   }, [initImages])
 
   useEffect(() => {
     if (initComplete) {
-      renderImages()
+      renderAll()
     }
   }, [initComplete])
 
@@ -265,12 +269,15 @@ export function Canvas(props: Props) {
   }, [selectNum])
 
   useEffect(() => {
-    renderImages()
+    renderAll()
     console.log('reanderAll')
   }, [adjustNum, cmpCount])
 
   return (
     <div className="flex-grow w-max h-full bg-blue-400">
+		<Button onClick={screenshot(canvas3dRef.current,renderAll)}>
+		screenshot
+		</Button>
       <Button onClick={handleBack} disabled={!(operationHistory.tail > 0)}>
         undo
       </Button>

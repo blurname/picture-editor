@@ -78,9 +78,6 @@ export function Editor() {
     }
 		console.log('descStoreOld:', chosen.getUniqueProps())
   }
-	//useEffect(() => {
-		//console.log('ddesc',desc)
-	//}, [desc]);
   const onChangeInput =
     (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
       const curValue = parseFloat(e.target.value)

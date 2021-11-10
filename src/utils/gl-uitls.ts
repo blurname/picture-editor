@@ -537,6 +537,7 @@ export class MosaicSpirit extends RectModel {
     if (type === 'multi') {
       shader = MosaicMultiShader
     }
+
     return shader
   }
   getBuffersByShape(type: MosaicType): Buffers {
@@ -598,6 +599,7 @@ export class CircleLikeSpirit extends BeamSpirit {
       uColor: [1.0, 1.0, 1.0, 1.0],
       projectionX: this.projectionX,
       projectionY: this.projectionY,
+			layer:this.layer
     })
     this.shader = this.beam.shader(circleShader)
     this.updateGuidRect()

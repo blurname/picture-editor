@@ -17,10 +17,10 @@ const mosaics: Mosaic[] = [
     id: 1,
     value: 'multi',
   },
-  {
-    id: 2,
-    value: 'fract',
-  },
+  //{
+    //id: 2,
+    //value: 'fract',
+  //},
 ]
 export function Mosaic() {
   //const { props } = menu.children.filter((child) => {
