@@ -8,6 +8,7 @@ import React, {
 } from 'react'
 import { globalContext } from '../../context'
 import {
+	clearRectBorder,
   drawRectBorder,
   getCursorIsInQuad,
   getCursorMovDistance,
@@ -23,9 +24,8 @@ import {
 } from '../../utils/gl-uitls'
 import { getIsHavingSpirits, getSpirits } from '../../utils/http'
 import { textRneder } from '../../utils/textRender'
-import {screenshot} from '../../utils/saveImage'
-import {useRenderAll} from '../../hooks/useRenderAll'
-
+import { screenshot } from '../../utils/saveImage'
+import { useRenderAll } from '../../hooks/useRenderAll'
 
 type Props = {}
 type remoteModel = {
@@ -60,7 +60,7 @@ export function Canvas(props: Props) {
   const [initCount, setInitCount] = useState(-1)
   const [initImages, setInitImages] = useState([] as remoteModel[])
   const [initComplete, setInitComplete] = useState(false)
-	const [renderAll] = useRenderAll(spiritCanvas.spirits)
+  const [renderAll] = useRenderAll(spiritCanvas.spirits)
 
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
@@ -91,19 +91,19 @@ export function Canvas(props: Props) {
     if (!isMoveable || zoomable) return
     e.preventDefault()
     //canvas3dRef.current.style.cursor = 'move'
-    const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
-    const result = getCursorIsInQuad(
-      { x: cursorPos.left, y: cursorPos.top },
-      images[selectNum].getGuidRect(),
-    )
-    if (result === 'out') return
+    //const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
+		//const result = getCursorIsInQuad(
+			//{ x: cursorPos.left, y: cursorPos.top },
+			//images[selectNum].getGuidRect(),
+		//)
     const distance = getCursorMovDistance(e, canvas)
     images[curImage].updatePosition(distance)
     spiritCanvas.updateGuidRect(images[curImage])
     //spiritCanvas.spirits[curImage].render()
+		//renderAll()
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
-        images[i].render()
+				images[i].render()
         if (curImage === i) {
           drawRectBorder(canvas2dRef.current, images[curImage].getGuidRect())
           //if (!zoomable && !isMoveable)
@@ -111,7 +111,8 @@ export function Canvas(props: Props) {
         }
       }
     }
-		spiritCanvas.renderAllLine()
+		//setAdjustNum(adjustNum+1)
+    spiritCanvas.renderAllLine()
   }
   const handleOnMouseDown = (e: MouseEvent) => {
     e.preventDefault()
@@ -173,11 +174,11 @@ export function Canvas(props: Props) {
     setAdjustNum(adjustNum + 1)
   }
   //const renderAll = () => {
-    ////spiritCanvas.renderBackground()
-    //console.log(spiritCanvas.spirits)
-    //for (const image of images) {
-      //if (image) image.render()
-    //}
+  ////spiritCanvas.renderBackground()
+  //console.log(spiritCanvas.spirits)
+  //for (const image of images) {
+  //if (image) image.render()
+  //}
   //}
   const handleBack = () => {
     operationHistory.undo()
@@ -235,7 +236,7 @@ export function Canvas(props: Props) {
           spiritType: img.spirit_type,
           model: JSON.parse(img.model),
           element: img.element,
-          uniqueProps: JSON.parse(img.unique_props)
+          uniqueProps: JSON.parse(img.unique_props),
         }
       })
       console.log('models:', models)
@@ -244,7 +245,7 @@ export function Canvas(props: Props) {
           models[i].spiritType,
           models[i].model,
           models[i].element,
-					models[i].uniqueProps
+          models[i].uniqueProps,
         )
       }
       setTimeout(() => {
@@ -269,15 +270,15 @@ export function Canvas(props: Props) {
   }, [selectNum])
 
   useEffect(() => {
-    renderAll()
+		renderAll()
     console.log('reanderAll')
   }, [adjustNum, cmpCount])
 
   return (
     <div className="flex-grow w-max h-full bg-blue-400">
-		<Button onClick={screenshot(canvas3dRef.current,renderAll)}>
-		screenshot
-		</Button>
+      <Button onClick={screenshot(canvas3dRef.current, renderAll)}>
+        screenshot
+      </Button>
       <Button onClick={handleBack} disabled={!(operationHistory.tail > 0)}>
         undo
       </Button>

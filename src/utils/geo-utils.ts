@@ -462,6 +462,16 @@ export const drawRectBorder = (
 		guidRect.height
   )
 }
+export const clearRectBorder = (canvas2dRef:HTMLCanvasElement)=>{
+  const ctx = canvas2dRef.getContext('2d')
+  ctx.clearRect(
+    -canvas2dRef.width / 2,
+    -canvas2dRef.height / 2,
+    canvas2dRef.width,
+    canvas2dRef.height,
+  )
+
+}
 
 export const createTranslateMat = (offset:Pos) => {
   return [
