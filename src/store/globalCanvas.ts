@@ -4,7 +4,8 @@ import { ax } from '../utils/http'
 import { theWShader } from '../filter/shader'
 import { is, object, string, number, array } from 'superstruct'
 import {
-  BackSpirit,
+  BackgroundSpirit,
+  backNonImageSpirit,
   BeamSpirit,
   CircleSpirit,
   GuidLine,
@@ -20,8 +21,9 @@ enum eSpiType {
   image = 1,
   mark,
   mosaic,
+	background
 }
-function loadImage(url: string) {
+export function loadImage(url: string) {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.onload = () => resolve(img)
@@ -62,7 +64,7 @@ export class SpiritCanvas {
   //guidRects: GuidRect[]
   guidLines: GuidLine[]
   beamClener: Beam
-  background: BackSpirit
+  background: BackgroundSpirit
   chosenType: SpiritType
   isLarged: boolean
   ax: AxiosInstance
@@ -80,7 +82,7 @@ export class SpiritCanvas {
     console.log('asldfkjsad;lfjk')
     this.id = await createCanvas(this.ownerId)
   }
-  updateFromRemote<T extends Shape | string>(
+  updateFromRemote<T extends Shape | string| MosaicType|'background'>(
     typeId: number,
     model: Model,
     element: T,
@@ -94,6 +96,9 @@ export class SpiritCanvas {
         this.addMark(element as Shape, model.id, true, model, uniqueProps)
       else if (typeId === 3)
         this.addMosaic(element as MosaicType, model.id, true, model)
+			else if(typeId === 4){
+				this.addBackground(model.id,true)
+			}
     }
   }
   async addImage(
@@ -161,6 +166,16 @@ export class SpiritCanvas {
     if (!exist)
       this.spiritCommit(mosaic.getModel(), eSpiType.mosaic, mosaicType)
   }
+	addBackground(
+		id:number,
+		exist:boolean = false
+	){
+		const background = new backNonImageSpirit(this.canvas3d,id)
+		this.spirits[id] = background
+		if(!exist){
+			this.spiritCommit(background.getModel(), eSpiType.background, 'background')
+		}
+	}
 
   setCanvas3d(canvas: HTMLCanvasElement) {
     this.canvas3d = canvas
@@ -176,7 +191,7 @@ export class SpiritCanvas {
       }
     }
   }
-  async spiritCommit<T extends Model, U extends Shape | string>(
+  async spiritCommit<T extends Model, U extends Shape | string|'background'>(
     model: T,
     spiritType: eSpiType,
     element: U,
@@ -189,13 +204,13 @@ export class SpiritCanvas {
   }
   renderAllLine() {
     //this.beamClener.clear()
-    //this.background.render()
+		//this.background.render()
     for (let index = 0; index < this.guidLines.length; index++) {
       if (this.guidLines[index] !== null) this.guidLines[index].render()
       //console.log('renderLine:' + index)
     }
   }
-  setBackgournd(back: BackSpirit) {
+  setBackgournd(back: BackgroundSpirit) {
     this.background = back
   }
   setChosenType(type: SpiritType) {

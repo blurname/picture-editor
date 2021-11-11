@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 import { globalContext } from '../../context'
 import {
-	clearRectBorder,
+  clearRectBorder,
   drawRectBorder,
   getCursorIsInQuad,
   getCursorMovDistance,
@@ -16,6 +16,7 @@ import {
 } from '../../utils/geo-utils'
 
 import {
+  BackgroundSpirit,
   BeamSpirit,
   CircleSpirit,
   ImageSpirit,
@@ -60,13 +61,14 @@ export function Canvas(props: Props) {
   const [initCount, setInitCount] = useState(-1)
   const [initImages, setInitImages] = useState([] as remoteModel[])
   const [initComplete, setInitComplete] = useState(false)
+  const [localInit, setLocalInit] = useState(false)
   const [renderAll] = useRenderAll(spiritCanvas.spirits)
 
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
+	
 
-  //}
   const maxLayer = (indexArray: number[], spirits: BeamSpirit[]) => {
     console.log(indexArray)
     let min = 2
@@ -88,22 +90,23 @@ export function Canvas(props: Props) {
   let oldPos: Pos
 
   const handleOnMouseMove = (e: MouseEvent) => {
-    if (!isMoveable || zoomable) return
+    if (curImage===0 || !isMoveable || zoomable) return
     e.preventDefault()
-    //canvas3dRef.current.style.cursor = 'move'
+    canvas3dRef.current.style.cursor = 'move'
     //const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
-		//const result = getCursorIsInQuad(
-			//{ x: cursorPos.left, y: cursorPos.top },
-			//images[selectNum].getGuidRect(),
-		//)
+    //const result = getCursorIsInQuad(
+      //{ x: cursorPos.left, y: cursorPos.top },
+      //images[selectNum].getGuidRect(),
+    //)
+    //if (result === 'out') return
     const distance = getCursorMovDistance(e, canvas)
     images[curImage].updatePosition(distance)
     spiritCanvas.updateGuidRect(images[curImage])
     //spiritCanvas.spirits[curImage].render()
-		//renderAll()
+    //renderAll()
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
-				images[i].render()
+        images[i].render()
         if (curImage === i) {
           drawRectBorder(canvas2dRef.current, images[curImage].getGuidRect())
           //if (!zoomable && !isMoveable)
@@ -111,7 +114,6 @@ export function Canvas(props: Props) {
         }
       }
     }
-		//setAdjustNum(adjustNum+1)
     spiritCanvas.renderAllLine()
   }
   const handleOnMouseDown = (e: MouseEvent) => {
@@ -131,8 +133,10 @@ export function Canvas(props: Props) {
         }
       }
     }
-
-    if (indexArray.length > 0) {
+		//if(indexArray.length===1){
+			//setSelectNum(0)
+		//}
+		 if (indexArray.length > 0) {
       const cur = maxLayer(indexArray, images)
       curImage = cur
       setSelectNum(curImage)
@@ -153,11 +157,16 @@ export function Canvas(props: Props) {
       oldPos = images[curImage].getPos()
       canvas3dRef.current.style.cursor = 'move'
     }
+		else{
+		setSelectNum(0)
+		spiritCanvas.setChosenType('Background')
+		}
   }
 
   const thandleOnMouseUp = (e: MouseEvent) => {
+
     isMoveable = false
-    console.log('oldPos:', oldPos)
+    //console.log('oldPos:', oldPos)
     if (oldPos !== undefined) {
       const spirit = spiritCanvas.spirits[curImage]
       operationHistory.commit(
@@ -168,18 +177,11 @@ export function Canvas(props: Props) {
       )
     }
     //operationHistory.commit(s, from, wto)
-    console.log('images.length:' + images.length)
+    //console.log('images.length:' + images.length)
     if (!zoomable) canvas3dRef.current.style.cursor = 'default'
     renderAll()
     setAdjustNum(adjustNum + 1)
   }
-  //const renderAll = () => {
-  ////spiritCanvas.renderBackground()
-  //console.log(spiritCanvas.spirits)
-  //for (const image of images) {
-  //if (image) image.render()
-  //}
-  //}
   const handleBack = () => {
     operationHistory.undo()
     renderAll()
@@ -198,6 +200,9 @@ export function Canvas(props: Props) {
     spiritCanvas.spirits = images
     const getCount = async () => {
       const count = await getIsHavingSpirits(spiritCanvas.id)
+      if (count === 0) {
+        setLocalInit(true)
+      }
       setInitCount(count)
     }
     getCount()
@@ -251,8 +256,16 @@ export function Canvas(props: Props) {
       setTimeout(() => {
         renderAll()
       }, 500)
+    } else {
+      console.log('addBackground')
     }
   }, [initImages])
+  useEffect(() => {
+    if (localInit) {
+      spiritCanvas.addBackground(0)
+      setCmpCount(cmpCount + 1)
+    }
+  }, [localInit])
 
   useEffect(() => {
     if (initComplete) {
@@ -270,12 +283,13 @@ export function Canvas(props: Props) {
   }, [selectNum])
 
   useEffect(() => {
-		renderAll()
+    renderAll()
     console.log('reanderAll')
   }, [adjustNum, cmpCount])
 
   return (
     <div className="flex-grow w-max h-full bg-blue-400">
+      <h1>cmpcount{cmpCount}</h1>
       <Button onClick={screenshot(canvas3dRef.current, renderAll)}>
         screenshot
       </Button>

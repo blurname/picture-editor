@@ -60,11 +60,14 @@ type MarkProps = {
 type CircleProps = MarkProps & {
   radius: number
 }
-type UniqueProps = MarkProps | ImageProps | CircleProps
+type BackgroundProps = MarkProps& {
+
+}
+type UniqueProps = MarkProps | ImageProps | CircleProps | BackgroundProps
 
 type Mosaic = Model
 type Shape = 'line' | 'hollowRect' | 'circle' | 'theW'
-type SpiritType = 'Image' | 'Mark' | 'Mosaic'
+type SpiritType = 'Image' | 'Mark' | 'Mosaic'|'Background'
 type MosaicType = 'multi' | 'fract'
 type Point = { x: number; y: number }
 

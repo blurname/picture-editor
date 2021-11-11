@@ -15,10 +15,12 @@ import {
   lineShader,
   circleShader,
   theWShader,
-  backgourndShader,
+  backCellShader,
   MosaicMultiShader,
   MonolithicShader,
+	backImageShader,
 } from '../filter/shader'
+import {loadImage} from '../store/globalCanvas'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {
   createCircle,
@@ -737,18 +739,38 @@ export class GuidLine {
     return this.id
   }
 }
-export class BackSpirit extends BeamSpirit {
+export class BackgroundSpirit extends BeamSpirit {
+	uColor:number[]
+	backShader:object
+	backUniforms:object
+	backType:'image'|'nonImage'
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
-    this.isToggle = false
+		this.isToggle = false
+		//this.isToggle = true
+		this.spiritType = 'Background'
     const back = createBackGrid()
+		this.layer = 0.8
+		this.model.layer = this.layer
     this.vertexBuffers = this.beam.resource(VertexBuffers, back.vertex)
     this.indexBuffer = this.beam.resource(IndexBuffer, back.index)
-    this.shader = this.beam.shader(backgourndShader)
-    this.uniforms = this.beam.resource(Uniforms, {
-      rows: 32,
-    })
+		//this.shader = this.beam.shader(backCellShader)
+		//this.uniforms = this.beam.resource(Uniforms, {
+			//rows: 16,
+			//uColor:this.uColor
+		//})
+		//this.uniqueProps = {
+			//id:this.id,
+			//uColor:this.uColor
+		//}
+
   }
+	setBackground(shader:any,uniforms:UniformsResource){
+		//this.shader = this.beam.shader(shader)
+
+		//this.uniforms = this.beam.resource(Uniforms,uniforms)
+		throw new Error('not implemented')
+	}
   render() {
     this.beam
       .depth()
@@ -760,7 +782,61 @@ export class BackSpirit extends BeamSpirit {
       )
   }
 }
-
+export class backImageSpirit extends BackgroundSpirit{
+	textures:TexturesResource
+	image:HTMLImageElement
+	constructor (canvas:HTMLCanvasElement,id:number,image:HTMLImageElement) {
+		super(canvas,id)
+		this.shader = this.beam.shader(backImageShader)
+		this.textures = this.beam.resource(Textures)
+		this.image = image
+		this.textures.set('img', {image:this.image,flip:true})
+	}
+	//setBackground(shader:any,uniforms:UniformsResource){
+		//this.shader = this.beam.shader(shader)
+		////this.uniforms = this.beam.resource(Uniforms,uniforms)
+	//}
+	//async setImage(imgUrl:string){
+		//const img = await loadImage(imgUrl)
+		//console.log('img:', img)
+		//this.textures.set('img', {img:img,flip:true})
+	//}
+  render() {
+    this.beam
+			.depth()
+      .draw(
+        this.shader,
+        this.vertexBuffers as any,
+        this.indexBuffer as any,
+        //this.uniforms as any,
+				this.textures as any
+      )
+  }
+}
+export class backNonImageSpirit extends BackgroundSpirit{
+	constructor (canvas:HTMLCanvasElement,id:number) {
+		super(canvas,id)
+		this.uniforms = this.beam.resource(Uniforms,this.uniforms)
+		this.shader = this.beam.shader(backCellShader)
+		this.uniforms = this.beam.resource(Uniforms, {
+			rows: 16,
+			uColor:this.uColor
+		})
+	}
+	setBackground(shader:any,uniforms:UniformsResource){
+		//this.shader = this.beam.shader(shader)
+		this.uniforms = this.beam.resource(Uniforms,uniforms)
+		this.shader = this.beam.shader(backCellShader)
+		this.uniforms = this.beam.resource(Uniforms, {
+			rows: 16,
+			uColor:this.uColor
+		})
+		//this.uniqueProps = {
+			//id:this.id,
+			//uColor:this.uColor
+		//}
+	}
+}
 const fUpdateGuidRect = <T>(
   fn: (base: T, offset: Pos, scale: number) => Rect,
   base: T,

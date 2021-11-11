@@ -2,8 +2,27 @@ import { Button, Collapse, Input, Slider } from 'antd'
 import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { globalContext } from '../../context'
-import { ImageSpirit, MarkSpirit } from '../../utils/gl-uitls'
+import { backCellShader, backImageShader } from '../../filter/shader'
+import { backCellUniform, backImageUniform } from '../../filter/uniform'
+import {loadImage} from '../../store/globalCanvas'
+import {
+  BackgroundSpirit,
+  backImageSpirit,
+  backNonImageSpirit,
+  ImageSpirit,
+  MarkSpirit,
+} from '../../utils/gl-uitls'
+import {imgUrl} from '../Components/Img'
 import { editorSchema } from './editorSchema'
+
+const backShader = {
+  cell: backCellShader,
+  image: backImageShader,
+}
+const backUniforms = {
+  cell: backCellUniform,
+  image: backImageUniform,
+}
 export function Editor() {
   const {
     spiritCanvas,
@@ -20,37 +39,39 @@ export function Editor() {
   const [old, setOld] = useState({} as any)
 
   //const onColorChange =
-    //(desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
-      //const hex: string = e.target.value
-      //const r = parseInt('0x' + hex.slice(1, 3)) / 255.0
-      //const g = parseInt('0x' + hex.slice(3, 5)) / 255.0
-      //const b = parseInt('0x' + hex.slice(5)) / 255.0
-      //const color = [r, g, b, 1]
-      //let mark = spiritCanvas.spirits[selectNum] as MarkSpirit
-      //mark.updateUniform(desc, color)
-      //operationHistory.commit(
-        //mark.getUniqueProps() as MarkProps,
-        //{ [desc]: old },
-        //{ [desc]: color },
-        //'UniqueProps',
-      //)
-      //setAdjustNum(adjustNum + 1)
-    //}
+  //(desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
+  //const hex: string = e.target.value
+  //const r = parseInt('0x' + hex.slice(1, 3)) / 255.0
+  //const g = parseInt('0x' + hex.slice(3, 5)) / 255.0
+  //const b = parseInt('0x' + hex.slice(5)) / 255.0
+  //const color = [r, g, b, 1]
+  //let mark = spiritCanvas.spirits[selectNum] as MarkSpirit
+  //mark.updateUniform(desc, color)
+  //operationHistory.commit(
+  //mark.getUniqueProps() as MarkProps,
+  //{ [desc]: old },
+  //{ [desc]: color },
+  //'UniqueProps',
+  //)
+  //setAdjustNum(adjustNum + 1)
+  //}
   //type RGB = 'R'|'G'|'B'
   enum RGB {
-    R =0,
+    R = 0,
     G,
     B,
   }
-  const onChangeRGB = <T extends Partial<keyof typeof RGB>>(rgb: T,cdesc:string)=>(e: ChangeEvent<HTMLInputElement>) => {
-    let mark = spiritCanvas.spirits[selectNum] as MarkSpirit
-		let color = mark.getColor().map((c) => c)
-		const index = RGB[rgb] as number
-		color[index]=parseInt(e.target.value)/255.0
-    mark.updateUniqueProps({ [cdesc]: color })
-		setAdjustNum(adjustNum + 1)
-    setValue(color)
-  }
+  const onChangeRGB =
+    <T extends Partial<keyof typeof RGB>>(rgb: T, cdesc: string) =>
+    (e: ChangeEvent<HTMLInputElement>) => {
+      let mark = spiritCanvas.spirits[selectNum] as MarkSpirit
+      let color = mark.getColor().map((c) => c)
+      const index = RGB[rgb] as number
+      color[index] = parseInt(e.target.value) / 255.0
+      mark.updateUniqueProps({ [cdesc]: color })
+      setAdjustNum(adjustNum + 1)
+      setValue(color)
+    }
 
   const onDeleteClick = () => {
     spiritCanvas.deleteElement(selectNum)
@@ -58,25 +79,25 @@ export function Editor() {
   }
 
   const onLayerChange = (value: number) => {
-	//console.log('layerold',spiritCanvas.spirits[selectNum].getModel()])
-		setOld(spiritCanvas.spirits[selectNum].getModel()['layer'])
-    spiritCanvas.spirits[selectNum].updateModel({'layer':1-value})
-		setValue(value)
-		setDesc('layer')
+    //console.log('layerold',spiritCanvas.spirits[selectNum].getModel()])
+    setOld(spiritCanvas.spirits[selectNum].getModel()['layer'])
+    spiritCanvas.spirits[selectNum].updateModel({ layer: 1 - value })
+    setValue(value)
+    setDesc('layer')
   }
-	const afterLayerChage = () => {
-		commitToHistory()
-	}
+  const afterLayerChage = () => {
+    commitToHistory()
+  }
 
   const storeOld = (cdesc: string) => () => {
-    const chosen = spiritCanvas.spirits[selectNum] 
-		setDesc(cdesc)
+    const chosen = spiritCanvas.spirits[selectNum]
+    setDesc(cdesc)
     if (desc === 'rotate' || desc === 'scale') {
       setOld(chosen.getModel()[cdesc])
     } else {
       setOld(chosen.getUniqueProps()[cdesc])
     }
-		console.log('descStoreOld:', chosen.getUniqueProps())
+    console.log('descStoreOld:', chosen.getUniqueProps())
   }
   const onChangeInput =
     (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -100,7 +121,7 @@ export function Editor() {
   }
   const commitToHistory = () => {
     const chosen = spiritCanvas.spirits[selectNum]
-    if (desc === 'rotate' || desc === 'scale'||desc==='layer') {
+    if (desc === 'rotate' || desc === 'scale' || desc === 'layer') {
       operationHistory.commit(
         chosen.getModel(),
         { [desc]: old },
@@ -117,6 +138,24 @@ export function Editor() {
     }
     setAdjustNum(adjustNum + 1)
   }
+  const onChangeBackNonImage = (shaderName: string) => () => {
+    const shader = backShader[shaderName]
+    const uniform = backUniforms[shaderName]
+    const back = new backNonImageSpirit(spiritCanvas.canvas3d, 0)
+    back.setBackground(shader, uniform)
+		spiritCanvas.spirits[0] = back
+    setAdjustNum(adjustNum + 1)
+  }
+  const onChangeBackImage = (imgUrl:string) =>async () => {
+    //const shader = backShader['image']
+    //const uniform = backUniforms['image']
+		const image = await loadImage(imgUrl) as HTMLImageElement
+    const back = new backImageSpirit(spiritCanvas.canvas3d, 0,image)
+    //back.setBackground(shader, uniform as any)
+		//back.setImage(imgUrl)
+		spiritCanvas.spirits[0] = back
+    setAdjustNum(adjustNum + 1)
+  }
   const shaping = editorSchema.children[0]
   const filters = editorSchema.children[1]
   const color = editorSchema.children[2]
@@ -128,8 +167,8 @@ export function Editor() {
   return (
     <div className="flex-grow-0 w-50 bg-blue-100 object-right">
       Editor
-			<h1>desc:{desc}</h1>
-			<h1>adj:{adjustNum}</h1>
+      <h1>desc:{desc}</h1>
+      <h1>adj:{adjustNum}</h1>
       <div style={{ height: 50 }}>curCmpId:{selectNum}</div>
       <div>
         {zoomable && (
@@ -157,8 +196,8 @@ export function Editor() {
           delete element
         </Button>
       </div>
-      <Collapse className="w-12/12" defaultActiveKey={[1, 2, 3]}>
-        {selectNum !== -1 && (
+      <Collapse className="w-12/12" defaultActiveKey={[1, 2, 3, 4]}>
+        {selectNum > 0 && (
           <CollapsePanel header="shaping" key="1">
             <div>
               {shaping.children.map((cur, index) => {
@@ -172,7 +211,7 @@ export function Editor() {
                       marks={cur.props.marks}
                       defaultValue={cur.props.value}
                       onChange={onLayerChange}
-											onAfterChange={afterLayerChage}
+                      onAfterChange={afterLayerChage}
                     ></Slider>
                   )
                 }
@@ -240,9 +279,9 @@ export function Editor() {
                       min={cur.props.range.min}
                       max={cur.props.range.max}
                       defaultValue={cur.props.value}
-											onInput={onChangeRGB(cur.desc,'uColor')}
-											onMouseUp={commitToHistory}
-											onMouseDown={storeOld('uColor')}
+                      onInput={onChangeRGB(cur.desc, 'uColor')}
+                      onMouseUp={commitToHistory}
+                      onMouseDown={storeOld('uColor')}
                       id={cur.desc}
                     />
                     <label htmlFor={cur.desc}>{cur.desc}</label>
@@ -250,6 +289,13 @@ export function Editor() {
                 </div>
               )
             })}
+          </CollapsePanel>
+        )}
+        {spiritCanvas?.chosenType === 'Background' && (
+          <CollapsePanel header="Background" key="4">
+            <h1>Background</h1>
+            <Button onClick={onChangeBackNonImage('cell')}>cell_back</Button>
+            <Button onClick={onChangeBackImage(imgUrl+'back1.jpg')}>image_back</Button>
           </CollapsePanel>
         )}
       </Collapse>

@@ -228,28 +228,51 @@ const backgroundVS = `
 		vTexCoord = texCoord;
 	}
 `
-const backgroundFS = `
+const backCellFS = `
 	precision highp float;
 	varying vec2 vTexCoord;
 	uniform float rows;
+	uniform vec4 uColor;
 	void main(){
 		vec2 st = fract(vTexCoord*rows);
 		float d1 = step(st.x,0.9);
 		float d2 = step(0.1,st.y);
 
-		gl_FragColor.rgb = mix(vec3(0.5,0.,0.7),vec3(1.0),d1*d2);
+		gl_FragColor.rgb = mix(vec3(uColor.r,uColor.g,uColor.b),vec3(1.0),d1*d2);
 		gl_FragColor.a = 1.0;
 	}
 `
-export const backgourndShader = {
+
+const backImageFS = `
+precision highp float;
+varying highp vec2 vTexCoord;
+
+uniform sampler2D img;
+void main(){
+	gl_FragColor = texture2D(img,vTexCoord);
+}
+`
+export const backCellShader = {
   vs: backgroundVS,
-  fs: backgroundFS,
+  fs: backCellFS,
   buffers: {
     position: { type: vec4, n: 2 },
     texCoord: { type: vec2 },
   },
   uniforms: {
     rows: { type: float },
+    uColor: { type: vec3 },
+  },
+}
+export const backImageShader = {
+  vs: backgroundVS,
+  fs: backImageFS,
+  buffers: {
+    position: { type: vec4, n: 2 },
+    texCoord: { type: vec2 },
+  },
+  textures: {
+    img: { type: tex2D },
   },
 }
 
@@ -277,17 +300,6 @@ void main() {
 }
 `
 
-//export const BasicImage = {
-//vs: defaultVS,
-//fs: defaultFS,
-//buffers: {
-//position: { type: vec4, n: 3 },
-//texCoord: { type: vec2 },
-//},
-//textures: {
-//img: { type: tex2D },
-//},
-//}
 
 const saturationVS = `
 	attribute vec4 position;
@@ -471,7 +483,7 @@ const PartBrightnessContrast = `
 		}
 	}
 `
-const PartVignetee =`
+const PartVignetee = `
 if(vignette!=0.0){
   float innerVig = 1.0 - vignette;
   float outerVig = 1.0001; // Position for the outer vignette
@@ -488,7 +500,7 @@ if(vignette!=0.0){
 //const ExShaderUniforms = ['float hue', 'float saturation', 'float brightness', 'float contrast']
 
 //const UniformsInShader = (ex:string[])=>{
-	//return ex.map((uniform) => "uniform "+uniform+";")
+//return ex.map((uniform) => "uniform "+uniform+";")
 //}
 const MonolithicFS = `
 
