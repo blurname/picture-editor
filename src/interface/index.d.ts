@@ -33,17 +33,6 @@ interface Model {
   rotate: number
   layer: number
 }
-//interface Mark extends Model{
-//color:number[]
-//}
-//interface Image extends Model{
-//zoom:boolean
-//hue:number
-//saturation:number
-//contrast:number
-//brightness:number
-//vignette:number
-//}
 
 type ImageProps = {
   id: number

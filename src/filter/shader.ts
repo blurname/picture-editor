@@ -232,7 +232,7 @@ const backCellFS = `
 	precision highp float;
 	varying vec2 vTexCoord;
 	uniform float rows;
-	uniform vec4 uColor;
+	uniform vec3 uColor;
 	void main(){
 		vec2 st = fract(vTexCoord*rows);
 		float d1 = step(st.x,0.9);

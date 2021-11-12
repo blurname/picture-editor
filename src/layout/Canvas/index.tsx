@@ -24,7 +24,6 @@ import {
   TheW,
 } from '../../utils/gl-uitls'
 import { getIsHavingSpirits, getSpirits } from '../../utils/http'
-import { textRneder } from '../../utils/textRender'
 import { screenshot } from '../../utils/saveImage'
 import { useRenderAll } from '../../hooks/useRenderAll'
 
@@ -54,8 +53,8 @@ export function Canvas(props: Props) {
   let canvas: CanvasPos = {
     width: 1300,
     height: 900,
-    left: 320,
-    top: 110,
+    left: 400,
+    top: 150,
   }
   const [images, setImages] = useState([] as BeamSpirit[])
   const [initCount, setInitCount] = useState(-1)
@@ -262,8 +261,8 @@ export function Canvas(props: Props) {
   }, [initImages])
   useEffect(() => {
     if (localInit) {
-      spiritCanvas.addBackground(0)
-      setCmpCount(cmpCount + 1)
+      //spiritCanvas.addBackground(0)
+      //setCmpCount(cmpCount + 1)
     }
   }, [localInit])
 
@@ -284,7 +283,6 @@ export function Canvas(props: Props) {
 
   useEffect(() => {
     renderAll()
-    console.log('reanderAll')
   }, [adjustNum, cmpCount])
 
   return (

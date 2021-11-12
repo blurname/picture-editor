@@ -1,8 +1,9 @@
-import { Button, Collapse, Input } from 'antd'
+import { Button, Collapse } from 'antd'
 import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react'
+import React, { ChangeEvent, useContext, useState } from 'react'
 import { globalContext } from '../../context'
 import { EAffine } from './EAffine'
+import { EBack } from './EBack'
 import { EImage } from './EImage'
 import { EMark } from './EMark'
 
@@ -145,7 +146,9 @@ export function Editor() {
           </CollapsePanel>
         )}
         {spiritCanvas?.chosenType === 'Background' && (
-          <CollapsePanel header="Background" key="4"></CollapsePanel>
+          <CollapsePanel header="Background" key="4">
+            <EBack />
+          </CollapsePanel>
         )}
       </Collapse>
     </div>

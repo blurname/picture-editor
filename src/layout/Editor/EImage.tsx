@@ -1,16 +1,9 @@
 import { Button, Input } from 'antd'
 import React, {
   ChangeEvent,
-  Dispatch,
-  MouseEventHandler,
-  SetStateAction,
 } from 'react'
 import { editorSchema } from './editorSchema'
 type Props = {
-  //spiritCanvas: SpiritCanvas
-  //selectNum: number
-  //adjustNum: number
-  //setAdjustNum: Dispatch<SetStateAction<Number>>
   resetValue: (desc: string) => () => void
   commitToHistory: () => void
   storeOld: (desc: string) => () => void

@@ -1,27 +1,25 @@
 import { AxiosInstance } from 'axios'
 import { Beam } from 'beam-gl'
-import { ax } from '../utils/http'
-import { theWShader } from '../filter/shader'
-import { is, object, string, number, array } from 'superstruct'
+import {backShader, backUniforms} from '../layout/Editor/EBack'
 import {
   BackgroundSpirit,
-  backNonImageSpirit,
+  BackImageSpirit,
+  BackNonImageSpirit,
   BeamSpirit,
   CircleSpirit,
   GuidLine,
   ImageSpirit,
   MarkSpirit,
   MosaicSpirit,
-  TheW,
 } from '../utils/gl-uitls'
 import { createCanvas } from '../utils/http'
-import { imgUrl } from '../layout/Components/Img'
 
 enum eSpiType {
   image = 1,
   mark,
   mosaic,
-	background
+  backNonImage,
+	backImage
 }
 export function loadImage(url: string) {
   return new Promise((resolve, reject) => {
@@ -82,7 +80,7 @@ export class SpiritCanvas {
     console.log('asldfkjsad;lfjk')
     this.id = await createCanvas(this.ownerId)
   }
-  updateFromRemote<T extends Shape | string| MosaicType|'background'>(
+  updateFromRemote<T extends Shape | string | MosaicType | 'background'>(
     typeId: number,
     model: Model,
     element: T,
@@ -96,8 +94,10 @@ export class SpiritCanvas {
         this.addMark(element as Shape, model.id, true, model, uniqueProps)
       else if (typeId === 3)
         this.addMosaic(element as MosaicType, model.id, true, model)
-			else if(typeId === 4){
-				this.addBackground(model.id,true)
+      else if (typeId === 4) {
+        this.addBackground(element, 'backNonImage', true)
+      }else if(typeId===5){
+        this.addBackground(element, 'backImage', true)
 			}
     }
   }
@@ -117,9 +117,7 @@ export class SpiritCanvas {
     if (uniqueProps) {
       spirit.updateFromRemote(uniqueProps as ImageProps, 'UniqueProps')
     }
-		console.log('addImage:', spirit)
     this.spirits[id] = spirit
-		//console.log(this.spirits[id])
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
     )
@@ -168,16 +166,27 @@ export class SpiritCanvas {
     if (!exist)
       this.spiritCommit(mosaic.getModel(), eSpiType.mosaic, mosaicType)
   }
-	addBackground(
-		id:number,
-		exist:boolean = false
-	){
-		const background = new backNonImageSpirit(this.canvas3d,id)
-		this.spirits[id] = background
-		if(!exist){
-			this.spiritCommit(background.getModel(), eSpiType.background, 'background')
+  async addBackground(
+    element: string,
+    type:keyof Pick<typeof eSpiType,'backNonImage'|'backImage'> ,
+    exist: boolean = false,
+  ) {
+    let background: BackNonImageSpirit|BackImageSpirit
+    if (type ==='backNonImage'){
+      background = new BackNonImageSpirit(this.canvas3d) 
+			;(background as BackNonImageSpirit).setShader(backShader[element],backUniforms[element] )
+    }
+    else  {
+      const image = (await loadImage(element)) as HTMLImageElement
+      background = new BackImageSpirit(this.canvas3d, image)
 		}
-	}
+    this.spirits[0] = background
+    if (!exist) {
+      this.spiritCommit(background.getModel(), eSpiType[type], element)
+    }else{
+			this.updateBackground(background.getModel(), eSpiType[type], element)
+		}
+  }
 
   setCanvas3d(canvas: HTMLCanvasElement) {
     this.canvas3d = canvas
@@ -193,7 +202,7 @@ export class SpiritCanvas {
       }
     }
   }
-  async spiritCommit<T extends Model, U extends Shape | string|'background'>(
+  async spiritCommit<T extends Model, U extends Shape | string | 'background'>(
     model: T,
     spiritType: eSpiType,
     element: U,
@@ -204,9 +213,21 @@ export class SpiritCanvas {
     )
     console.log(res.data)
   }
+	
+  async updateBackground<T extends Model, U extends Shape | string | 'background'>(
+    model: T,
+    spiritType: eSpiType,
+    element: U,
+  ) {
+    const res = await this.ax.post(
+      `/canvas/update_back/?canvasid=${this.id}&spirittype=${spiritType}&canvas_spirit_id=${model.id}&element=${element}`,
+      JSON.stringify(model),
+    )
+    console.log(res.data)
+  }
   renderAllLine() {
     //this.beamClener.clear()
-		//this.background.render()
+    //this.background.render()
     for (let index = 0; index < this.guidLines.length; index++) {
       if (this.guidLines[index] !== null) this.guidLines[index].render()
       //console.log('renderLine:' + index)
