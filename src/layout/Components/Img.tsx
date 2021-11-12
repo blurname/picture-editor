@@ -37,14 +37,15 @@ const imgs: ImgType[] = [
 ]
 
 export function Img() {
-	const { props } = menu.children.filter((child) => child.desc === 'img')[0]
-	const { spiritCanvas, cmpCount, setCmpCount ,setAdjustNum,adjustNum} = useContext(globalContext)
-	const { style } = props
-	const addToSpirits = (imgSrc: string) => () => {
-	spiritCanvas.addImage(imgSrc, cmpCount)
-	setCmpCount(cmpCount + 1)
-	setAdjustNum(adjustNum+1)
-	}
+  const { props } = menu.children.filter((child) => child.desc === 'img')[0]
+  const { spiritCanvas, cmpCount, setCmpCount, setAdjustNum, adjustNum } =
+    useContext(globalContext)
+  const { style } = props
+  const addToSpirits = (imgSrc: string) => () => {
+    spiritCanvas.addImage(imgSrc, cmpCount)
+    setCmpCount(cmpCount + 1)
+    setAdjustNum(adjustNum + 1)
+  }
   return (
     //<div className="w-1/12">
     //{imgs.map((img, index) => {

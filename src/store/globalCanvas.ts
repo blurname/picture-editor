@@ -117,7 +117,9 @@ export class SpiritCanvas {
     if (uniqueProps) {
       spirit.updateFromRemote(uniqueProps as ImageProps, 'UniqueProps')
     }
+		console.log('addImage:', spirit)
     this.spirits[id] = spirit
+		//console.log(this.spirits[id])
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
     )

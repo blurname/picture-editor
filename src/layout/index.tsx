@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom'
 import { Content } from 'antd/lib/layout/layout'
 import Sider from 'antd/lib/layout/Sider'
 console.log('canvaseditor')
-export function CanvasEditor() {
+export function Layout() {
   const { id } = useParams()
   const [cmpCount, setCmpCount] = useState(0)
   const [selectNum, setSelectNum] = useState(-1)

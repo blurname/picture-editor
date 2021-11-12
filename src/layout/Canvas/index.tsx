@@ -255,7 +255,7 @@ export function Canvas(props: Props) {
       }
       setTimeout(() => {
         renderAll()
-      }, 500)
+      }, 1000)
     } else {
       console.log('addBackground')
     }

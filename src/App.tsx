@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import './App.css'
 import layer, { Content, Footer, Header } from 'antd/lib/layout/layout'
 import { Boxes } from './layout/Boxes'
-import { CanvasEditor } from './layout/CanvasEditor'
+import { Layout } from './layout'
 function App() {
   return (
     <div className="App h-full">
@@ -12,7 +12,7 @@ function App() {
         </Header>
         <Router>
           <Route exact path="/canvas/:id">
-            <CanvasEditor />
+            <Layout />
           </Route>
           <Route exact path="/">
             <Boxes />
