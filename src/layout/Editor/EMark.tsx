@@ -5,9 +5,11 @@ import React, {
   MouseEventHandler,
   SetStateAction,
   useContext,
+	useEffect,
+	useState,
 } from 'react'
 import { globalContext } from '../../context'
-import { MarkSpirit } from '../../utils/gl-uitls'
+import { BeamSpirit, MarkSpirit } from '../../utils/gl-uitls'
 import { editorSchema } from './editorSchema'
 type Props = {
   commitToHistory: () => void
@@ -54,6 +56,16 @@ export function EMark(props: Props) {
       setAdjustNum(adjustNum + 1)
       setValue(color)
     }
+
+	const [curSpirit, setCurSpirit] = useState<BeamSpirit>(spiritCanvas.spirits[selectNum]);
+	useEffect(() => {
+		setCurSpirit(spiritCanvas.spirits[selectNum])
+		console.log('rgb',curSpirit.getUniqueProps()['uColor'][RGB['R']] )
+		console.log('color',curSpirit.getUniqueProps()['uColor'][RGB['R']] )
+		console.log('color',curSpirit.getUniqueProps()['uColor'][RGB['G']] )
+		console.log('color',curSpirit.getUniqueProps()['uColor'][RGB['B']] )
+
+		}, [selectNum]);
   const color = editorSchema.children[2]
   return (
     <>
@@ -66,7 +78,7 @@ export function EMark(props: Props) {
                 step={cur.props.step}
                 min={cur.props.range.min}
                 max={cur.props.range.max}
-                defaultValue={cur.props.value}
+                value={curSpirit.getUniqueProps()['uColor'][RGB[cur.desc]]*255}
                 onInput={onChangeRGB(cur.desc, 'uColor')}
                 onMouseUp={commitToHistory}
                 onMouseDown={storeOld('uColor')}

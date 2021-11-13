@@ -53,7 +53,7 @@ export function Canvas(props: Props) {
   let canvas: CanvasPos = {
     width: 1300,
     height: 900,
-    left: 400,
+    left: 300,
     top: 150,
   }
   const [images, setImages] = useState([] as BeamSpirit[])

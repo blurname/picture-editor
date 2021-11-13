@@ -20,7 +20,6 @@ const marks: MarkType[] = [
   { id: 4, value: 'theW' },
 ]
 export function Mark() {
-  const { props } = menu.children.filter((child) => child.desc === 'mark')[0]
   const { spiritCanvas, cmpCount, setCmpCount } = useContext(globalContext)
   const addMark = (shape: Shape) => () => {
     spiritCanvas.addMark(shape, cmpCount)

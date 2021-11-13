@@ -2,9 +2,6 @@ import { Button } from 'antd'
 import React, {
   useState,
   useContext,
-  useEffect,
-  useCallback,
-  useMemo,
 } from 'react'
 import { globalContext } from '../../context'
 import { menu } from './menuSchema'

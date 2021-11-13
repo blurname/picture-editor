@@ -1,6 +1,7 @@
-import { Button, Input, Slider } from 'antd'
-import React, { ChangeEvent, Dispatch, SetStateAction, useContext } from 'react'
+import { Input, Slider } from 'antd'
+import React, { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
 import { globalContext } from '../../context'
+import {BeamSpirit} from '../../utils/gl-uitls'
 import { editorSchema } from './editorSchema'
 type Props = {
   resetValue: (desc: string) => () => void
@@ -22,9 +23,7 @@ export function EAffine(props: Props) {
   } = props
   const { spiritCanvas, selectNum } = useContext(globalContext)
   const shaping = editorSchema.children[0]
-
   const onLayerChange = (value: number) => {
-    //console.log('layerold',spiritCanvas.spirits[selectNum].getModel()])
     setOld(spiritCanvas.spirits[selectNum].getModel()['layer'])
     spiritCanvas.spirits[selectNum].updateModel({ layer: 1 - value })
     setValue(value)
@@ -33,6 +32,10 @@ export function EAffine(props: Props) {
   const afterLayerChage = () => {
     commitToHistory()
   }
+	const [curSpirit, setCurSpirit] = useState<BeamSpirit>(spiritCanvas.spirits[selectNum]);
+	useEffect(() => {
+		setCurSpirit(spiritCanvas.spirits[selectNum])
+		}, [selectNum]);
   return (
     <div>
       {shaping.children.map((cur, index) => {
@@ -44,7 +47,7 @@ export function EAffine(props: Props) {
               max={cur.props.range.max}
               step={cur.props.step}
               marks={cur.props.marks}
-              defaultValue={cur.props.value}
+              value={1-curSpirit.getlayer()}
               onChange={onLayerChange}
               onAfterChange={afterLayerChage}
             ></Slider>
@@ -57,7 +60,7 @@ export function EAffine(props: Props) {
               step={cur.props.step}
               min={cur.props.range.min}
               max={cur.props.range.max}
-              defaultValue={cur.props.value}
+              value={curSpirit.getModel()[cur.desc]}
               onInput={onChangeInput(cur.desc)}
               id={cur.desc}
               onMouseUp={commitToHistory}
