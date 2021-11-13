@@ -1,3 +1,32 @@
+const color = {
+  desc: 'color',
+  children: [
+    {
+      desc: 'R',
+      props: {
+        value: 0,
+        range: { min: 0, max: 255 },
+        step: 1,
+      },
+    },
+    {
+      desc: 'G',
+      props: {
+        value: 0,
+        range: { min: 0, max: 255 },
+        step: 1,
+      },
+    },
+    {
+      desc: 'B',
+      props: {
+        value: 0,
+        range: { min: 0, max: 255 },
+        step: 1,
+      },
+    },
+  ],
+}
 export const editorSchema = {
   desc: 'editor',
   children: [
@@ -84,32 +113,23 @@ export const editorSchema = {
         },
       ],
     },
-		{
-			desc:'color',
-			children:[
-				{
-					desc:'R',
-					props:{
-						value:0,
-						range:{min:0,max:255},
-						step:1
-					}
-				},{
-					desc:'G',
-					props:{
-						value:0,
-						range:{min:0,max:255},
-						step:1
-					}
-				},{
-					desc:'B',
-					props:{
-						value:0,
-						range:{min:0,max:255},
-						step:1
-					}
-				}
-			]
-		}
+    color,
+  ],
+}
+export const shaderSchema = {
+  desc: 'shader',
+  children: [
+    {
+      desc: 'cell',
+      children: [
+        {
+          desc: 'rows',
+          props: {
+            range: { min: 2, max: 64 },
+            step: 1,
+          },
+        },
+      ],
+    },
   ],
 }

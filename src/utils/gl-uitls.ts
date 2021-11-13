@@ -797,12 +797,6 @@ export class BackImageSpirit extends BackgroundSpirit {
 export class BackNonImageSpirit extends BackgroundSpirit {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas, 0)
-    //this.uniforms = this.beam.resource(Uniforms,this.uniforms)
-    //this.shader = this.beam.shader(backCellShader)
-    //this.uniforms = this.beam.resource(Uniforms, {
-    //rows: 16,
-    //uColor:this.uColor
-    //})
   }
   updateUniform(uniform: string, value: number) {
     this.uniqueProps[uniform] = value
@@ -811,7 +805,8 @@ export class BackNonImageSpirit extends BackgroundSpirit {
   setShader(shader: any, uniforms: any) {
     this.shader = this.beam.shader(shader)
     this.uniforms = this.beam.resource(Uniforms, uniforms)
-    this.uniqueProps = this.uniforms as any
+    this.uniqueProps = this.uniforms.state as any
+		this.uniqueProps.id = 0
 		this.updateUniqueProps(uniforms)
   }
   updateUniqueProps(uniqueProps: object) {
@@ -820,20 +815,6 @@ export class BackNonImageSpirit extends BackgroundSpirit {
       this.updateUniform(key, element)
     }
   }
-
-  //setBackground(shader: any, uniforms: UniformsResource) {
-    ////this.shader = this.beam.shader(shader)
-    //this.uniforms = this.beam.resource(Uniforms, uniforms)
-    //this.shader = this.beam.shader(backCellShader)
-    //this.uniforms = this.beam.resource(Uniforms, {
-      //rows: 16,
-      //uColor: this.uColor,
-    //})
-    //this.uniqueProps = {
-      //id: this.id,
-      //uColor: this.uColor,
-    //}
-  //}
 }
 const fUpdateGuidRect = <T>(
   fn: (base: T, offset: Pos, scale: number) => Rect,

@@ -147,7 +147,12 @@ export function Editor() {
         )}
         {spiritCanvas?.chosenType === 'Background' && (
           <CollapsePanel header="Background" key="4">
-            <EBack />
+            <EBack
+						setValue={setValue}
+              commitToHistory={commitToHistory}
+              storeOld={storeOld}
+              onChangeInput={onChangeInput}
+            />
           </CollapsePanel>
         )}
       </Collapse>

@@ -95,7 +95,7 @@ export class SpiritCanvas {
       else if (typeId === 3)
         this.addMosaic(element as MosaicType, model.id, true, model)
       else if (typeId === 4) {
-        this.addBackground(element, 'backNonImage', true)
+        this.addBackground(element, 'backNonImage', true,uniqueProps)
       }else if(typeId===5){
         this.addBackground(element, 'backImage', true)
 			}
@@ -170,11 +170,13 @@ export class SpiritCanvas {
     element: string,
     type:keyof Pick<typeof eSpiType,'backNonImage'|'backImage'> ,
     exist: boolean = false,
+    uniqueProps?: Partial<UniqueProps>,
   ) {
     let background: BackNonImageSpirit|BackImageSpirit
     if (type ==='backNonImage'){
       background = new BackNonImageSpirit(this.canvas3d) 
 			;(background as BackNonImageSpirit).setShader(backShader[element],backUniforms[element] )
+			background.updateUniqueProps(uniqueProps)
     }
     else  {
       const image = (await loadImage(element)) as HTMLImageElement

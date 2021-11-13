@@ -60,11 +60,6 @@ export function EMark(props: Props) {
 	const [curSpirit, setCurSpirit] = useState<BeamSpirit>(spiritCanvas.spirits[selectNum]);
 	useEffect(() => {
 		setCurSpirit(spiritCanvas.spirits[selectNum])
-		console.log('rgb',curSpirit.getUniqueProps()['uColor'][RGB['R']] )
-		console.log('color',curSpirit.getUniqueProps()['uColor'][RGB['R']] )
-		console.log('color',curSpirit.getUniqueProps()['uColor'][RGB['G']] )
-		console.log('color',curSpirit.getUniqueProps()['uColor'][RGB['B']] )
-
 		}, [selectNum]);
   const color = editorSchema.children[2]
   return (
