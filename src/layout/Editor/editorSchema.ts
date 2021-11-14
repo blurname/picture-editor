@@ -129,7 +129,13 @@ export const shaderSchema = {
             step: 1,
           },
         },
+...color.children
       ],
+    },
+    {
+      desc: 'pure',
+      children: [
+				...color.children],
     },
   ],
 }

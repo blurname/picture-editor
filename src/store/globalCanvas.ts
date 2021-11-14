@@ -175,7 +175,9 @@ export class SpiritCanvas {
     let background: BackNonImageSpirit|BackImageSpirit
     if (type ==='backNonImage'){
       background = new BackNonImageSpirit(this.canvas3d) 
-			;(background as BackNonImageSpirit).setShader(backShader[element],backUniforms[element] )
+			console.log('backShader:',backUniforms[element])
+			;(background as BackNonImageSpirit).setShaderName(element)
+			;(background as BackNonImageSpirit).setShader(backShader[element],JSON.parse(JSON.stringify(backUniforms[element])) )
 			background.updateUniqueProps(uniqueProps)
     }
     else  {

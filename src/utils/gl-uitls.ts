@@ -778,6 +778,7 @@ export class BackImageSpirit extends BackgroundSpirit {
   image: HTMLImageElement
   constructor(canvas: HTMLCanvasElement, image: HTMLImageElement) {
     super(canvas, 0)
+		this.backType = 'image'
     this.shader = this.beam.shader(backImageShader)
     this.textures = this.beam.resource(Textures)
     this.image = image
@@ -795,13 +796,22 @@ export class BackImageSpirit extends BackgroundSpirit {
   }
 }
 export class BackNonImageSpirit extends BackgroundSpirit {
+	shaderName:string
   constructor(canvas: HTMLCanvasElement) {
     super(canvas, 0)
+		this.backType = 'nonImage'
+		this.spiritType = 'BackNonImage'
   }
   updateUniform(uniform: string, value: number) {
     this.uniqueProps[uniform] = value
     this.uniforms.set(uniform, value)
   }
+	setShaderName(shaderName:string){
+		this.shaderName = shaderName
+	}
+	getShaderName(){
+		return this.shaderName
+	}
   setShader(shader: any, uniforms: any) {
     this.shader = this.beam.shader(shader)
     this.uniforms = this.beam.resource(Uniforms, uniforms)

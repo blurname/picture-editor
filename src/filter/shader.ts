@@ -228,18 +228,26 @@ const backgroundVS = `
 		vTexCoord = texCoord;
 	}
 `
+const backPureFS = `
+	precision highp float;
+	varying vec2 vTexCoord;
+	uniform vec4 uColor;
+	void main(){
+		gl_FragColor.rgba = uColor;
+	}
+`
 const backCellFS = `
 	precision highp float;
 	varying vec2 vTexCoord;
 	uniform float rows;
-	uniform vec3 uColor;
+	uniform vec4 uColor;
 	void main(){
 		vec2 st = fract(vTexCoord*rows);
 		float d1 = step(st.x,0.9);
 		float d2 = step(0.1,st.y);
 
 		gl_FragColor.rgb = mix(vec3(uColor.r,uColor.g,uColor.b),vec3(1.0),d1*d2);
-		gl_FragColor.a = 1.0;
+		gl_FragColor.a = uColor.a;
 	}
 `
 
@@ -252,6 +260,17 @@ void main(){
 	gl_FragColor = texture2D(img,vTexCoord);
 }
 `
+export const backPureShader = {
+  vs: backgroundVS,
+  fs: backPureFS,
+  buffers: {
+    position: { type: vec4, n: 2 },
+		texCoord: { type: vec2 },
+  },
+  uniforms: {
+    uColor: { type: vec4 },
+  },
+}
 export const backCellShader = {
   vs: backgroundVS,
   fs: backCellFS,
@@ -261,7 +280,7 @@ export const backCellShader = {
   },
   uniforms: {
     rows: { type: float },
-    uColor: { type: vec3 },
+    uColor: { type: vec4 },
   },
 }
 export const backImageShader = {

@@ -2,6 +2,7 @@ import { Button, Collapse } from 'antd'
 import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
 import React, { ChangeEvent, useContext, useState } from 'react'
 import { globalContext } from '../../context'
+import { BeamSpirit } from '../../utils/gl-uitls'
 import { EAffine } from './EAffine'
 import { EBack } from './EBack'
 import { EImage } from './EImage'
@@ -36,24 +37,34 @@ export function Editor() {
     console.log('descStoreOld:', chosen.getUniqueProps())
   }
   const onChangeInput =
-    (desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
+    (desc: string, func?: (a:any,b:any) => void) =>
+    (e: ChangeEvent<HTMLInputElement>) => {
       const curValue = parseFloat(e.target.value)
-      updateValue(desc, curValue)
+      if (func) {
+        updateValue(desc, curValue, func)
+      } else {
+        updateValue(desc, curValue)
+      }
     }
 
   const resetValue = (desc: string) => () => {
     updateValue(desc, 0.00001)
   }
-  const updateValue = (desc: string, curValue: number) => {
+  const updateValue = (
+    desc: string,
+    curValue: number,
+    func?: (a:any,b:any) => void,
+  ) => {
     let chosen = spiritCanvas.spirits[selectNum]
-    if (desc === 'rotate' || desc === 'scale') {
+    if (func) {
+      func(desc,curValue)
+    } else if (desc === 'rotate' || desc === 'scale') {
       chosen.updateModel({ [desc]: curValue })
     } else {
       chosen.updateUniqueProps({ [desc]: curValue })
     }
     setAdjustNum(adjustNum + 1)
     setValue(curValue)
-    return
   }
   const commitToHistory = () => {
     const chosen = spiritCanvas.spirits[selectNum]
@@ -145,10 +156,10 @@ export function Editor() {
             />
           </CollapsePanel>
         )}
-        {spiritCanvas?.chosenType === 'Background' && (
+        {spiritCanvas?.chosenType === 'BackNonImage' && (
           <CollapsePanel header="Background" key="4">
             <EBack
-						setValue={setValue}
+              setValue={setValue}
               commitToHistory={commitToHistory}
               storeOld={storeOld}
               onChangeInput={onChangeInput}

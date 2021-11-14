@@ -33,6 +33,7 @@ export function Background() {
     <div className="w-1/12">
       <Button onClick={onChangeBackNonImage('cell')}>cell_back</Button>
       <Button onClick={onChangeBackImage(imgUrl + 'back1.jpg')}>back1</Button>
+      <Button onClick={onChangeBackNonImage('pure')}>pure_back</Button>
     </div>
   )
 }

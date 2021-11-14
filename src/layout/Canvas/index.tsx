@@ -158,7 +158,7 @@ export function Canvas(props: Props) {
     }
 		else{
 		setSelectNum(0)
-		spiritCanvas.setChosenType('Background')
+		spiritCanvas.setChosenType(images[0].getSpiritType())
 		}
   }
 
@@ -261,8 +261,8 @@ export function Canvas(props: Props) {
   }, [initImages])
   useEffect(() => {
     if (localInit) {
-      //spiritCanvas.addBackground(0)
-      //setCmpCount(cmpCount + 1)
+			spiritCanvas.addBackground('pure','backNonImage')
+			setCmpCount(cmpCount + 1)
     }
   }, [localInit])
 
