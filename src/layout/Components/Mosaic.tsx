@@ -1,28 +1,24 @@
-import { Button } from 'antd'
+import { Button, List } from 'antd'
 import React, {
   useState,
   useContext,
 } from 'react'
 import { globalContext } from '../../context'
+import {imgUrl} from './Img'
 import { menu } from './menuSchema'
 type Mosaic = {
   id: number
   value: MosaicType
+	imgUrl:string
 }
 const mosaics: Mosaic[] = [
   {
     id: 1,
     value: 'multi',
+		imgUrl:imgUrl+'scr-multi.png'
   },
-  //{
-    //id: 2,
-    //value: 'fract',
-  //},
 ]
 export function Mosaic() {
-  //const { props } = menu.children.filter((child) => {
-    //child.desc === 'mosaic'
-  //})[0]
 
   const { spiritCanvas, cmpCount, setCmpCount } = useContext(globalContext)
   const addMosaic = (type: MosaicType) => () => {
@@ -30,14 +26,26 @@ export function Mosaic() {
     setCmpCount(cmpCount + 1)
   }
   return (
-    <div className="w-1/12">
-      {mosaics.map((mosaic, index) => {
-        return (
-          <div className="auto mb-6" key={mosaic.id}>
-            <Button onClick={addMosaic(mosaic.value)}>{mosaic.value}</Button>
+    <List
+      itemLayout="vertical"
+      size="small"
+      dataSource={mosaics}
+      renderItem={(img, index) => (
+        <List.Item key={index}>
+          <div className="w-24 mb-6" onClick={addMosaic(img.value)}>
+            <img className="" src={img.imgUrl} />
           </div>
-        )
-      })}
-    </div>
+        </List.Item>
+      )}
+    />
   )
 }
+    //<div className="w-1/12">
+      //{mosaics.map((mosaic, index) => {
+        //return (
+          //<div className="auto mb-6" key={mosaic.id}>
+            //<Button onClick={addMosaic(mosaic.value)}>{mosaic.value}</Button>
+          //</div>
+        //)
+      //})}
+    //</div>

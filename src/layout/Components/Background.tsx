@@ -1,39 +1,71 @@
-import { Button } from 'antd'
-import React, {
-  useContext,
-} from 'react'
+import { Button, List } from 'antd'
+import React, { useContext } from 'react'
 import { globalContext } from '../../context'
-import {imgUrl} from './Img'
+import { imgUrl } from './Img'
 type Mosaic = {
   id: number
-  value: MosaicType
+  value: string
+  imgUrl: string
+  type: 'nonImage' | 'image'
 }
-const mosaics: Mosaic[] = [
+const backs: Mosaic[] = [
   {
     id: 1,
-    value: 'multi',
+    value: 'cell',
+    imgUrl: imgUrl + 'scr-cell.png',
+    type: 'nonImage',
   },
-  //{
-    //id: 2,
-    //value: 'fract',
-  //},
+  {
+    id: 2,
+    value: 'pure',
+    imgUrl: imgUrl + 'scr-pure.png',
+    type: 'nonImage',
+  },
+  {
+    id: 3,
+    value: 'back1',
+    imgUrl: imgUrl + 'back1.jpg',
+    type: 'image',
+  },
 ]
 export function Background() {
   const { spiritCanvas, setAdjustNum, adjustNum } = useContext(globalContext)
 
   const onChangeBackNonImage = (shaderName: string) => () => {
-    spiritCanvas.addBackground(shaderName, 'backNonImage',true)
+    spiritCanvas.addBackground(shaderName, 'backNonImage', true)
     setAdjustNum(adjustNum + 1)
   }
   const onChangeBackImage = (imgUrl: string) => async () => {
-    await spiritCanvas.addBackground(imgUrl, 'backImage',true)
+    await spiritCanvas.addBackground(imgUrl, 'backImage', true)
     setAdjustNum(adjustNum + 1)
   }
   return (
-    <div className="w-1/12">
-      <Button onClick={onChangeBackNonImage('cell')}>cell_back</Button>
-      <Button onClick={onChangeBackImage(imgUrl + 'back1.jpg')}>back1</Button>
-      <Button onClick={onChangeBackNonImage('pure')}>pure_back</Button>
-    </div>
+    <List
+      itemLayout="vertical"
+      size="small"
+      dataSource={backs}
+      renderItem={(img, index) => {
+        if (img.type === 'nonImage') {
+          return (
+            <List.Item key={index}>
+              <div
+                className="w-24 mb-6"
+                onClick={onChangeBackNonImage(img.value)}
+              >
+                <img className="" src={img.imgUrl} />
+              </div>
+            </List.Item>
+          )
+        } else {
+          return (
+            <List.Item key={index}>
+              <div className="w-24 mb-6" onClick={onChangeBackImage(img.value)}>
+                <img className="" src={img.imgUrl} />
+              </div>
+            </List.Item>
+          )
+        }
+      }}
+    />
   )
 }

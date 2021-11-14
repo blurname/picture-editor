@@ -47,19 +47,6 @@ export function Img() {
     setAdjustNum(adjustNum + 1)
   }
   return (
-    //<div className="w-1/12">
-    //{imgs.map((img, index) => {
-    //return (
-    //<div
-    //className="auto mb-6"
-    //onClick={addToSpirits(img.value)}
-    //key={index}
-    //>
-    //<img className="" src={img.value} />
-    //</div>
-    //)
-    //})}
-    //</div>
     <List
       itemLayout="vertical"
       size="small"

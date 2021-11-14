@@ -1,24 +1,31 @@
-import { Button } from 'antd'
+import { Button, List } from 'antd'
 import React, { useContext } from 'react'
 import { globalContext } from '../../context'
+import { imgUrl } from './Img'
 import { menu } from './menuSchema'
 
 type MarkType = {
   id: number
   value: Shape
+  imgUrl: string
 }
 const marks: MarkType[] = [
   {
     id: 1,
     value: 'line',
+    imgUrl: imgUrl + 'scr-line.png',
   },
   {
     id: 2,
     value: 'hollowRect',
+    imgUrl: imgUrl + 'scr-hollowrect.png',
   },
-  { id: 3, value: 'circle' },
-  { id: 4, value: 'theW' },
+  { id: 3, value: 'circle',
+
+    imgUrl: imgUrl + 'scr-circle.png',
+	},
 ]
+
 export function Mark() {
   const { spiritCanvas, cmpCount, setCmpCount } = useContext(globalContext)
   const addMark = (shape: Shape) => () => {
@@ -26,14 +33,26 @@ export function Mark() {
     setCmpCount(cmpCount + 1)
   }
   return (
-    <div className="">
-      {marks.map((mark, index) => {
-        return (
-          <div className="w-1/12 mb-6" key={mark.id}>
-            <Button onClick={addMark(mark.value)}>{mark.value}</Button>
+    <List
+      itemLayout="vertical"
+      size="small"
+      dataSource={marks}
+      renderItem={(img, index) => (
+        <List.Item key={index}>
+          <div className="w-24 mb-6" onClick={addMark(img.value)}>
+            <img className="" src={img.imgUrl} />
           </div>
-        )
-      })}
-    </div>
+        </List.Item>
+      )}
+    />
   )
 }
+    //<div className="">
+      //{marks.map((mark, index) => {
+        //return (
+          //<div className="w-1/12 mb-6" key={mark.id}>
+            //<Button onClick={addMark(mark.value)}>{mark.value}</Button>
+          //</div>
+        //)
+      //})}
+    //</div>
