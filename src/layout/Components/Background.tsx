@@ -26,7 +26,7 @@ export function Background() {
     setAdjustNum(adjustNum + 1)
   }
   const onChangeBackImage = (imgUrl: string) => async () => {
-    spiritCanvas.addBackground(imgUrl, 'backImage',true)
+    await spiritCanvas.addBackground(imgUrl, 'backImage',true)
     setAdjustNum(adjustNum + 1)
   }
   return (
