@@ -51,8 +51,8 @@ export function Canvas(props: Props) {
     operationHistory,
   } = useContext(globalContext)
   let canvas: CanvasPos = {
-    width: 500,
-    height: 500,
+    width: 1300,
+    height: 900,
     left: 300,
     top: 150,
   }

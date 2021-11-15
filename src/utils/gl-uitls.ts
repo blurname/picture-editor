@@ -19,6 +19,7 @@ import {
   MosaicMultiShader,
   MonolithicShader,
   backImageShader,
+	MosaicFracShader,
 } from '../filter/shader'
 import { loadImage } from '../store/globalCanvas'
 import { depthCommand, Offscreen2DCommand } from './command'
@@ -538,15 +539,15 @@ export class MosaicSpirit extends RectModel {
     let shader: any
     if (type === 'multi') {
       shader = MosaicMultiShader
-    }
+    } else if(type === 'frac'){
+			shader = MosaicFracShader
+		}
 
     return shader
   }
   getBuffersByShape(type: MosaicType): Buffers {
     let buffers: any
-    if (type === 'multi') {
-      buffers = createMosaic(300, 300)
-    }
+    buffers = createMosaic(300, 300)
     return buffers
   }
 

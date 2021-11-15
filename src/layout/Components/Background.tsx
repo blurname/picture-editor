@@ -23,7 +23,7 @@ const backs: Mosaic[] = [
   },
   {
     id: 3,
-    value: 'back1',
+    value: imgUrl+'back1.jpg',
     imgUrl: imgUrl + 'back1.jpg',
     type: 'image',
   },

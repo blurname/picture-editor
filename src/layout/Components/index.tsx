@@ -1,14 +1,14 @@
-import { Collapse, Tabs } from 'antd'
-import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
+import { Tabs } from 'antd'
 import React from 'react'
 import {Background} from './Background'
 import { Img } from './Img'
 import { Mark } from './Mark'
 import {Mosaic} from './Mosaic'
+import {SortingLayers} from './SortingLayers'
 const {TabPane} = Tabs
 export function Components() {
   return (
-	<Tabs className="flex-grow-0 bg-lime-50" tabPosition='left' size='small' tabBarStyle={{width:100}} type='card'>
+	<Tabs className="flex-grow-0 bg-blue-300" tabPosition='left' size='small' tabBarStyle={{width:100}} type='card'>
       <TabPane className="w-45"  tab="image" key="1">
         <Img />
       </TabPane>
@@ -20,6 +20,9 @@ export function Components() {
       </TabPane>
       <TabPane className="w-45" tab="background" key="4">
         <Background />
+      </TabPane>
+      <TabPane className="w-45" tab="layers" key="5">
+        <SortingLayers />
       </TabPane>
 	</Tabs>
   )

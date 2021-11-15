@@ -614,3 +614,35 @@ export const MosaicMultiShader = {
     layer: { type: float },
   },
 }
+
+const mosaicFracVS = `
+precision highp float;
+varying vec4 vTexCoord;
+
+float random (vec2 st) {
+	return fract(sin(dot(st.xy,
+											 vec2(12.9898,78.233)))*
+												 43758.5453123);
+}
+
+void main(){
+	vec2 st = vec2(vTexCoord.x,vTexCoord.y)*10.0;
+	gl_FragColor.rgb = vec3(fract(st.x),0.5,0.6);
+	gl_FragColor.a = 1.0;
+}
+`
+export const MosaicFracShader = {
+  vs: basicMosaicVS,
+  fs: mosaicFracVS,
+  buffers: {
+    position: { type: vec4, n: 2 },
+    texCoord: { type: vec4, n: 2 },
+  },
+  uniforms: {
+    transMat: { type: mat4 },
+    rotateMat: { type: mat4 },
+    scaleMat: { type: mat4 },
+    projectionMat: { type: mat4 },
+    layer: { type: float },
+  },
+}
