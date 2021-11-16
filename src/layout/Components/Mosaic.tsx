@@ -20,6 +20,10 @@ const mosaics: Mosaic[] = [
     id: 2,
     value: 'frac',
 		imgUrl:imgUrl+'scr-multi.png'
+  },{
+    id: 3,
+    value: 'snow',
+		imgUrl:imgUrl+'scr-multi.png'
   },
 ]
 export function Mosaic() {
@@ -37,6 +41,7 @@ export function Mosaic() {
       renderItem={(img, index) => (
         <List.Item key={index}>
           <div className="w-24 mb-6" onClick={addMosaic(img.value)}>
+						<h3>{img.value}</h3>
             <img className="" src={img.imgUrl} />
           </div>
         </List.Item>

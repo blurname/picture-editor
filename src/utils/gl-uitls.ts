@@ -20,6 +20,7 @@ import {
   MonolithicShader,
   backImageShader,
 	MosaicFracShader,
+	MosaicSnowShader,
 } from '../filter/shader'
 import { loadImage } from '../store/globalCanvas'
 import { depthCommand, Offscreen2DCommand } from './command'
@@ -541,8 +542,9 @@ export class MosaicSpirit extends RectModel {
       shader = MosaicMultiShader
     } else if(type === 'frac'){
 			shader = MosaicFracShader
+		} else if(type === 'snow'){
+			shader = MosaicSnowShader
 		}
-
     return shader
   }
   getBuffersByShape(type: MosaicType): Buffers {

@@ -631,9 +631,53 @@ void main(){
 	gl_FragColor.a = 1.0;
 }
 `
+
 export const MosaicFracShader = {
   vs: basicMosaicVS,
   fs: mosaicFracVS,
+  buffers: {
+    position: { type: vec4, n: 2 },
+    texCoord: { type: vec4, n: 2 },
+  },
+  uniforms: {
+    transMat: { type: mat4 },
+    rotateMat: { type: mat4 },
+    scaleMat: { type: mat4 },
+    projectionMat: { type: mat4 },
+    layer: { type: float },
+  },
+}
+
+const mosaicSnowVS = `
+precision highp float;
+varying vec4 vTexCoord;
+
+vec2 f(vec2 z, vec2 c) {
+	return mat2(z, -z.y, z.x) * z + c;
+}
+
+void main(){
+	vec2 st = vec2(vTexCoord.x,vTexCoord.y);
+	   vec2 c = vec2(0.0,0.0) + 4.0*(st - vec2(0.5)) / 1.0;
+		 vec2 z = vec2(0.0);
+		 bool escaped = false;
+		 int j;
+		 for (int i = 0; i < 65536; i++) {
+			 if(i > 256) break;
+			 j = i;
+			 z = f(z, c);
+			 if (length(z) > 2.0) {
+				 escaped = true;
+				 break;
+			 } 
+		 }
+			 gl_FragColor.rgb = escaped ? vec3(float(j)) / float(256) : vec3(0.5);
+			 gl_FragColor.a = 1.0;
+}
+`
+export const MosaicSnowShader = {
+  vs: basicMosaicVS,
+  fs: mosaicSnowVS,
   buffers: {
     position: { type: vec4, n: 2 },
     texCoord: { type: vec4, n: 2 },
