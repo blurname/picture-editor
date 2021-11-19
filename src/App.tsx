@@ -12,28 +12,29 @@ import { IFound } from './layout/User/IFound'
 import { IPaticipate } from './layout/User/IPaticipate'
 function App() {
   return (
-        <Router>
-    <div className="App h-full">
-      <Header className="bg-green-100">
-        {/* <h1 className="text-blue-gray-900 font-large">picture editor</h1> */}
-        <Head/>
-      </Header>
-      <div className="h-full">
+    <Router>
+      <div className="App h-full">
+        <Header className="bg-green-100">
+          {/* <h1 className="text-blue-gray-900 font-large">picture editor</h1> */}
+          <Head />
+        </Header>
+        <div className="h-full">
           <Routes>
-          {/* <Route  path="/canvas/:id"
+            {/* <Route  path="/canvas/:id"
             element ={<Layout />}/>
           <Route  path="/boxes"
             element = {<Boxes />}/>*/}
-          <Route  path="/signin" element={<Signin />}/> 
-          <Route  path="/signup" element={<Signup />}/> 
-          <Route  path="/usercenter" element={<Center/>} />
-          <Route path ='usercenter/ifound' element={<IFound/>} />
-          <Route path ='usercenter/ipaticipate' element={<IPaticipate/>} />
+            <Route path="/signin" element={<Signin />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/usercenter" element={<Center />}>
+              <Route path="ifound" element={<IFound />} />
+              <Route path="ipaticipate" element={<IPaticipate />} />
+            </Route>
           </Routes>
+        </div>
+        <Footer className="bg-green-200" />
       </div>
-      <Footer className="bg-green-200" />
-    </div>
-        </Router>
+    </Router>
   )
 }
 export default App

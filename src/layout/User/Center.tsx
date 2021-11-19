@@ -30,6 +30,7 @@ export function Center(){
       <Link to ='/usercenter/ipaticipate'>paticipate</Link>
       </Menu.Item>
     </Menu>
+    <hr />
     <Outlet/>
     </div>
     <div>
