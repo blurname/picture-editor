@@ -53,15 +53,13 @@ export const editorSchema = {
           desc: 'layer',
           props: {
             value: 0.1,
-            range: { min: 0.1, max: 0.7 },
+            range: { min: 0.3, max: 0.7 },
             marks: {
               0.7: 7,
               0.6: 6,
               0.5: 5,
               0.4: 4,
               0.3: 3,
-              0.2: 2,
-              0.1: 1,
             },
             step: null,
           },
