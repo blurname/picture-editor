@@ -9,7 +9,7 @@ import React, {
   ChangeEvent,
 } from 'react'
 import useSWR from 'swr'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ax, baseUrl, createCanvas, getSpirits } from '../../utils/http'
 import { createW } from '../../utils/geo-utils'
 const fetcher = (url: string) => fetch(url, {}).then((res) => res.json())
@@ -22,12 +22,13 @@ type CanvasDB = {
 export function Boxes() {
   const { data, error } = useSWR(url, fetcher)
   const [file, setFile] = useState({} as File)
-  const history = useHistory()
+	const navi = useNavigate()
   if (!data) return <div>loading</div>
   //console.log(JSON.parse(data) )
-  const goCanvas = (id: number) => () => {
-    history.push(`/canvas/${id}`)
-  }
+	const goCanvas = (id: number) => () => {
+		//history.push(`/canvas/${id}`)
+		navi(`/canvas/${id}`)
+	}
   const createNewCanvas = async () => {
     const id = await createCanvas(24)
     goCanvas(id)()
