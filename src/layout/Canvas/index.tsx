@@ -9,6 +9,7 @@ import React, {
 import { globalContext } from '../../context'
 import {
   clearRectBorder,
+  drawNames,
   drawRectBorder,
   getCursorIsInQuad,
   getCursorMovDistance,
@@ -63,7 +64,7 @@ export function Canvas(props: Props) {
   const [initComplete, setInitComplete] = useState(false)
   const [localInit, setLocalInit] = useState(false)
   const [renderAll] = useRenderAll(spiritCanvas.spirits)
-	const socket = useSocket(wsbaseUrl,spiritCanvas.id,24)
+	//const socket = useSocket(wsbaseUrl,spiritCanvas.id,24)
 
 
   let isMoveable = false
@@ -94,7 +95,7 @@ export function Canvas(props: Props) {
   const handleOnMouseMove = (e: MouseEvent) => {
     if (curImage===0 || !isMoveable || zoomable) return
     e.preventDefault()
-    canvas3dRef.current.style.cursor = 'move'
+    canvas2dRef.current.style.cursor = 'move'
     //const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     //const result = getCursorIsInQuad(
       //{ x: cursorPos.left, y: cursorPos.top },
@@ -111,6 +112,7 @@ export function Canvas(props: Props) {
         images[i].render()
         if (curImage === i) {
           drawRectBorder(canvas2dRef.current, images[curImage].getGuidRect())
+					drawNames(canvas2dRef.current,images[curImage].getGuidRect(),{id:31,name:'baolei'})
           //if (!zoomable && !isMoveable)
           //spiritCanvas.setChosenType(images[curImage].getSpiritType())
         }
@@ -144,12 +146,13 @@ export function Canvas(props: Props) {
       setSelectNum(curImage)
       spiritCanvas.setChosenType(images[curImage].getSpiritType())
       drawRectBorder(canvas2dRef.current, images[cur].getGuidRect())
+			drawNames(canvas2dRef.current,images[curImage].getGuidRect(),{id:31,name:'baolei'})
       if (zoomable && images[curImage].getSpiritType() === 'Image') {
         const image = images[curImage] as ImageSpirit
         if (image.isZoomed) {
-          canvas3dRef.current.style.cursor = 'zoom-in'
+          canvas2dRef.current.style.cursor = 'zoom-in'
         } else {
-          canvas3dRef.current.style.cursor = 'zoom-out'
+          canvas2dRef.current.style.cursor = 'zoom-out'
         }
         image.zoom({ x: cursorPos.left, y: cursorPos.top })
         return
@@ -157,7 +160,7 @@ export function Canvas(props: Props) {
       isMoveable = true
       //setIsMoveable(true)
       oldPos = images[curImage].getPos()
-      canvas3dRef.current.style.cursor = 'move'
+      canvas2dRef.current.style.cursor = 'move'
     }
 		else{
 		setSelectNum(0)
@@ -180,7 +183,7 @@ export function Canvas(props: Props) {
     }
     //operationHistory.commit(s, from, wto)
     //console.log('images.length:' + images.length)
-    if (!zoomable) canvas3dRef.current.style.cursor = 'default'
+    if (!zoomable) canvas2dRef.current.style.cursor = 'default'
     renderAll()
     setAdjustNum(adjustNum + 1)
   }
@@ -276,8 +279,8 @@ export function Canvas(props: Props) {
   }, [initComplete])
 
   useEffect(() => {
-    if (zoomable) canvas3dRef.current.style.cursor = 'zoom-in'
-    else canvas3dRef.current.style.cursor = 'default'
+    if (zoomable) canvas2dRef.current.style.cursor = 'zoom-in'
+    else canvas2dRef.current.style.cursor = 'default'
   }, [zoomable])
 
   useEffect(() => {
@@ -304,15 +307,19 @@ export function Canvas(props: Props) {
         redo
       </Button>
       <canvas
-        className="bg-gray-100"
+        className="bg-grey-100"
         ref={canvas2dRef}
         style={{
           top: canvas.top,
           left: canvas.left,
           position: 'absolute',
+					zIndex:2
         }}
         width={canvas.width}
         height={canvas.height}
+        onMouseUp={thandleOnMouseUp}
+        onMouseMove={handleOnMouseMove}
+        onMouseDown={handleOnMouseDown}
       />
       <canvas
         className=""
@@ -321,12 +328,10 @@ export function Canvas(props: Props) {
           top: canvas.top,
           left: canvas.left,
           position: 'absolute',
+					zIndex:1
         }}
         width={canvas.width}
         height={canvas.height}
-        onMouseUp={thandleOnMouseUp}
-        onMouseMove={handleOnMouseMove}
-        onMouseDown={handleOnMouseDown}
       />
     </div>
   )

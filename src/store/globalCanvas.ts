@@ -237,6 +237,9 @@ export class SpiritCanvas {
       //console.log('renderLine:' + index)
     }
   }
+	renderNames(){
+
+	}
   setBackgournd(back: BackgroundSpirit) {
     this.background = back
   }

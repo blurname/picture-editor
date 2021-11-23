@@ -22,6 +22,7 @@ import {
 	MosaicFracShader,
 	MosaicSnowShader,
 } from '../filter/shader'
+import {User} from '../hooks/useUsers'
 import { loadImage } from '../store/globalCanvas'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {
@@ -742,6 +743,15 @@ export class GuidLine {
     return this.id
   }
 }
+export class userNames {
+	beam:Beam
+	user:User
+	canvas:HTMLCanvasElement
+	constructor (canvas:HTMLCanvasElement,user:User) {
+		this.canvas = canvas
+		this.user = user
+	}
+}
 export class BackgroundSpirit extends BeamSpirit {
   uColor: number[]
   backShader: object
@@ -767,6 +777,7 @@ export class BackgroundSpirit extends BeamSpirit {
 
   render() {
     this.beam
+		.clear()
       .depth()
       .draw(
         this.shader,
@@ -789,6 +800,7 @@ export class BackImageSpirit extends BackgroundSpirit {
   }
   render() {
     this.beam
+		.clear()
       .depth()
       .draw(
         this.shader,
