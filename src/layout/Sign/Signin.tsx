@@ -7,8 +7,8 @@ import {ax, baseUrl} from '../../utils/http'
 const signUpUrl = baseUrl+'/signup' 
 export function Signin() {
   const {setUserId }= useContext(userContext)
-  const [name, setName] = useState('')
-  const [passwd, setPasswd] = useState('')
+  const [name, setName] = useState('a')
+  const [passwd, setPasswd] = useState('a')
 	const navigate = useNavigate()
   const changeName = (e: ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value)
@@ -38,6 +38,7 @@ export function Signin() {
       <div>
         <input
           onChange={changeName}
+					defaultValue={name}
           className="bg-lime-300 w-lg h-30 text-8xl "
           type="text"
         />
@@ -45,6 +46,7 @@ export function Signin() {
       <div>
         <input
           onChange={changePasswd}
+					defaultValue={passwd}
           className="bg-cyan-300 w-lg h-30 text-8xl"
           type="text"
         />

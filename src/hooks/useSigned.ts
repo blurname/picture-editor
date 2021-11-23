@@ -7,11 +7,11 @@ export function useSigned() {
   //const userInfo:User =  await ax.get(
   //`/user/get_info_from_id/?id=${userId}`,
   //)
-  const { userId,setUserId } = useContext(userContext)
-  const [user, setUser] = useState<User>()
+  const { userId, setUserId } = useContext(userContext)
+  const [user, setUser] = useState<User>(undefined)
   const signout = () => {
     localStorage.clear()
-		setUserId(undefined)
+    setUserId(undefined)
     navigate('/signin')
     setUser(undefined)
   }
@@ -21,6 +21,7 @@ export function useSigned() {
     const name = localStorage.getItem(userId + '')
     const userInfo = { id: userId, name }
     setUser(userInfo)
+		console.log('setUser',user)
   }, [userId])
   return { user, signout }
 }

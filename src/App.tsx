@@ -29,7 +29,19 @@ function App() {
         </Header>
         <div className="h-full">
           <Routes>
-            <Route path="/canvas/:id" element={<Layout />} />
+            <Route
+              path="/canvas/:id"
+              element={
+                <userContext.Provider
+                  value={{
+                    userId,
+                    setUserId,
+                  }}
+                >
+                  <Layout />
+                </userContext.Provider>
+              }
+            />
             {/* <Route  path="/canvas/:id"
             element ={<Layout />}/>
           <Route  path="/boxes"

@@ -8,20 +8,20 @@ import {SortingLayers} from './SortingLayers'
 const {TabPane} = Tabs
 export function Components() {
   return (
-	<Tabs className="flex-grow-0 bg-blue-300" tabPosition='left' size='small' tabBarStyle={{width:100}} type='card'>
-      <TabPane className="w-45"  tab="image" key="1">
+	<Tabs className="flex-grow-0 bg-blue-gray-200" tabPosition='left' size='small' tabBarStyle={{width:100}} type='card'>
+      <TabPane className="w-45 h-30"  tab="image" key="1">
         <Img />
       </TabPane>
-      <TabPane className="w-45" tab="mark" key="2">
+      <TabPane className="w-45 h-30" tab="mark" key="2">
         <Mark />
       </TabPane>
-      <TabPane className="w-45" tab="mosaic" key="3">
+      <TabPane className="w-45 h-30" tab="mosaic" key="3">
         <Mosaic />
       </TabPane>
-      <TabPane className="w-45" tab="background" key="4">
+      <TabPane className="w-45 h-30" tab="background" key="4">
         <Background />
       </TabPane>
-      <TabPane className="w-45" tab="layers" key="5">
+      <TabPane className="w-45 h-30" tab="layers" key="5">
         <SortingLayers />
       </TabPane>
 	</Tabs>

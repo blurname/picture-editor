@@ -14,7 +14,9 @@ type CanvasDB = {
 export function Boxes() {
   const { id } = useParams()
   const [canvasUrl, setCanvasUrl] = useState(url + id)
+	console.log('userId:', id)
   const { data, error } = useSWR(canvasUrl, fetcher)
+	console.log(data)
   const [file, setFile] = useState({} as File)
   const navi = useNavigate()
   if (!data) return <div>loading</div>
