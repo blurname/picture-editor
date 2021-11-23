@@ -29,7 +29,6 @@ export function Signin() {
 			message.success('sign in successfully')
 			setUserId(user.id)
 			localStorage.setItem('userId', user.id+'')
-
 			localStorage.setItem(user.id+'', user.name)
 			navigate(`/boxes/${user.id}`)
 		}

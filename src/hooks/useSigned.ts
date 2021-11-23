@@ -1,32 +1,31 @@
 import React, { useState, useEffect, createFactory, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {userContext} from '../context'
+import { userContext } from '../context'
 import { ax } from '../utils/http'
 import { User } from './useUsers'
 export function useSigned() {
   //const userInfo:User =  await ax.get(
   //`/user/get_info_from_id/?id=${userId}`,
   //)
-	const {userId} = useContext(userContext)
-	const [lUserId, setLUserId] = useState();
-  const name = localStorage.getItem(lUserId)
-  const userInfo = { id: parseInt(lUserId), name }
-  const [user, setUser] = useState<User>(userInfo)
+  const { userId,setUserId } = useContext(userContext)
+  const [user, setUser] = useState<User>()
   const signout = () => {
     localStorage.clear()
+		setUserId(undefined)
     navigate('/signin')
     setUser(undefined)
   }
 
   const navigate = useNavigate()
-	useEffect(() => {
-		
-
-	}, [userId]);
-  return { user, signout,setLUserId }
+  useEffect(() => {
+    const name = localStorage.getItem(userId + '')
+    const userInfo = { id: userId, name }
+    setUser(userInfo)
+  }, [userId])
+  return { user, signout }
 }
 
-export function useUserId(){
-	const [userId, setUserId] = useState();
-
+export function useUserId() {
+  const [userId, setUserId] = useState()
 }
+
