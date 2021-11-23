@@ -23,9 +23,10 @@ import {
   MosaicSpirit,
   TheW,
 } from '../../utils/gl-uitls'
-import { getIsHavingSpirits, getSpirits } from '../../utils/http'
+import { baseUrl, getIsHavingSpirits, getSpirits, wsbaseUrl } from '../../utils/http'
 import { screenshot } from '../../utils/saveImage'
 import { useRenderAll } from '../../hooks/useRenderAll'
+import {useSocket} from '../../hooks/useSocket'
 
 type Props = {}
 type remoteModel = {
@@ -62,6 +63,8 @@ export function Canvas(props: Props) {
   const [initComplete, setInitComplete] = useState(false)
   const [localInit, setLocalInit] = useState(false)
   const [renderAll] = useRenderAll(spiritCanvas.spirits)
+	const socket = useSocket(wsbaseUrl,spiritCanvas.id,24)
+
 
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)

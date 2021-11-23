@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction} from 'react'
+import React, {createContext, Dispatch, SetStateAction} from 'react'
 import {OperationHistory, SpiritCanvas } from './store/globalCanvas'
 type globalCanvasType = {
 	spiritCanvas:SpiritCanvas
@@ -13,3 +13,8 @@ type globalCanvasType = {
   setAdjustNum: React.Dispatch<React.SetStateAction<number>>
 }
 export const globalContext = React.createContext({} as globalCanvasType)
+type userType={
+	userId:number
+	setUserId:Dispatch<SetStateAction<number>>
+}
+export const userContext = createContext({} as userType)

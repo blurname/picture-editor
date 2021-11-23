@@ -1,37 +1,31 @@
 import { Button, Card, Col, Row, Upload } from 'antd'
-import Meta from 'antd/lib/card/Meta'
-import React, {
-  useState,
-  useContext,
-  useEffect,
-  useCallback,
-  useMemo,
-  ChangeEvent,
-} from 'react'
+import React, { useState } from 'react'
 import useSWR from 'swr'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ax, baseUrl, createCanvas, getSpirits } from '../../utils/http'
 import { createW } from '../../utils/geo-utils'
 const fetcher = (url: string) => fetch(url, {}).then((res) => res.json())
-const url = 'http://localhost:30001/canvas/get/?ownerid=24'
+const url = baseUrl + '/canvas/get/?ownerid='
 type CanvasDB = {
   id: number
   owner_id: number
   create_at: number
 }
 export function Boxes() {
-  const { data, error } = useSWR(url, fetcher)
+  const { id } = useParams()
+  const [canvasUrl, setCanvasUrl] = useState(url + id)
+  const { data, error } = useSWR(canvasUrl, fetcher)
   const [file, setFile] = useState({} as File)
-	const navi = useNavigate()
+  const navi = useNavigate()
   if (!data) return <div>loading</div>
   //console.log(JSON.parse(data) )
-	const goCanvas = (id: number) => () => {
-		//history.push(`/canvas/${id}`)
-		navi(`/canvas/${id}`)
-	}
+  const goCanvas = (id: number) => () => {
+    //history.push(`/canvas/${id}`)
+    navi(`/canvas/${id}`)
+  }
   const createNewCanvas = async () => {
-    const id = await createCanvas(24)
-    goCanvas(id)()
+    const canvasId = await createCanvas(parseInt(id))
+    goCanvas(canvasId)()
   }
   const uploadFormData = () => {
     ax.post(baseUrl + '/image/formdata')
@@ -42,13 +36,13 @@ export function Boxes() {
   }
   const changeRaw = (e: any) => {
     setFile(e.target.files[0])
-		const img = new Image()
-		img.src = e.target.files[0]
-		console.log(img)
+    const img = new Image()
+    img.src = e.target.files[0]
+    console.log(img)
   }
   const uploadRaw = async () => {
     const form = new FormData()
-		//form.append('formImg', file)
+    //form.append('formImg', file)
     form.append('kkk', 'la;skjf;lasdjf;lkd')
     //ax.post(baseUrl + '/image/upload', form, {
     //headers: {
@@ -57,9 +51,9 @@ export function Boxes() {
     //})
     const res = await fetch(baseUrl + '/image/upload', {
       method: 'POST',
-			//headers: {
-				//'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-			//},
+      //headers: {
+      //'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      //},
       body: form,
     })
     console.log(res.text())
@@ -70,21 +64,21 @@ export function Boxes() {
       <Button type="primary" onClick={createNewCanvas}>
         new
       </Button>
-			<Button type="primary" onClick={() => getSpirits(829)}>
-				get
-			</Button>
-			<div>
-				<Upload {...uploadProps}>
-					<Button type="primary" onClick={() => getSpirits(829)}>
-						upload Imag
-					</Button>
-				</Upload>
-			</div>
-			<div>
-				<input onChange={changeRaw} type="file" />
-				<h3>{file.name}</h3>
-				<button onClick={uploadRaw}>upload raw</button>
-			</div>
+      <Button type="primary" onClick={() => getSpirits(829)}>
+        get
+      </Button>
+      <div>
+        <Upload {...uploadProps}>
+          <Button type="primary" onClick={() => getSpirits(829)}>
+            upload Imag
+          </Button>
+        </Upload>
+      </div>
+      <div>
+        <input onChange={changeRaw} type="file" />
+        <h3>{file.name}</h3>
+        <button onClick={uploadRaw}>upload raw</button>
+      </div>
       <Row>
         {canvases.map((item: CanvasDB, index: number) => (
           <Col span={8} key={index}>

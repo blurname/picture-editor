@@ -26,7 +26,7 @@ function App() {
             element ={<Layout />}/>
           <Route  path="/boxes"
             element = {<Boxes />}/>*/}
-						<Route path="/boxes" element={<Boxes/>}/>
+						<Route path="/boxes/:id" element={<Boxes/>}/>
             <Route path="/signin" element={<Signin />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/usercenter" element={<Center />}>
