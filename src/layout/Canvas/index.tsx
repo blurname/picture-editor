@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { globalContext } from '../../context'
+import { globalContext, userContext } from '../../context'
 import {
   clearRectBorder,
   drawNames,
@@ -28,6 +28,7 @@ import { baseUrl, getIsHavingSpirits, getSpirits, wsbaseUrl } from '../../utils/
 import { screenshot } from '../../utils/saveImage'
 import { useRenderAll } from '../../hooks/useRenderAll'
 import {useSocket} from '../../hooks/useSocket'
+import {useEmitControll} from '../../hooks/useEmitControll'
 
 type Props = {}
 type remoteModel = {
@@ -52,6 +53,7 @@ export function Canvas(props: Props) {
     zoomable,
     operationHistory,
   } = useContext(globalContext)
+	const {userId} = useContext(userContext)
   let canvas: CanvasPos = {
     width: 1300,
     height: 900,
@@ -64,7 +66,8 @@ export function Canvas(props: Props) {
   const [initComplete, setInitComplete] = useState(false)
   const [localInit, setLocalInit] = useState(false)
   const [renderAll] = useRenderAll(spiritCanvas.spirits)
-	//const socket = useSocket(wsbaseUrl,spiritCanvas.id,24)
+	const socket = useSocket(wsbaseUrl,spiritCanvas.id,userId)
+	useEmitControll(socket, userId, selectNum)
 
 
   let isMoveable = false

@@ -5,11 +5,15 @@ import React, {
   useCallback,
   useMemo,
   useRef,
-	useReducer,
+  useReducer,
 } from 'react'
 import { io } from 'socket.io-client'
 export function useSocket(URL: string, canvasId: number, userId: number) {
-  const [socket, setSocket] = useState(io(URL))
+  const [socket, setSocket] = useState(
+    io(URL, {
+      transports: ['websocket'],
+    }),
+  )
   useEffect(() => {
     socket.emit('join', canvasId, userId)
   }, [])

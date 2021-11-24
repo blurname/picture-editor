@@ -476,14 +476,15 @@ export const clearRectBorder = (canvas2dRef:HTMLCanvasElement)=>{
 export const drawNames = (canvas2dRef:HTMLCanvasElement,guidRect:Rect,user:User) => {
 	const ctx = canvas2dRef.getContext('2d')
 	ctx.font='40px serif'
+	ctx.fillStyle='orange'
 	const editing  = user.name+" is editing"
 	ctx.fillText(editing, guidRect.x, -(guidRect.y+guidRect.height*1.3))
-	ctx.fillRect(
-		guidRect.x,
-		-(guidRect.y+guidRect.height*1.3),
-		guidRect.width/4,
-		guidRect.height/4
-	)
+	//ctx.fillRect(
+		//guidRect.x,
+		//-(guidRect.y+guidRect.height*1.3),
+		//guidRect.width/4,
+		//guidRect.height/4
+	//)
 }
 
 export const createTranslateMat = (offset:Pos) => {

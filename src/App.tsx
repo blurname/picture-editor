@@ -42,13 +42,9 @@ function App() {
                 </userContext.Provider>
               }
             />
-            {/* <Route  path="/canvas/:id"
-            element ={<Layout />}/>
-          <Route  path="/boxes"
-            element = {<Boxes />}/>*/}
             <Route path="/boxes/:id" element={<Boxes />} />
             <Route
-              path="/signin"
+              path="*"
               element={
                 <userContext.Provider
                   value={{
@@ -61,8 +57,20 @@ function App() {
               }
             />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/usercenter" element={<Center />}>
-              <Route path="ifound" element={<IFound />} />
+            <Route
+              path="/usercenter"
+              element={
+                <userContext.Provider
+                  value={{
+                    userId,
+                    setUserId,
+                  }}
+                >
+                  <Center />
+                </userContext.Provider>
+              }
+            >
+              <Route path="boxes/:id" element={<Boxes />} />
               <Route path="ipaticipate" element={<IPaticipate />} />
             </Route>
           </Routes>

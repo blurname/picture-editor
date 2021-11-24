@@ -1,6 +1,6 @@
 import axios from 'axios'
 export const baseUrl = 'http://localhost:30001'
-export const wsbaseUrl = 'http://localhost:30000'
+export const wsbaseUrl = 'ws://localhost:30000'
 export const ax = axios.create({
   baseURL: baseUrl,
   headers: {

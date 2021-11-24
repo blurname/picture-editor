@@ -30,7 +30,7 @@ export function Signin() {
 			setUserId(user.id)
 			localStorage.setItem('userId', user.id+'')
 			localStorage.setItem(user.id+'', user.name)
-			navigate(`/boxes/${user.id}`)
+			navigate(`/usercenter`)
 		}
 	}
   return (

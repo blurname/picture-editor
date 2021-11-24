@@ -7,7 +7,7 @@ export function Head() {
   const { user, signout } = useSigned()
   const navigate = useNavigate()
   const backHome = () => {
-    navigate(`/boxes/${user.id}`)
+    navigate(`/usercenter`)
   }
   return (
     <Menu mode='horizontal' className="bg-green-300">
