@@ -71,7 +71,19 @@ function App() {
               }
             >
               <Route path="boxes/:id" element={<Boxes />} />
-              <Route path="ipaticipate" element={<IPaticipate />} />
+              <Route
+                path="ipaticipate/:id"
+                element={
+                  <userContext.Provider
+                    value={{
+                      userId,
+                      setUserId,
+                    }}
+                  >
+                    <IPaticipate />
+                  </userContext.Provider>
+                }
+              />
             </Route>
           </Routes>
         </div>
