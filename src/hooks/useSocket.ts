@@ -12,9 +12,11 @@ export function useSocket(URL: string, canvasId: number, userId: number) {
   const [socket, setSocket] = useState(
     io(URL, {
       transports: ['websocket'],
+			autoConnect:false
     }),
   )
   useEffect(() => {
+		socket.connect()
     socket.emit('join', canvasId, userId)
   }, [])
   return socket
