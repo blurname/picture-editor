@@ -91,7 +91,7 @@ export function Editor() {
   }
 
   return (
-    <div className="flex-grow-0 w-50 bg-blue-100 object-right">
+    <div className="flex-grow-0 w-50 bg-teal-50 object-right">
       Editor
       <h1>desc:{desc}</h1>
       <h1>adj:{adjustNum}</h1>

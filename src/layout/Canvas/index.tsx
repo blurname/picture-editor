@@ -24,11 +24,18 @@ import {
   MosaicSpirit,
   TheW,
 } from '../../utils/gl-uitls'
-import { baseUrl, getIsHavingSpirits, getSpirits, wsbaseUrl } from '../../utils/http'
+import {
+  baseUrl,
+  getIsHavingSpirits,
+  getSpirits,
+  wsbaseUrl,
+} from '../../utils/http'
 import { screenshot } from '../../utils/saveImage'
 import { useRenderAll } from '../../hooks/useRenderAll'
-import {useSocket} from '../../hooks/useSocket'
-import {useEmitControll} from '../../hooks/useEmitControll'
+import { useSocket } from '../../hooks/useSocket'
+import { useEmitControll } from '../../hooks/useEmitControll'
+import { CanvasScoekt } from '../../utils/socket-utils'
+import { useNavigate } from 'react-router-dom'
 
 type Props = {}
 type remoteModel = {
@@ -53,7 +60,8 @@ export function Canvas(props: Props) {
     zoomable,
     operationHistory,
   } = useContext(globalContext)
-	const {userId} = useContext(userContext)
+  const { userId } = useContext(userContext)
+  const navigate = useNavigate()
   let canvas: CanvasPos = {
     width: 1300,
     height: 900,
@@ -66,14 +74,16 @@ export function Canvas(props: Props) {
   const [initComplete, setInitComplete] = useState(false)
   const [localInit, setLocalInit] = useState(false)
   const [renderAll] = useRenderAll(spiritCanvas.spirits)
-	const socket = useSocket(wsbaseUrl,spiritCanvas.id,userId)
-	useEmitControll(socket, userId, selectNum)
-
+  const socket = useSocket(wsbaseUrl, spiritCanvas.id, userId)
+  const [canvasSocket] = useState(
+    new CanvasScoekt(userId, spiritCanvas.id, socket),
+  )
+  canvasSocket.onConnection()
+  useEmitControll(socket, userId, selectNum)
 
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
   const canvas3dRef = useRef(null as HTMLCanvasElement)
-	
 
   const maxLayer = (indexArray: number[], spirits: BeamSpirit[]) => {
     console.log(indexArray)
@@ -96,13 +106,13 @@ export function Canvas(props: Props) {
   let oldPos: Pos
 
   const handleOnMouseMove = (e: MouseEvent) => {
-    if (curImage===0 || !isMoveable || zoomable) return
+    if (curImage === 0 || !isMoveable || zoomable) return
     e.preventDefault()
     canvas2dRef.current.style.cursor = 'move'
     //const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     //const result = getCursorIsInQuad(
-      //{ x: cursorPos.left, y: cursorPos.top },
-      //images[selectNum].getGuidRect(),
+    //{ x: cursorPos.left, y: cursorPos.top },
+    //images[selectNum].getGuidRect(),
     //)
     //if (result === 'out') return
     const distance = getCursorMovDistance(e, canvas)
@@ -115,7 +125,10 @@ export function Canvas(props: Props) {
         images[i].render()
         if (curImage === i) {
           drawRectBorder(canvas2dRef.current, images[curImage].getGuidRect())
-					drawNames(canvas2dRef.current,images[curImage].getGuidRect(),{id:31,name:'baolei'})
+          drawNames(canvas2dRef.current, images[curImage].getGuidRect(), {
+            id: 31,
+            name: 'baolei',
+          })
           //if (!zoomable && !isMoveable)
           //spiritCanvas.setChosenType(images[curImage].getSpiritType())
         }
@@ -140,16 +153,19 @@ export function Canvas(props: Props) {
         }
       }
     }
-		//if(indexArray.length===1){
-			//setSelectNum(0)
-		//}
-		 if (indexArray.length > 0) {
+    //if(indexArray.length===1){
+    //setSelectNum(0)
+    //}
+    if (indexArray.length > 0) {
       const cur = maxLayer(indexArray, images)
       curImage = cur
       setSelectNum(curImage)
       spiritCanvas.setChosenType(images[curImage].getSpiritType())
       drawRectBorder(canvas2dRef.current, images[cur].getGuidRect())
-			drawNames(canvas2dRef.current,images[curImage].getGuidRect(),{id:31,name:'baolei'})
+      drawNames(canvas2dRef.current, images[curImage].getGuidRect(), {
+        id: 31,
+        name: 'baolei',
+      })
       if (zoomable && images[curImage].getSpiritType() === 'Image') {
         const image = images[curImage] as ImageSpirit
         if (image.isZoomed) {
@@ -164,15 +180,13 @@ export function Canvas(props: Props) {
       //setIsMoveable(true)
       oldPos = images[curImage].getPos()
       canvas2dRef.current.style.cursor = 'move'
+    } else {
+      setSelectNum(0)
+      spiritCanvas.setChosenType(images[0].getSpiritType())
     }
-		else{
-		setSelectNum(0)
-		spiritCanvas.setChosenType(images[0].getSpiritType())
-		}
   }
 
   const thandleOnMouseUp = (e: MouseEvent) => {
-
     isMoveable = false
     //console.log('oldPos:', oldPos)
     if (oldPos !== undefined) {
@@ -270,8 +284,8 @@ export function Canvas(props: Props) {
   }, [initImages])
   useEffect(() => {
     if (localInit) {
-			spiritCanvas.addBackground('pure','backNonImage')
-			setCmpCount(cmpCount + 1)
+      spiritCanvas.addBackground('pure', 'backNonImage')
+      setCmpCount(cmpCount + 1)
     }
   }, [localInit])
 
@@ -293,10 +307,14 @@ export function Canvas(props: Props) {
   useEffect(() => {
     renderAll()
   }, [adjustNum, cmpCount])
-
+  const closeSockt = () => {
+    canvasSocket.exit()
+    //navigate('/usercenter/')
+  }
   return (
-    <div className="flex-grow w-max h-full bg-blue-400">
+    <div className="flex-grow w-max h-full bg-gray-100">
       <h1>cmpcount{cmpCount}</h1>
+      <Button onClick={closeSockt}>back home</Button>
       <Button onClick={screenshot(canvas3dRef.current, renderAll)}>
         screenshot
       </Button>
@@ -310,13 +328,13 @@ export function Canvas(props: Props) {
         redo
       </Button>
       <canvas
-        className="bg-grey-100"
+        className=""
         ref={canvas2dRef}
         style={{
           top: canvas.top,
           left: canvas.left,
           position: 'absolute',
-					zIndex:2
+          zIndex: 2,
         }}
         width={canvas.width}
         height={canvas.height}
@@ -331,7 +349,7 @@ export function Canvas(props: Props) {
           top: canvas.top,
           left: canvas.left,
           position: 'absolute',
-					zIndex:1
+          zIndex: 1,
         }}
         width={canvas.width}
         height={canvas.height}

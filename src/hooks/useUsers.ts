@@ -5,7 +5,7 @@ export type User={
 	name:string
 }
 export function useUsers(socket:Socket){
-	const [users, setUsers] = useState([]);
+	const [users, setUsers] = useState(Map);
 	useEffect(() => {
 		socket.on('user-joined', (user) => {
 			setUsers([...users,user])

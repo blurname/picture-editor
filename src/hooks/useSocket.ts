@@ -18,6 +18,7 @@ export function useSocket(URL: string, canvasId: number, userId: number) {
   useEffect(() => {
 		socket.connect()
     socket.emit('join', canvasId, userId)
+
   }, [])
   return socket
 }

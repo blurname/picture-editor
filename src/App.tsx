@@ -87,7 +87,7 @@ function App() {
             </Route>
           </Routes>
         </div>
-        <Footer className="bg-green-200" />
+        <Footer className="bg-green-100" />
       </div>
     </Router>
   )
