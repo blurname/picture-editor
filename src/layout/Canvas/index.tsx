@@ -36,6 +36,8 @@ import { useSocket } from '../../hooks/useSocket'
 import { useEmitControll } from '../../hooks/useEmitControll'
 import { CanvasScoekt } from '../../utils/socket-utils'
 import { useNavigate } from 'react-router-dom'
+import { useUsers } from '../../hooks/useUsers'
+import { map } from 'superstruct'
 
 type Props = {}
 type remoteModel = {
@@ -78,8 +80,9 @@ export function Canvas(props: Props) {
   const [canvasSocket] = useState(
     new CanvasScoekt(userId, spiritCanvas.id, socket),
   )
-  canvasSocket.onConnection()
-  useEmitControll(socket, userId, selectNum)
+  //canvasSocket.onConnection()
+  useEmitControll(socket,spiritCanvas.id, userId, selectNum)
+  const { users } = useUsers(socket,adjustNum)
 
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
@@ -313,6 +316,9 @@ export function Canvas(props: Props) {
   }
   return (
     <div className="flex-grow w-max h-full bg-gray-100">
+			{users.map((cur,index) => {
+				return <h1 key={index}>{cur.name}</h1>
+			})}
       <h1>cmpcount{cmpCount}</h1>
       <Button onClick={closeSockt}>back home</Button>
       <Button onClick={screenshot(canvas3dRef.current, renderAll)}>

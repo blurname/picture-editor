@@ -13,7 +13,7 @@ export class CanvasScoekt {
     this.socket = socket
   }
   onConnection() {
-    this.newJoin()
+		//this.newJoin()
 		
   }
   exit() {
@@ -23,9 +23,9 @@ export class CanvasScoekt {
     })
   }
   newJoin() {
-    this.socket.on('newJoin', (userMap: any) => {
-      console.log('userMap:', userMap)
-    })
+		this.socket.on('users', (users:any) => {
+			console.log('users:',users)
+		})
   }
   joinUsers(id: number, user: User) {
     this.users.set(id, user)

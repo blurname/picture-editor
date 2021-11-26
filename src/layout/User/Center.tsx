@@ -18,7 +18,10 @@ export function Center() {
             <Link to={'/usercenter/ipaticipate/' + userId}>paticipate</Link>
           </Menu.Item>
           <Menu.Item key="3">
-            <Link to={'/signin'}>singin</Link>
+            <Link to={'/signin/a'}>a</Link>
+          </Menu.Item>
+          <Menu.Item key="4">
+            <Link to={'/signin/b'}>b</Link>
           </Menu.Item>
         </Menu>
         <hr />

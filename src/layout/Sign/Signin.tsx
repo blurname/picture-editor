@@ -1,21 +1,22 @@
 import { message } from 'antd'
 import React, { useState, ChangeEvent, useContext, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { userContext } from '../../context'
 import { User } from '../../hooks/useUsers'
 import { ax, baseUrl } from '../../utils/http'
 const signUpUrl = baseUrl + '/signup'
 export function Signin() {
+	const params = useParams()
   const { setUserId } = useContext(userContext)
-  const [name, setName] = useState('a')
-  const [passwd, setPasswd] = useState('a')
+  const [name, setName] = useState(params.rn)
+  const [passwd, setPasswd] = useState(params.rn)
   const navigate = useNavigate()
-  const changeName = (e: ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value)
-  }
-  const changePasswd = (e: ChangeEvent<HTMLInputElement>) => {
-    setPasswd(e.target.value)
-  }
+	const changeName = (e: ChangeEvent<HTMLInputElement>) => {
+		setName(e.target.value)
+	}
+	const changePasswd = (e: ChangeEvent<HTMLInputElement>) => {
+		setPasswd(e.target.value)
+	}
   useEffect(() => {
     signIn()
   }, [])

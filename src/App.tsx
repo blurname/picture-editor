@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+} from 'react-router-dom'
 import './App.css'
 import layer, { Content, Footer, Header } from 'antd/lib/layout/layout'
 import { Boxes } from './layout/Boxes'
@@ -44,7 +49,7 @@ function App() {
             />
             <Route path="/boxes/:id" element={<Boxes />} />
             <Route
-              path="*"
+              path="/signin/:rn"
               element={
                 <userContext.Provider
                   value={{
