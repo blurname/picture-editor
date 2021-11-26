@@ -1,6 +1,7 @@
 import { Button } from 'antd'
 import React, {
   MouseEvent,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -33,7 +34,7 @@ import {
 import { screenshot } from '../../utils/saveImage'
 import { useRenderAll } from '../../hooks/useRenderAll'
 import { useSocket } from '../../hooks/useSocket'
-import { useEmitControll } from '../../hooks/useEmitControll'
+import { useController } from '../../hooks/useEmitControll'
 import { CanvasScoekt } from '../../utils/socket-utils'
 import { useNavigate } from 'react-router-dom'
 import { useUsers } from '../../hooks/useUsers'
@@ -81,8 +82,28 @@ export function Canvas(props: Props) {
     new CanvasScoekt(userId, spiritCanvas.id, socket),
   )
   //canvasSocket.onConnection()
-  useEmitControll(socket,spiritCanvas.id, userId, selectNum)
-  const { users } = useUsers(socket,adjustNum)
+  const { controllerList } = useController(
+    socket,
+    spiritCanvas.id,
+    userId,
+    selectNum,
+  )
+  const renderController = useCallback(() => {
+    clearRectBorder(canvas2dRef.current)
+    for (let i = 0; i < controllerList.length; i++) {
+      const selectId = controllerList[i].selectId
+      if (selectId !== -1) {
+        drawRectBorder(canvas2dRef.current, images[selectId].getGuidRect())
+        drawNames(canvas2dRef.current, images[selectId].getGuidRect(), {
+          id: controllerList[i].id,
+          name: 'baolei',
+        })
+        //if (!zoomable && !isMoveable)
+        //spiritCanvas.setChosenType(images[curImage].getSpiritType())
+      }
+    }
+  }, [controllerList])
+  const { users } = useUsers(socket, adjustNum)
 
   let isMoveable = false
   const canvas2dRef = useRef(null as HTMLCanvasElement)
@@ -126,21 +147,17 @@ export function Canvas(props: Props) {
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
         images[i].render()
-        if (curImage === i) {
-          drawRectBorder(canvas2dRef.current, images[curImage].getGuidRect())
-          drawNames(canvas2dRef.current, images[curImage].getGuidRect(), {
-            id: 31,
-            name: 'baolei',
-          })
-          //if (!zoomable && !isMoveable)
-          //spiritCanvas.setChosenType(images[curImage].getSpiritType())
-        }
+        ////if (!zoomable && !isMoveable)
+        ////spiritCanvas.setChosenType(images[curImage].getSpiritType())
+        //}
       }
     }
+    renderController()
+
     spiritCanvas.renderAllLine()
   }
   const handleOnMouseDown = (e: MouseEvent) => {
-    e.preventDefault()
+		e.preventDefault()
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     let indexArray: number[] = []
     for (let i = 0; i < images.length; i++) {
@@ -164,11 +181,7 @@ export function Canvas(props: Props) {
       curImage = cur
       setSelectNum(curImage)
       spiritCanvas.setChosenType(images[curImage].getSpiritType())
-      drawRectBorder(canvas2dRef.current, images[cur].getGuidRect())
-      drawNames(canvas2dRef.current, images[curImage].getGuidRect(), {
-        id: 31,
-        name: 'baolei',
-      })
+      renderController()
       if (zoomable && images[curImage].getSpiritType() === 'Image') {
         const image = images[curImage] as ImageSpirit
         if (image.isZoomed) {
@@ -305,6 +318,7 @@ export function Canvas(props: Props) {
 
   useEffect(() => {
     console.log('canvas changed the selectNum')
+		renderController()
   }, [selectNum])
 
   useEffect(() => {
@@ -316,9 +330,9 @@ export function Canvas(props: Props) {
   }
   return (
     <div className="flex-grow w-max h-full bg-gray-100">
-			{users.map((cur,index) => {
-				return <h1 key={index}>{cur.name}</h1>
-			})}
+      {users.map((cur, index) => {
+        return <h1 key={index}>{cur.name}</h1>
+      })}
       <h1>cmpcount{cmpCount}</h1>
       <Button onClick={closeSockt}>back home</Button>
       <Button onClick={screenshot(canvas3dRef.current, renderAll)}>
@@ -360,6 +374,23 @@ export function Canvas(props: Props) {
         width={canvas.width}
         height={canvas.height}
       />
+      <div
+        className=""
+        style={{
+          top: canvas.top,
+          left: canvas.left + canvas.width + 30,
+          position: 'absolute',
+          zIndex: 1,
+        }}
+      >
+        {controllerList.map((cur) => {
+          return (
+            <h1>
+              user:{cur.id} controlls {cur.selectId}
+            </h1>
+          )
+        })}
+      </div>
     </div>
   )
 }

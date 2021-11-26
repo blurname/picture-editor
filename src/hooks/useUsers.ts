@@ -10,6 +10,7 @@ export function useUsers(socket:Socket,adjustNum:number){
 		socket.on('client-users', (u:string) => {
 			console.log('new users',u)
 			const map = jsonToMap(u)
+			
 			const newUsers = [] as User[]
 			for (const iterator of map.keys()) {
 				console.log('users map',map.get(iterator))
@@ -17,9 +18,6 @@ export function useUsers(socket:Socket,adjustNum:number){
 				newUsers.push({id:value.id,name:'user'+value.id})
 			}
 			setUsers(newUsers)
-		})
-		socket.on('client-who-controll', (userId:number,selectNum)=>{
-			console.log(`${userId} controll: ${selectNum}`)
 		})
 	},[]);
 	return {users}

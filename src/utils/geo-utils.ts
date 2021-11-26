@@ -448,12 +448,12 @@ export const drawRectBorder = (
 ) => {
 
   const ctx = canvas2dRef.getContext('2d')
-  ctx.clearRect(
-    -canvas2dRef.width / 2,
-    -canvas2dRef.height / 2,
-    canvas2dRef.width,
-    canvas2dRef.height,
-  )
+  //ctx.clearRect(
+    //-canvas2dRef.width / 2,
+    //-canvas2dRef.height / 2,
+    //canvas2dRef.width,
+    //canvas2dRef.height,
+  //)
   ctx.strokeStyle = 'purple'
   ctx.lineWidth = 8
   ctx.strokeRect(
@@ -477,7 +477,7 @@ export const drawNames = (canvas2dRef:HTMLCanvasElement,guidRect:Rect,user:User)
 	const ctx = canvas2dRef.getContext('2d')
 	ctx.font='40px serif'
 	ctx.fillStyle='orange'
-	const editing  = user.name+" is editing"
+	const editing  = user.id+" is editing"
 	ctx.fillText(editing, guidRect.x, -(guidRect.y+guidRect.height*1.3))
 	//ctx.fillRect(
 		//guidRect.x,
