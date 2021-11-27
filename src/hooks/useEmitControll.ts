@@ -38,7 +38,6 @@ export function useController(
       const newControllerList = [] as Controller[]
       controller.set(userId, selectNum)
       for (const iterator of controller.keys()) {
-        console.log('users map', controller.get(iterator))
         const value = controller.get(iterator)
         newControllerList.push({ id: iterator, spiritId: value })
       }
@@ -50,7 +49,6 @@ export function useController(
     const newControllerList = [] as Controller[]
     controller.set(userId, selectNum)
     for (const iterator of controller.keys()) {
-      console.log('users map', controller.get(iterator))
       const value = controller.get(iterator)
       newControllerList.push({ id: iterator, spiritId: value })
     }

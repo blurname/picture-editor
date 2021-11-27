@@ -102,7 +102,7 @@ export function Canvas(props: Props) {
 		clearRectBorder(canvas2dRef.current)
 		for (let i = 0; i < controllerList.length; i++) {
 			const selectId = controllerList[i].spiritId
-			if (selectId !== -1) {
+			if (selectId !== -1 && selectId!==0) {
 				drawRectBorder(canvas2dRef.current, images[selectId].getGuidRect())
 				drawNames(canvas2dRef.current, images[selectId].getGuidRect(), {
 					id: controllerList[i].id,
@@ -325,7 +325,7 @@ export function Canvas(props: Props) {
   useEffect(() => {
     console.log('canvas changed the selectNum')
 		renderController()
-  }, [selectNum])
+  }, [selectNum,controllerList])
 
   useEffect(() => {
     renderAll()
