@@ -39,6 +39,7 @@ import { CanvasScoekt } from '../../utils/socket-utils'
 import { useNavigate } from 'react-router-dom'
 import { useUsers } from '../../hooks/useUsers'
 import { map } from 'superstruct'
+import {useMovement} from '../../hooks/useMovement'
 
 type Props = {}
 type remoteModel = {
@@ -71,6 +72,8 @@ export function Canvas(props: Props) {
     left: 300,
     top: 150,
   }
+  const canvas2dRef = useRef(null as HTMLCanvasElement)
+  const canvas3dRef = useRef(null as HTMLCanvasElement)
   const [images, setImages] = useState([] as BeamSpirit[])
   const [initCount, setInitCount] = useState(-1)
   const [initImages, setInitImages] = useState([] as remoteModel[])
@@ -87,28 +90,29 @@ export function Canvas(props: Props) {
     spiritCanvas.id,
     userId,
     selectNum,
+		canvas2dRef,
+		images
   )
-  const renderController = useCallback(() => {
-    clearRectBorder(canvas2dRef.current)
-    for (let i = 0; i < controllerList.length; i++) {
-      const selectId = controllerList[i].selectId
-      if (selectId !== -1) {
-        drawRectBorder(canvas2dRef.current, images[selectId].getGuidRect())
-        drawNames(canvas2dRef.current, images[selectId].getGuidRect(), {
-          id: controllerList[i].id,
-          name: 'baolei',
-        })
-        //if (!zoomable && !isMoveable)
-        //spiritCanvas.setChosenType(images[curImage].getSpiritType())
-      }
-    }
-  }, [controllerList])
   const { users } = useUsers(socket, adjustNum)
 
   let isMoveable = false
-  const canvas2dRef = useRef(null as HTMLCanvasElement)
-  const canvas3dRef = useRef(null as HTMLCanvasElement)
 
+	const renderController = useCallback(() => {
+		clearRectBorder(canvas2dRef.current)
+		for (let i = 0; i < controllerList.length; i++) {
+			const selectId = controllerList[i].spiritId
+			if (selectId !== -1) {
+				drawRectBorder(canvas2dRef.current, images[selectId].getGuidRect())
+				drawNames(canvas2dRef.current, images[selectId].getGuidRect(), {
+					id: controllerList[i].id,
+					name: 'baolei',
+				})
+				//if (!zoomable && !isMoveable)
+				//spiritCanvas.setChosenType(images[curImage].getSpiritType())
+			}
+		}
+	}, [controllerList,canvas2dRef])
+	useMovement(socket, images, spiritCanvas,renderController)
   const maxLayer = (indexArray: number[], spirits: BeamSpirit[]) => {
     console.log(indexArray)
     let min = 2
@@ -142,6 +146,7 @@ export function Canvas(props: Props) {
     const distance = getCursorMovDistance(e, canvas)
     images[curImage].updatePosition(distance)
     spiritCanvas.updateGuidRect(images[curImage])
+		socket.emit('server-move',spiritCanvas.id,curImage,distance)
     //spiritCanvas.spirits[curImage].render()
     //renderAll()
     for (let i = 0; i < images.length; i++) {
@@ -383,10 +388,10 @@ export function Canvas(props: Props) {
           zIndex: 1,
         }}
       >
-        {controllerList.map((cur) => {
+        {controllerList.map((cur,index) => {
           return (
-            <h1>
-              user:{cur.id} controlls {cur.selectId}
+            <h1 key={index}>
+              user:{cur.id} controlls {cur.spiritId}
             </h1>
           )
         })}
