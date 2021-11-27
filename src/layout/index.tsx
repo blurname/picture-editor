@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import { Editor } from '../layout/Editor'
 import { Canvas } from '../layout/Canvas'
-import { Components } from '../layout/Components'
+import {Components} from "../layout/Components"
 import { globalContext, userContext } from '../context'
 import { SpiritCanvas, OperationHistory } from '../store/globalCanvas'
 import { ax, wsbaseUrl } from '../utils/http'

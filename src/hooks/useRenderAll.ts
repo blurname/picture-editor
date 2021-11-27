@@ -2,7 +2,7 @@ import {
   useCallback,
 } from 'react'
 import { BeamSpirit } from '../utils/gl-uitls'
-export function useRenderAll(spirits: BeamSpirit[]) {
+export function useRenderAll(spirits: BeamSpirit[],cmpCount:number) {
   const renderAll = useCallback(() => {
 		for (let i = 0; i < spirits.length; i++) {
 			const element = spirits[i];
@@ -11,6 +11,6 @@ export function useRenderAll(spirits: BeamSpirit[]) {
     //for (const si of spirits) {
 			//console.log(si)
     //}
-  }, [spirits])
+  }, [spirits,cmpCount])
   return [renderAll]
 }

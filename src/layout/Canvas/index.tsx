@@ -80,7 +80,7 @@ export function Canvas(props: Props) {
   const [initImages, setInitImages] = useState([] as remoteModel[])
   const [initComplete, setInitComplete] = useState(false)
   const [localInit, setLocalInit] = useState(false)
-  const [renderAll] = useRenderAll(spiritCanvas.spirits)
+  const [renderAll] = useRenderAll(spiritCanvas.spirits,cmpCount)
   //const socket = useSocket(wsbaseUrl, spiritCanvas.id, userId)
   const [canvasSocket] = useState(
     new CanvasScoekt(userId, spiritCanvas.id, socket),

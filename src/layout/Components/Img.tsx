@@ -4,6 +4,7 @@ import './index.css'
 import { globalContext } from '../../context'
 import { baseUrl } from '../../utils/http'
 import { Image, List, Avatar, Space } from 'antd'
+import {Socket} from 'socket.io-client'
 type ImgType = {
   id: number
   value: string
@@ -35,14 +36,17 @@ const imgs: ImgType[] = [
     value: imgUrl + 't5.jpeg',
   },
 ]
-
-export function Img() {
-  const { props } = menu.children.filter((child) => child.desc === 'img')[0]
+type Props = {
+	socket:Socket
+}
+export function Img(prop:Props) {
+  //const { props } = menu.children.filter((child) => child.desc === 'img')[0]
   const { spiritCanvas, cmpCount, setCmpCount, setAdjustNum, adjustNum } =
     useContext(globalContext)
-  const { style } = props
+  //const { style } = props
   const addToSpirits = (imgSrc: string) => () => {
     spiritCanvas.addImage(imgSrc, cmpCount)
+		prop.socket.emit('server-add',spiritCanvas.id,'Image',imgSrc,cmpCount)
     setCmpCount(cmpCount + 1)
     setAdjustNum(adjustNum + 1)
   }

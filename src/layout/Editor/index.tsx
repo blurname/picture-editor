@@ -85,13 +85,23 @@ export function Editor() {
         'UniqueProps',
       )
     }
-    socket.emit(
-      'server-editor',
-			spiritCanvas.id,
-      chosen.getId(),
-      { [desc]: old },
-      { [desc]: value },
-    )
+    if (desc === 'layer') {
+      socket.emit(
+        'server-editor',
+        spiritCanvas.id,
+        chosen.getId(),
+        { [desc]: 1 - old },
+        { [desc]: 1 - value },
+      )
+    } else {
+      socket.emit(
+        'server-editor',
+        spiritCanvas.id,
+        chosen.getId(),
+        { [desc]: old },
+        { [desc]: value },
+      )
+    }
     setAdjustNum(adjustNum + 1)
   }
   const onZoomable = () => {
@@ -102,7 +112,7 @@ export function Editor() {
 
   //return
   //}
-  useRemoteOperation(socket, operationHistory,adjustNum,setAdjustNum)
+  useRemoteOperation(socket, operationHistory, adjustNum, setAdjustNum)
 
   return (
     <div className="flex-grow-0 w-50 bg-teal-50 object-right">

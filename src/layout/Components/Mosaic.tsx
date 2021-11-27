@@ -3,6 +3,7 @@ import React, {
   useState,
   useContext,
 } from 'react'
+import {Socket} from 'socket.io-client'
 import { globalContext } from '../../context'
 import {imgUrl} from './Img'
 type Mosaic = {
@@ -26,11 +27,15 @@ const mosaics: Mosaic[] = [
 		imgUrl:imgUrl+'scr-multi.png'
   },
 ]
-export function Mosaic() {
+type Props = {
+	socket:Socket
+}
+export function Mosaic(prop:Props) {
 
   const { spiritCanvas, cmpCount, setCmpCount } = useContext(globalContext)
   const addMosaic = (type: MosaicType) => () => {
     spiritCanvas.addMosaic(type, cmpCount)
+		prop.socket.emit('server-add',spiritCanvas.id,'Mosaic',type,cmpCount)
     setCmpCount(cmpCount + 1)
   }
   return (

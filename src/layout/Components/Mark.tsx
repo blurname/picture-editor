@@ -1,5 +1,6 @@
 import { Button, List } from 'antd'
 import React, { useContext } from 'react'
+import {Socket} from 'socket.io-client'
 import { globalContext } from '../../context'
 import { imgUrl } from './Img'
 import { menu } from './menuSchema'
@@ -26,10 +27,14 @@ const marks: MarkType[] = [
 	},
 ]
 
-export function Mark() {
+type Props = {
+	socket:Socket
+}
+export function Mark(prop:Props) {
   const { spiritCanvas, cmpCount, setCmpCount } = useContext(globalContext)
   const addMark = (shape: Shape) => () => {
     spiritCanvas.addMark(shape, cmpCount)
+		prop.socket.emit('server-add',spiritCanvas.id,'Mark',shape,cmpCount)
     setCmpCount(cmpCount + 1)
   }
   return (
