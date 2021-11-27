@@ -4,9 +4,10 @@ import { Canvas } from '../layout/Canvas'
 import { Components } from '../layout/Components'
 import { globalContext, userContext } from '../context'
 import { SpiritCanvas, OperationHistory } from '../store/globalCanvas'
-import { ax } from '../utils/http'
+import { ax, wsbaseUrl } from '../utils/http'
 import { useCanvas } from '../hooks/useCanvas'
 import { useParams } from 'react-router-dom'
+import {useSocket} from '../hooks/useSocket'
 console.log('canvaseditor')
 export function Layout() {
 	const { id } = useParams()
@@ -21,6 +22,7 @@ export function Layout() {
   const [operationHistory, setOperationHistory] = useState(
     new OperationHistory(spiritCanvas, ax),
   )
+  const socket = useSocket(wsbaseUrl, spiritCanvas.id, userId)
   console.log(operationHistory.lens)
   useEffect(() => {
     console.log('spiritCanvas.id:', spiritCanvas.id)
@@ -39,6 +41,7 @@ export function Layout() {
           zoomable,
           setZoomable,
           operationHistory,
+					socket
         }}
       >
           <Components />

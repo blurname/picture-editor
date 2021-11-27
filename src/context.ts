@@ -11,6 +11,7 @@ type globalCanvasType = {
 	zoomable:boolean
 	setZoomable:Dispatch<SetStateAction<boolean>>
   setAdjustNum: React.Dispatch<React.SetStateAction<number>>
+	socket:Socket
 }
 export const globalContext = React.createContext({} as globalCanvasType)
 type userType={

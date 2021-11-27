@@ -63,6 +63,7 @@ export function Canvas(props: Props) {
     setCmpCount,
     zoomable,
     operationHistory,
+		socket
   } = useContext(globalContext)
   const { userId } = useContext(userContext)
   const navigate = useNavigate()
@@ -80,7 +81,7 @@ export function Canvas(props: Props) {
   const [initComplete, setInitComplete] = useState(false)
   const [localInit, setLocalInit] = useState(false)
   const [renderAll] = useRenderAll(spiritCanvas.spirits)
-  const socket = useSocket(wsbaseUrl, spiritCanvas.id, userId)
+  //const socket = useSocket(wsbaseUrl, spiritCanvas.id, userId)
   const [canvasSocket] = useState(
     new CanvasScoekt(userId, spiritCanvas.id, socket),
   )

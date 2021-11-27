@@ -2,6 +2,7 @@ import { Button, Collapse } from 'antd'
 import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
 import React, { ChangeEvent, useContext, useState } from 'react'
 import { globalContext } from '../../context'
+import { useRemoteOperation } from '../../hooks/useRemoteOperation'
 import { BeamSpirit } from '../../utils/gl-uitls'
 import { EAffine } from './EAffine'
 import { EBack } from './EBack'
@@ -17,6 +18,7 @@ export function Editor() {
     zoomable,
     setZoomable,
     operationHistory,
+    socket,
   } = useContext(globalContext)
 
   const [value, setValue] = useState({} as any)
@@ -37,7 +39,7 @@ export function Editor() {
     console.log('descStoreOld:', chosen.getUniqueProps())
   }
   const onChangeInput =
-    (desc: string, func?: (a:any,b:any) => void) =>
+    (desc: string, func?: (a: any, b: any) => void) =>
     (e: ChangeEvent<HTMLInputElement>) => {
       const curValue = parseFloat(e.target.value)
       if (func) {
@@ -53,11 +55,11 @@ export function Editor() {
   const updateValue = (
     desc: string,
     curValue: number,
-    func?: (a:any,b:any) => void,
+    func?: (a: any, b: any) => void,
   ) => {
     let chosen = spiritCanvas.spirits[selectNum]
     if (func) {
-      func(desc,curValue)
+      func(desc, curValue)
     } else if (desc === 'rotate' || desc === 'scale') {
       chosen.updateModel({ [desc]: curValue })
     } else {
@@ -83,12 +85,24 @@ export function Editor() {
         'UniqueProps',
       )
     }
+    socket.emit(
+      'server-editor',
+			spiritCanvas.id,
+      chosen.getId(),
+      { [desc]: old },
+      { [desc]: value },
+    )
     setAdjustNum(adjustNum + 1)
   }
   const onZoomable = () => {
     //appRef.current.style.cursor='zoom-in'
     setZoomable(!zoomable)
   }
+  //const commitFromRemote = (modelOrUniq:any,o:any,n:any) => {
+
+  //return
+  //}
+  useRemoteOperation(socket, operationHistory,adjustNum,setAdjustNum)
 
   return (
     <div className="flex-grow-0 w-50 bg-teal-50 object-right">
