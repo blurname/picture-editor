@@ -164,11 +164,15 @@ export function Canvas(props: Props) {
   }
   const handleOnMouseDown = (e: MouseEvent) => {
 		e.preventDefault()
+		const controllSet = new Set()
+		for (let i = 0; i < controllerList.length; i++) {
+				controllSet.add(controllerList[i].spiritId)
+		}
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     let indexArray: number[] = []
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
-        if (images[i].getIsToggle()) {
+        if ((!controllSet.has(i)||selectNum===i) && images[i].getIsToggle()) {
           const result = getCursorIsInQuad(
             { x: cursorPos.left, y: cursorPos.top },
             images[i].getGuidRect(),

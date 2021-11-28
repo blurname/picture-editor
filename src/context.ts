@@ -1,4 +1,5 @@
 import React, {createContext, Dispatch, SetStateAction} from 'react'
+import {Socket} from 'socket.io-client'
 import {OperationHistory, SpiritCanvas } from './store/globalCanvas'
 type globalCanvasType = {
 	spiritCanvas:SpiritCanvas

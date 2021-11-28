@@ -11,6 +11,7 @@ export function useController(
   canvasId: number,
   userId: number,
   selectNum: number,
+	spiritCanvas:BeamSpirit[],
   canvas2d: MutableRefObject<HTMLCanvasElement>,
   images: BeamSpirit[],
 ) {
