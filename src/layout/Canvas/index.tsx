@@ -1,5 +1,6 @@
-import { Button } from 'antd'
+import { Button, Input, Modal } from 'antd'
 import React, {
+  ChangeEvent,
   MouseEvent,
   useCallback,
   useContext,
@@ -26,6 +27,7 @@ import {
   TheW,
 } from '../../utils/gl-uitls'
 import {
+  ax,
   baseUrl,
   getIsHavingSpirits,
   getSpirits,
@@ -39,7 +41,7 @@ import { CanvasScoekt } from '../../utils/socket-utils'
 import { useNavigate } from 'react-router-dom'
 import { useUsers } from '../../hooks/useUsers'
 import { map } from 'superstruct'
-import {useMovement} from '../../hooks/useMovement'
+import { useMovement } from '../../hooks/useMovement'
 
 type Props = {}
 type remoteModel = {
@@ -63,7 +65,7 @@ export function Canvas(props: Props) {
     setCmpCount,
     zoomable,
     operationHistory,
-		socket
+    socket,
   } = useContext(globalContext)
   const { userId } = useContext(userContext)
   const navigate = useNavigate()
@@ -80,7 +82,7 @@ export function Canvas(props: Props) {
   const [initImages, setInitImages] = useState([] as remoteModel[])
   const [initComplete, setInitComplete] = useState(false)
   const [localInit, setLocalInit] = useState(false)
-  const [renderAll] = useRenderAll(spiritCanvas.spirits,cmpCount)
+  const [renderAll] = useRenderAll(spiritCanvas.spirits, cmpCount)
   //const socket = useSocket(wsbaseUrl, spiritCanvas.id, userId)
   const [canvasSocket] = useState(
     new CanvasScoekt(userId, spiritCanvas.id, socket),
@@ -91,29 +93,29 @@ export function Canvas(props: Props) {
     spiritCanvas.id,
     userId,
     selectNum,
-		canvas2dRef,
-		images
+    canvas2dRef,
+    images,
   )
   const { users } = useUsers(socket, adjustNum)
 
   let isMoveable = false
 
-	const renderController = useCallback(() => {
-		clearRectBorder(canvas2dRef.current)
-		for (let i = 0; i < controllerList.length; i++) {
-			const selectId = controllerList[i].spiritId
-			if (selectId !== -1 && selectId!==0) {
-				drawRectBorder(canvas2dRef.current, images[selectId].getGuidRect())
-				drawNames(canvas2dRef.current, images[selectId].getGuidRect(), {
-					id: controllerList[i].id,
-					name: 'baolei',
-				})
-				//if (!zoomable && !isMoveable)
-				//spiritCanvas.setChosenType(images[curImage].getSpiritType())
-			}
-		}
-	}, [controllerList,canvas2dRef])
-	useMovement(socket, images, spiritCanvas,renderController)
+  const renderController = useCallback(() => {
+    clearRectBorder(canvas2dRef.current)
+    for (let i = 0; i < controllerList.length; i++) {
+      const selectId = controllerList[i].spiritId
+      if (selectId !== -1 && selectId !== 0) {
+        drawRectBorder(canvas2dRef.current, images[selectId].getGuidRect())
+        drawNames(canvas2dRef.current, images[selectId].getGuidRect(), {
+          id: controllerList[i].id,
+          name: 'baolei',
+        })
+        //if (!zoomable && !isMoveable)
+        //spiritCanvas.setChosenType(images[curImage].getSpiritType())
+      }
+    }
+  }, [controllerList, canvas2dRef])
+  useMovement(socket, images, spiritCanvas, renderController)
   const maxLayer = (indexArray: number[], spirits: BeamSpirit[]) => {
     console.log(indexArray)
     let min = 2
@@ -147,7 +149,7 @@ export function Canvas(props: Props) {
     const distance = getCursorMovDistance(e, canvas)
     images[curImage].updatePosition(distance)
     spiritCanvas.updateGuidRect(images[curImage])
-		socket.emit('server-move',spiritCanvas.id,curImage,distance)
+    socket.emit('server-move', spiritCanvas.id, curImage, distance)
     //spiritCanvas.spirits[curImage].render()
     //renderAll()
     for (let i = 0; i < images.length; i++) {
@@ -163,16 +165,19 @@ export function Canvas(props: Props) {
     spiritCanvas.renderAllLine()
   }
   const handleOnMouseDown = (e: MouseEvent) => {
-		e.preventDefault()
-		const controllSet = new Set()
-		for (let i = 0; i < controllerList.length; i++) {
-				controllSet.add(controllerList[i].spiritId)
-		}
+    e.preventDefault()
+    const controllSet = new Set()
+    for (let i = 0; i < controllerList.length; i++) {
+      controllSet.add(controllerList[i].spiritId)
+    }
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
     let indexArray: number[] = []
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
-        if ((!controllSet.has(i)||selectNum===i) && images[i].getIsToggle()) {
+        if (
+          (!controllSet.has(i) || selectNum === i) &&
+          images[i].getIsToggle()
+        ) {
           const result = getCursorIsInQuad(
             { x: cursorPos.left, y: cursorPos.top },
             images[i].getGuidRect(),
@@ -328,8 +333,8 @@ export function Canvas(props: Props) {
 
   useEffect(() => {
     console.log('canvas changed the selectNum')
-		renderController()
-  }, [selectNum,controllerList])
+    renderController()
+  }, [selectNum, controllerList])
 
   useEffect(() => {
     renderAll()
@@ -338,6 +343,24 @@ export function Canvas(props: Props) {
     canvasSocket.exit()
     //navigate('/usercenter/')
   }
+  const showModal = () => {
+    setIsModalVisible(true)
+  }
+
+  const handleOk = () => {
+    ax.post(`/user/invite/?name=${invitedName}`)
+    setIsModalVisible(false)
+    setInvitedName('')
+  }
+
+  const handleCancel = () => {
+    setIsModalVisible(false)
+  }
+  const [invitedName, setInvitedName] = useState('')
+  const handleInputName = (e: ChangeEvent<HTMLInputElement>) => {
+    setInvitedName(e.target.value)
+  }
+  const [isModalVisible, setIsModalVisible] = useState(false)
   return (
     <div className="flex-grow w-max h-full bg-gray-100">
       {users.map((cur, index) => {
@@ -345,6 +368,19 @@ export function Canvas(props: Props) {
       })}
       <h1>cmpcount{cmpCount}</h1>
       <Button onClick={closeSockt}>back home</Button>
+      <Button onClick={showModal}>invite</Button>
+      <Modal
+        title="Basic Modal"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <Input
+          defaultValue={invitedName}
+          onInput={handleInputName}
+          type="text"
+        />
+      </Modal>
       <Button onClick={screenshot(canvas3dRef.current, renderAll)}>
         screenshot
       </Button>
@@ -393,7 +429,7 @@ export function Canvas(props: Props) {
           zIndex: 1,
         }}
       >
-        {controllerList.map((cur,index) => {
+        {controllerList.map((cur, index) => {
           return (
             <h1 key={index}>
               user:{cur.id} controlls {cur.spiritId}

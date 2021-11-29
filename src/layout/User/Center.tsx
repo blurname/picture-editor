@@ -23,6 +23,9 @@ export function Center() {
           <Menu.Item key="4">
             <Link to={'/signin/b'}>b</Link>
           </Menu.Item>
+          <Menu.Item key="5">
+            <Link to={'/usercenter/Invite/b'}>invite</Link>
+          </Menu.Item>
         </Menu>
         <hr />
         <Outlet />

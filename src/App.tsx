@@ -16,6 +16,7 @@ import { Head } from './layout/Head'
 import { IFound } from './layout/User/IFound'
 import { IPaticipate } from './layout/User/IPaticipate'
 import { userContext } from './context'
+import {Invite} from './layout/User/Invite'
 function App() {
   const [userId, setUserId] = useState()
   return (
@@ -86,6 +87,19 @@ function App() {
                     }}
                   >
                     <IPaticipate />
+                  </userContext.Provider>
+                }
+              />
+              <Route
+                path="invite/:id"
+                element={
+                  <userContext.Provider
+                    value={{
+                      userId,
+                      setUserId,
+                    }}
+                  >
+                    <Invite />
                   </userContext.Provider>
                 }
               />
