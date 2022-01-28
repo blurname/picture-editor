@@ -21,6 +21,7 @@ import {
   backImageShader,
 	MosaicFracShader,
 	MosaicSnowShader,
+  solidCircleShader,
 } from '../filter/shader'
 import {User} from '../hooks/useUsers'
 import { loadImage } from '../store/globalCanvas'
@@ -39,6 +40,7 @@ import {
   createBackGrid,
   createMosaic,
   createTranslateMat,
+  createSolidCircle,
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
@@ -676,6 +678,32 @@ export class CircleSpirit extends CircleLikeSpirit {
   constructor(canvas: HTMLCanvasElement, id: number) {
     super(canvas, id)
   }
+}
+export class SolidCircleSpirit extends CircleLikeSpirit{
+  constructor(canvas:HTMLCanvasElement,id:number){
+    super(canvas,id)
+    this.spiritType = 'Mark'
+    this.radius = 2
+    const xy = createProjectionXY(getCanvasEdge(this.canvas))
+    this.projectionX = xy.x
+    this.projectionY = xy.y
+    const circle = createSolidCircle()
+    this.vertexBuffers = this.beam.resource(VertexBuffers, circle.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, circle.index)
+    this.uniforms = this.beam.resource(Uniforms, {
+      radius: this.radius,
+      scale: this.scale,
+      centerX: this.offset.left,
+      centerY: this.offset.top,
+      uColor: [1.0, 1.0, 1.0, 1.0],
+      projectionX: this.projectionX,
+      projectionY: this.projectionY,
+      layer: this.layer,
+    })
+    this.shader = this.beam.shader(solidCircleShader)
+    this.updateGuidRect()
+  }
+  
 }
 export class TheW extends BeamSpirit {
   constructor(canvas: HTMLCanvasElement, id: number) {

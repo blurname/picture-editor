@@ -11,6 +11,7 @@ import {
   ImageSpirit,
   MarkSpirit,
   MosaicSpirit,
+  SolidCircleSpirit,
 } from '../utils/gl-uitls'
 import { createCanvas } from '../utils/http'
 
@@ -134,6 +135,9 @@ export class SpiritCanvas {
     let mark: BeamSpirit
     if (shape === 'circle') {
       mark = new CircleSpirit(this.canvas3d, id)
+    } else if(shape==='solidCircle') {
+      mark = new SolidCircleSpirit(this.canvas3d, id)
+      console.log(mark)
     } else {
       mark = new MarkSpirit(this.canvas3d, shape, id)
     }

@@ -55,7 +55,7 @@ type BackgroundProps = MarkProps& {
 type UniqueProps = MarkProps | ImageProps | CircleProps | BackgroundProps
 
 type Mosaic = Model
-type Shape = 'line' | 'hollowRect' | 'circle' | 'theW'
+type Shape = 'line' | 'hollowRect' | 'circle' | 'theW'|'solidCircle'
 type SpiritType = 'Image' | 'Mark' | 'Mosaic'|'Background'|'BackNonImage'|'BackImage'
 type MosaicType = 'multi' | 'frac'|'snow'
 type Point = { x: number; y: number }

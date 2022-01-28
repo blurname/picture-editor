@@ -25,6 +25,10 @@ const marks: MarkType[] = [
 
     imgUrl: imgUrl + 'scr-circle.png',
 	},
+  {
+    id:4,value:'solidCircle',
+    imgUrl:imgUrl+'scr-line.png'
+  }
 ]
 
 type Props = {

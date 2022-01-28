@@ -119,7 +119,7 @@ export const createHollowRectangle = (width: number,height:number) => {
     index,
   }
 }
-export const createCircle = (angleNum: number = 100) => {
+export const createCircle = (angleNum: number = 40) => {
   let position = [] as number[]
   let indexArray = [] as number[]
   let color = [] as number[]
@@ -159,6 +159,48 @@ export const createCircle = (angleNum: number = 100) => {
     },
   }
 }
+export const createSolidCircle = (angleNum: number = 40) => {
+	let position = [] as number[]
+	let indexArray = [] as number[]
+	let color = [] as number[]
+	//position.push(-1.0)
+	const angle = 360 / angleNum
+	for (let index = 0; index < angleNum; index++) {
+	  position.push(index * angle)
+	}
+	for (let index = 1; index <= angleNum; index += 1) {
+	  if (index === angleNum) {
+		indexArray.push(0)
+		indexArray.push(index)
+		indexArray.push(1)
+	  } else {
+		indexArray.push(0)
+		indexArray.push(index)
+		indexArray.push(index + 1)
+	  }
+	  color.push(0.5)
+	  color.push(0.2)
+	  color.push(0.7)
+	}
+	  color.push(0.5)
+	  color.push(0.2)
+	  color.push(0.7)
+  
+	  color.push(0.5)
+	  color.push(0.2)
+	  color.push(0.7)
+	return {
+	  vertex: {
+		position,
+			  color
+	  },
+	  index: {
+		//array:[0,1,2,0,2,3],
+		array: indexArray,
+		//array:[0,1,2,0,2,3,0,3,4],
+	  },
+	}
+  }
 
 export const createW = (line:number) =>{
 	const width = 500
