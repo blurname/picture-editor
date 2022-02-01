@@ -19,11 +19,11 @@ import {
   MosaicMultiShader,
   MonolithicShader,
   backImageShader,
-	MosaicFracShader,
-	MosaicSnowShader,
+  MosaicFracShader,
+  MosaicSnowShader,
   solidCircleShader,
 } from '../filter/shader'
-import {User} from '../hooks/useUsers'
+import { User } from '../hooks/useUsers'
 import { loadImage } from '../store/globalCanvas'
 import { depthCommand, Offscreen2DCommand } from './command'
 import {
@@ -45,20 +45,60 @@ import {
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
 
-export class PointSpirit{
-  beam:Beam
-  canvas:HTMLCanvasElement
-  layer:number
-  offset:Pos
-  shader:Shader
-  constructor(canvas:HTMLCanvasElement){
+export class PointSpirit {
+  beam: Beam
+  canvas: HTMLCanvasElement
+  layer: number
+  offset: Pos
+  vertexBuffers: VertexBuffersResource
+  indexBuffer: IndexBufferResource
+  uniforms: UniformsResource
+  shader: Shader
+  radius: number
+  scale: number
+  projectionX: number
+  projectionY: number
+  constructor(canvas: HTMLCanvasElement, offset: Pos) {
     this.canvas = canvas
     this.beam = new Beam(canvas)
-    this.offset = {left:0,top:0}
-    this.shader = createSolidCircle()
+    this.offset = offset
+    this.beam.define(depthCommand)
+    const point = createSolidCircle()
+    this.radius = 15
+    this.scale = 1
+    this.layer = 20
+    const xy = createProjectionXY(getCanvasEdge(this.canvas))
+    this.projectionX = xy.x
+    this.projectionY = xy.y
+    this.vertexBuffers = this.beam.resource(VertexBuffers, point.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, point.index)
+    this.shader = this.beam.shader(solidCircleShader)
+    this.uniforms = this.beam.resource(Uniforms, {
+      radius: this.radius,
+      scale: this.scale,
+      centerX: this.offset.left,
+      centerY: this.offset.top,
+      uColor: [1.0, 1.0, 1.0, 1.0],
+      projectionX: this.projectionX,
+      projectionY: this.projectionY,
+      layer: this.layer,
+    })
+    this.updatePosition(this.offset)
   }
-  render(){
-
+  updatePosition(distance: Pos = { left: 0, top: 0 }) {
+    this.offset = { ...distance }
+    this.uniforms.set('centerX', this.offset.left)
+    this.uniforms.set('centerY', this.offset.top)
+  }
+  render() {
+    this.beam
+      .depth()
+      .draw(
+        this.shader,
+        this.vertexBuffers as any,
+        this.indexBuffer as any,
+        this.uniforms as any,
+      )
   }
 }
 export class BeamSpirit {
@@ -163,7 +203,7 @@ export class BeamSpirit {
   getUniqueProps() {
     return this.uniqueProps
   }
-  render() {}
+  render() { }
 }
 export class RectModel extends BeamSpirit {
   constructor(canvas: HTMLCanvasElement, id: number) {
@@ -560,11 +600,11 @@ export class MosaicSpirit extends RectModel {
     let shader: any
     if (type === 'multi') {
       shader = MosaicMultiShader
-    } else if(type === 'frac'){
-			shader = MosaicFracShader
-		} else if(type === 'snow'){
-			shader = MosaicSnowShader
-		}
+    } else if (type === 'frac') {
+      shader = MosaicFracShader
+    } else if (type === 'snow') {
+      shader = MosaicSnowShader
+    }
     return shader
   }
   getBuffersByShape(type: MosaicType): Buffers {
@@ -696,11 +736,11 @@ export class CircleSpirit extends CircleLikeSpirit {
     super(canvas, id)
   }
 }
-export class SolidCircleSpirit extends CircleLikeSpirit{
-  constructor(canvas:HTMLCanvasElement,id:number){
-    super(canvas,id)
+export class SolidCircleSpirit extends CircleLikeSpirit {
+  constructor(canvas: HTMLCanvasElement, id: number) {
+    super(canvas, id)
     this.spiritType = 'Mark'
-    this.radius = 2
+    this.radius = 20
     const xy = createProjectionXY(getCanvasEdge(this.canvas))
     this.projectionX = xy.x
     this.projectionY = xy.y
@@ -720,7 +760,7 @@ export class SolidCircleSpirit extends CircleLikeSpirit{
     this.shader = this.beam.shader(solidCircleShader)
     this.updateGuidRect()
   }
-  
+
 }
 export class TheW extends BeamSpirit {
   constructor(canvas: HTMLCanvasElement, id: number) {
@@ -789,13 +829,13 @@ export class GuidLine {
   }
 }
 export class userNames {
-	beam:Beam
-	user:User
-	canvas:HTMLCanvasElement
-	constructor (canvas:HTMLCanvasElement,user:User) {
-		this.canvas = canvas
-		this.user = user
-	}
+  beam: Beam
+  user: User
+  canvas: HTMLCanvasElement
+  constructor(canvas: HTMLCanvasElement, user: User) {
+    this.canvas = canvas
+    this.user = user
+  }
 }
 export class BackgroundSpirit extends BeamSpirit {
   uColor: number[]
@@ -822,7 +862,7 @@ export class BackgroundSpirit extends BeamSpirit {
 
   render() {
     this.beam
-		.clear()
+      .clear()
       .depth()
       .draw(
         this.shader,
@@ -837,7 +877,7 @@ export class BackImageSpirit extends BackgroundSpirit {
   image: HTMLImageElement
   constructor(canvas: HTMLCanvasElement, image: HTMLImageElement) {
     super(canvas, 0)
-		this.backType = 'image'
+    this.backType = 'image'
     this.shader = this.beam.shader(backImageShader)
     this.textures = this.beam.resource(Textures)
     this.image = image
@@ -845,7 +885,7 @@ export class BackImageSpirit extends BackgroundSpirit {
   }
   render() {
     this.beam
-		.clear()
+      .clear()
       .depth()
       .draw(
         this.shader,
@@ -856,28 +896,28 @@ export class BackImageSpirit extends BackgroundSpirit {
   }
 }
 export class BackNonImageSpirit extends BackgroundSpirit {
-	shaderName:string
+  shaderName: string
   constructor(canvas: HTMLCanvasElement) {
     super(canvas, 0)
-		this.backType = 'nonImage'
-		this.spiritType = 'BackNonImage'
+    this.backType = 'nonImage'
+    this.spiritType = 'BackNonImage'
   }
   updateUniform(uniform: string, value: number) {
     this.uniqueProps[uniform] = value
     this.uniforms.set(uniform, value)
   }
-	setShaderName(shaderName:string){
-		this.shaderName = shaderName
-	}
-	getShaderName(){
-		return this.shaderName
-	}
+  setShaderName(shaderName: string) {
+    this.shaderName = shaderName
+  }
+  getShaderName() {
+    return this.shaderName
+  }
   setShader(shader: any, uniforms: any) {
     this.shader = this.beam.shader(shader)
     this.uniforms = this.beam.resource(Uniforms, uniforms)
     this.uniqueProps = this.uniforms.state as any
-		this.uniqueProps.id = 0
-		this.updateUniqueProps(uniforms)
+    this.uniqueProps.id = 0
+    this.updateUniqueProps(uniforms)
   }
   updateUniqueProps(uniqueProps: object) {
     for (const key in uniqueProps) {

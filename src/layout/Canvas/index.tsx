@@ -24,6 +24,7 @@ import {
   CircleSpirit,
   ImageSpirit,
   MosaicSpirit,
+  PointSpirit,
   TheW,
 } from '../../utils/gl-uitls'
 import {
@@ -138,7 +139,7 @@ export function Canvas(props: Props) {
 
   let curImage: number
   let oldPos: Pos
-  let points = []
+
   const handleOnMouseMove = (e: MouseEvent) => {
     handlePainting(e)
     if (curImage === 0 || !isMoveable || zoomable) return
@@ -370,8 +371,9 @@ export function Canvas(props: Props) {
   }
   const [isModalVisible, setIsModalVisible] = useState(false)
 
-
+  let points = [] as PointSpirit[]
   //painting
+  let [T, L, D, R] = [-10000, 10000, 10000, -10000]
   const [painting, setPainting] = useState(false)
   const handlePating = () => {
     setIsPainting(!isPainting)
@@ -388,17 +390,28 @@ export function Canvas(props: Props) {
     setPainting(true)
     console.log('start painting')
   }
+  const calcRange = (pos: Pos) => {
+    if (pos.top > T) T = pos.top
+    if (pos.left < L) L = pos.left
+    if (pos.top < D) D = pos.top
+    if (pos.left > R) R = pos.left
+  }
   const handlePainting = (e: MouseEvent) => {
     if (!painting) return
-    points = [...points, getCursorPosInCanvas(e, canvas)]
+    const pos = getCursorPosInCanvas(e, canvas)
+    if (pos === 'outOfCanvas') return
+    points = [...points, new PointSpirit(canvas3dRef.current, pos)]
+    calcRange(pos)
+    points.forEach((point) => { point.render() })
 
-    console.log(points)
+    // console.log(points)
   }
   const endPainting = () => {
     if (painting) {
       setPainting(false)
       // const pointSpirits = points.map((point)=>)
       console.log('end painting', points)
+      console.log(T, L, D, R)
       return
     }
   }
