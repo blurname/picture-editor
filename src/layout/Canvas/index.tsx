@@ -42,6 +42,7 @@ import { useNavigate } from 'react-router-dom'
 import { useUsers } from '../../hooks/useUsers'
 import { map } from 'superstruct'
 import { useMovement } from '../../hooks/useMovement'
+import { throttle } from '../../utils/render-utils'
 
 type Props = {}
 type remoteModel = {
@@ -66,6 +67,8 @@ export function Canvas(props: Props) {
     zoomable,
     operationHistory,
     socket,
+    isPainting,
+    setIsPainting
   } = useContext(globalContext)
   const { userId } = useContext(userContext)
   const navigate = useNavigate()
@@ -135,8 +138,9 @@ export function Canvas(props: Props) {
 
   let curImage: number
   let oldPos: Pos
-
+  let points = []
   const handleOnMouseMove = (e: MouseEvent) => {
+    handlePainting(e)
     if (curImage === 0 || !isMoveable || zoomable) return
     e.preventDefault()
     canvas2dRef.current.style.cursor = 'move'
@@ -166,11 +170,14 @@ export function Canvas(props: Props) {
   }
   const handleOnMouseDown = (e: MouseEvent) => {
     e.preventDefault()
+    startPainting()
     const controllSet = new Set()
     for (let i = 0; i < controllerList.length; i++) {
       controllSet.add(controllerList[i].spiritId)
     }
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
+
+    //choose spirit in the top level from same area
     let indexArray: number[] = []
     for (let i = 0; i < images.length; i++) {
       if (images[i] !== null) {
@@ -218,6 +225,7 @@ export function Canvas(props: Props) {
   }
 
   const thandleOnMouseUp = (e: MouseEvent) => {
+    endPainting()
     isMoveable = false
     //console.log('oldPos:', oldPos)
     if (oldPos !== undefined) {
@@ -361,12 +369,47 @@ export function Canvas(props: Props) {
     setInvitedName(e.target.value)
   }
   const [isModalVisible, setIsModalVisible] = useState(false)
+
+
+  //painting
+  const [painting, setPainting] = useState(false)
+  const handlePating = () => {
+    setIsPainting(!isPainting)
+
+  }
+  useEffect(() => {
+    if (isPainting) canvas2dRef.current.style.cursor = 'crosshair'
+    else canvas2dRef.current.style.cursor = 'default'
+  }, [isPainting])
+
+  const startPainting = () => {
+    if (!isPainting) return
+    points = []
+    setPainting(true)
+    console.log('start painting')
+  }
+  const handlePainting = (e: MouseEvent) => {
+    if (!painting) return
+    points = [...points, getCursorPosInCanvas(e, canvas)]
+
+    console.log(points)
+  }
+  const endPainting = () => {
+    if (painting) {
+      setPainting(false)
+      // const pointSpirits = points.map((point)=>)
+      console.log('end painting', points)
+      return
+    }
+  }
+
   return (
     <div className="flex-grow w-max h-full bg-gray-100">
       {users.map((cur, index) => {
         return <h1 key={index}>{cur.name}</h1>
       })}
       <h1>cmpcount{cmpCount}</h1>
+      <Button onClick={handlePating}>pating</Button>
       <Button onClick={closeSockt}>back home</Button>
       <Button onClick={showModal}>invite</Button>
       <Modal

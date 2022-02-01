@@ -159,7 +159,7 @@ export const createCircle = (angleNum: number = 40) => {
     },
   }
 }
-export const createSolidCircle = (angleNum: number = 40) => {
+export const createSolidCircle = (angleNum: number = 5) => {
 	let position = [] as number[]
 	let indexArray = [] as number[]
 	let color = [] as number[]

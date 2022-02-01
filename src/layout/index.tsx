@@ -18,6 +18,7 @@ export function Layout() {
   const [selectNum, setSelectNum] = useState(-1)
   const [adjustNum, setAdjustNum] = useState(0)
   const [zoomable, setZoomable] = useState(false)
+  const [isPainting,setIsPainting] = useState(false)
   const spiritCanvas = useCanvas(userId, parseInt(id))
   const [operationHistory, setOperationHistory] = useState(
     new OperationHistory(spiritCanvas, ax),
@@ -41,7 +42,9 @@ export function Layout() {
           zoomable,
           setZoomable,
           operationHistory,
-					socket
+					socket,
+          isPainting,
+          setIsPainting
         }}
       >
           <Components />

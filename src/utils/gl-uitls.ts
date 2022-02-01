@@ -44,6 +44,23 @@ import {
 } from './geo-utils'
 const { VertexBuffers, IndexBuffer, Uniforms, Textures, OffscreenTarget } =
   ResourceTypes
+
+export class PointSpirit{
+  beam:Beam
+  canvas:HTMLCanvasElement
+  layer:number
+  offset:Pos
+  shader:Shader
+  constructor(canvas:HTMLCanvasElement){
+    this.canvas = canvas
+    this.beam = new Beam(canvas)
+    this.offset = {left:0,top:0}
+    this.shader = createSolidCircle()
+  }
+  render(){
+
+  }
+}
 export class BeamSpirit {
   protected beam: Beam
   protected id: number
