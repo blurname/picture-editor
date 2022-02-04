@@ -258,6 +258,37 @@ export class RectModel extends BeamSpirit {
     this.updateGuidRect()
   }
 }
+export class PointContainerSpirit extends RectModel {
+  constructor(canvas: HTMLCanvasElement, id: number, TLDR: number[], points: PointSpirit[]) {
+    super(canvas, id)
+    this.spiritType = 'Mosaic'
+    const buffers = this.getBuffersByShape(type)
+    this.position = buffers.vertex.position
+    this.vertexBuffers = this.beam.resource(VertexBuffers, buffers.vertex)
+    this.indexBuffer = this.beam.resource(IndexBuffer, buffers.index)
+    this.uniforms = this.beam.resource(Uniforms, {
+      transMat: this.transMat,
+      rotateMat: this.rotateMat,
+      scaleMat: this.scaleMat,
+      projectionMat: this.projectionMat,
+      layer: this.layer,
+    })
+    this.updateGuidRect()
+  }
+  updateFromRemote<T extends SpiritsAction>(
+    action: T,
+    actionType: SpiritsActionLiteral,
+  ) {
+    if (actionType === 'Model') {
+      this.updateRectModel(action as Model)
+      //} else {
+      //this.updateRectMarkProps(action as MarkProps)
+    }
+  }
+  updateGuidRect() {
+    this.guidRect = updateContainer(this.position, this.scale)
+  }
+}
 export class ImageSpirit extends RectModel {
   image: HTMLImageElement
   textures: TexturesResource
@@ -963,6 +994,14 @@ const updateCircle = (radius: number, offset: Pos, scale: number) => {
     offset,
     scale,
   )
+}
+const updateContainer = (TLDR: number[], scale: number) => {
+  return {
+    x: TLDR[2] * scale,
+    y: TLDR[1] * scale,
+    width: Math.abs(TLDR[1] - TLDR[3]) * scale,
+    height: Math.abs(TLDR[0] - TLDR[2]) * scale
+  }
 }
 const getCanvasEdge = (canvas: HTMLCanvasElement) => {
   const w = canvas.width / 2

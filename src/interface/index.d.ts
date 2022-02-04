@@ -49,15 +49,15 @@ type MarkProps = {
 type CircleProps = MarkProps & {
   radius: number
 }
-type BackgroundProps = MarkProps& {
+type BackgroundProps = MarkProps & {
 
 }
 type UniqueProps = MarkProps | ImageProps | CircleProps | BackgroundProps
 
 type Mosaic = Model
-type Shape = 'line' | 'hollowRect' | 'circle' | 'theW'|'solidCircle'
-type SpiritType = 'Image' | 'Mark' | 'Mosaic'|'Background'|'BackNonImage'|'BackImage'
-type MosaicType = 'multi' | 'frac'|'snow'
+type Shape = 'line' | 'hollowRect' | 'circle' | 'theW' | 'solidCircle'
+type SpiritType = 'Image' | 'Mark' | 'Mosaic' | 'Background' | 'BackNonImage' | 'BackImage' | 'PointContainer'
+type MosaicType = 'multi' | 'frac' | 'snow'
 type Point = { x: number; y: number }
 
 type SpiritsAction = UniqueProps | Model

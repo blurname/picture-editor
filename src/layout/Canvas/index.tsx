@@ -44,6 +44,7 @@ import { useUsers } from '../../hooks/useUsers'
 import { map } from 'superstruct'
 import { useMovement } from '../../hooks/useMovement'
 import { throttle } from '../../utils/render-utils'
+import { render } from 'react-dom'
 
 type Props = {}
 type remoteModel = {
@@ -400,8 +401,10 @@ export function Canvas(props: Props) {
     if (!painting) return
     const pos = getCursorPosInCanvas(e, canvas)
     if (pos === 'outOfCanvas') return
+    renderAll()
     points = [...points, new PointSpirit(canvas3dRef.current, pos)]
     calcRange(pos)
+
     points.forEach((point) => { point.render() })
 
     // console.log(points)
