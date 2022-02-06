@@ -259,20 +259,16 @@ export class RectModel extends BeamSpirit {
   }
 }
 export class PointContainerSpirit extends RectModel {
+  width:number
+  height:number
+  points:PointSpirit[]
   constructor(canvas: HTMLCanvasElement, id: number, TLDR: number[], points: PointSpirit[]) {
     super(canvas, id)
-    this.spiritType = 'Mosaic'
-    const buffers = this.getBuffersByShape(type)
-    this.position = buffers.vertex.position
-    this.vertexBuffers = this.beam.resource(VertexBuffers, buffers.vertex)
-    this.indexBuffer = this.beam.resource(IndexBuffer, buffers.index)
-    this.uniforms = this.beam.resource(Uniforms, {
-      transMat: this.transMat,
-      rotateMat: this.rotateMat,
-      scaleMat: this.scaleMat,
-      projectionMat: this.projectionMat,
-      layer: this.layer,
-    })
+    this.spiritType = 'PointContainer'
+    this.width = Math.abs(TLDR[1] - TLDR[3]) 
+    this.height= Math.abs(TLDR[0] - TLDR[2]) 
+    this.offset = {left:TLDR[1],top:TLDR[2]}
+    this.points = points
     this.updateGuidRect()
   }
   updateFromRemote<T extends SpiritsAction>(
@@ -285,8 +281,16 @@ export class PointContainerSpirit extends RectModel {
       //this.updateRectMarkProps(action as MarkProps)
     }
   }
+  updatePosition(distance:Pos){
+    this.offset = distance
+    this.points.forEach((point) => point.updatePosition(distance))
+    this.updateGuidRect()
+  }
   updateGuidRect() {
-    this.guidRect = updateContainer(this.position, this.scale)
+    this.guidRect = updateContainer(this.offset,this.width,this.height,this.scale)
+  }
+  render() {
+    this.points.forEach((point) => point.render())
   }
 }
 export class ImageSpirit extends RectModel {
@@ -995,12 +999,12 @@ const updateCircle = (radius: number, offset: Pos, scale: number) => {
     scale,
   )
 }
-const updateContainer = (TLDR: number[], scale: number) => {
+const updateContainer = (offset:Pos,width:number,height:number,scale:number) => {
   return {
-    x: TLDR[2] * scale,
-    y: TLDR[1] * scale,
-    width: Math.abs(TLDR[1] - TLDR[3]) * scale,
-    height: Math.abs(TLDR[0] - TLDR[2]) * scale
+    x: offset.left*scale,
+    y: offset.top*scale,
+    width:  width*scale,
+    height:  height*scale
   }
 }
 const getCanvasEdge = (canvas: HTMLCanvasElement) => {

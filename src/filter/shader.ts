@@ -219,6 +219,30 @@ export const circleShader = {
   mode: GLTypes.Lines,
 }
 
+const solidCircleVS = `
+#define pi 3.1415926
+attribute highp vec4 position;
+attribute highp vec4 color;
+
+uniform highp float radius;
+uniform highp float centerX;
+uniform highp float centerY;
+uniform highp float offsetX;
+uniform highp float offsetY;
+uniform highp float projectionX;
+uniform highp float projectionY;
+uniform highp float scale;
+
+varying vec4 vColor;
+void main(){
+
+		//float glRad = radius*projectionX*scale;
+		float x = cos(position.x*3.1415926/180.0)*radius*projectionX*scale;
+		float y = sin(position.x*3.1415926/180.0)*radius*projectionY*scale;
+		gl_Position = vec4(x+centerX*projectionX+offsetX,y+centerY*projectionY+offsetY,0.0,1.0);
+		vColor = color;
+}
+`
 export const solidCircleShader = {
   vs: circleVS,
   fs: circleFS,
@@ -231,6 +255,8 @@ export const solidCircleShader = {
     scale: { type: float },
     centerX: { type: float },
     centerY: { type: float },
+    offsetX:{type:float},
+    offsetY:{type:float},
     projectionX: { type: float },
     projectionY: { type: float },
     uColor: { type: vec4, n: 3 },

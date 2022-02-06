@@ -11,6 +11,8 @@ import {
   ImageSpirit,
   MarkSpirit,
   MosaicSpirit,
+  PointContainerSpirit,
+  PointSpirit,
   SolidCircleSpirit,
 } from '../utils/gl-uitls'
 import { createCanvas } from '../utils/http'
@@ -170,6 +172,29 @@ export class SpiritCanvas {
     if (!exist)
       this.spiritCommit(mosaic.getModel(), eSpiType.mosaic, mosaicType)
   }
+  addPointContainer(
+    points:PointSpirit[],
+    id: number,
+    exist: boolean = false,
+    TLDR?:number[],
+    model?: Model,
+  ) {
+
+    let pointContainer:PointContainerSpirit 
+    pointContainer = new PointContainerSpirit(this.canvas3d,id,TLDR,points)
+    
+    if (model) pointContainer.updateFromRemote(model, 'Model')
+    this.spirits[id] = pointContainer
+    this.guidLines.push(
+      new GuidLine(this.canvas3d, pointContainer.getGuidRect(), pointContainer.getId()),
+    )
+    if (!exist){
+      //const pointsPos = points.map((point) =>  point.offset)
+      const pointsPos = points.reduce((pre,cur) =>  [...pre,cur.offset.left,cur.offset.top] ,[] as number[])
+      this.spiritContainerCommit(pointContainer.getModel(), eSpiType.mosaic,JSON.stringify(pointsPos))
+    }
+  }
+
   async addBackground(
     element: string,
     type:keyof Pick<typeof eSpiType,'backNonImage'|'backImage'> ,
@@ -195,7 +220,6 @@ export class SpiritCanvas {
 			this.updateBackground(background.getModel(), eSpiType[type], element)
 		}
   }
-
   setCanvas3d(canvas: HTMLCanvasElement) {
     this.canvas3d = canvas
     this.beamClener = new Beam(this.canvas3d)
@@ -210,7 +234,7 @@ export class SpiritCanvas {
       }
     }
   }
-  async spiritCommit<T extends Model, U extends Shape | string | 'background'>(
+  async spiritCommit<T extends Model, U extends Shape | string | 'background'|number[]>(
     model: T,
     spiritType: eSpiType,
     element: U,
@@ -218,6 +242,18 @@ export class SpiritCanvas {
     const res = await this.ax.post(
       `/canvas/add/?canvasid=${this.id}&spirittype=${spiritType}&canvas_spirit_id=${model.id}&element=${element}`,
       JSON.stringify(model),
+    )
+    console.log(res.data)
+  }
+
+  async spiritContainerCommit<T extends Model, U extends Shape | string | 'background'|number[]>(
+    model: T,
+    spiritType: eSpiType,
+    element: U,
+  ) {
+    const res = await this.ax.post(
+      `/canvas/addElementContainer/?canvasid=${this.id}&spirittype=${spiritType}&canvas_spirit_id=${model.id}`,
+        {model:JSON.stringify(model),element},
     )
     console.log(res.data)
   }

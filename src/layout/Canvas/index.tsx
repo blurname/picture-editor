@@ -36,15 +36,11 @@ import {
 } from '../../utils/http'
 import { screenshot } from '../../utils/saveImage'
 import { useRenderAll } from '../../hooks/useRenderAll'
-import { useSocket } from '../../hooks/useSocket'
 import { useController } from '../../hooks/useEmitControll'
 import { CanvasScoekt } from '../../utils/socket-utils'
 import { useNavigate } from 'react-router-dom'
 import { useUsers } from '../../hooks/useUsers'
-import { map } from 'superstruct'
 import { useMovement } from '../../hooks/useMovement'
-import { throttle } from '../../utils/render-utils'
-import { render } from 'react-dom'
 
 type Props = {}
 type remoteModel = {
@@ -142,6 +138,8 @@ export function Canvas(props: Props) {
   let oldPos: Pos
 
   const handleOnMouseMove = (e: MouseEvent) => {
+    //const distance0 = getCursorMovDistance(e, canvas)
+    //console.log(distance0)
     handlePainting(e)
     if (curImage === 0 || !isMoveable || zoomable) return
     e.preventDefault()
@@ -153,6 +151,7 @@ export function Canvas(props: Props) {
     //)
     //if (result === 'out') return
     const distance = getCursorMovDistance(e, canvas)
+    console.log(distance)
     images[curImage].updatePosition(distance)
     spiritCanvas.updateGuidRect(images[curImage])
     socket.emit('server-move', spiritCanvas.id, curImage, distance)
@@ -412,6 +411,8 @@ export function Canvas(props: Props) {
   const endPainting = () => {
     if (painting) {
       setPainting(false)
+      spiritCanvas.addPointContainer(points,cmpCount,false,[T,L,D,R] )
+      setCmpCount(cmpCount + 1)
       // const pointSpirits = points.map((point)=>)
       console.log('end painting', points)
       console.log(T, L, D, R)
