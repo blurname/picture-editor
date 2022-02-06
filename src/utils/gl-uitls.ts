@@ -9,6 +9,7 @@ import {
   UniformsResource,
   VertexBuffersResource,
 } from 'beam-gl'
+import {object} from 'superstruct'
 import {
   hollowRectShader,
   lineRectShader,
@@ -78,17 +79,19 @@ export class PointSpirit {
       scale: this.scale,
       centerX: this.offset.left,
       centerY: this.offset.top,
+      offsetX:0.0,
+      offsetY:0.0,
       uColor: [1.0, 1.0, 1.0, 1.0],
       projectionX: this.projectionX,
       projectionY: this.projectionY,
       layer: this.layer,
     })
-    this.updatePosition(this.offset)
+    //this.updatePosition(this.offset)
   }
   updatePosition(distance: Pos = { left: 0, top: 0 }) {
     this.offset = { ...distance }
-    this.uniforms.set('centerX', this.offset.left)
-    this.uniforms.set('centerY', this.offset.top)
+    this.uniforms.set('offsetX', this.offset.left)
+    this.uniforms.set('offsetY', this.offset.top)
   }
   render() {
     this.beam
@@ -261,13 +264,16 @@ export class RectModel extends BeamSpirit {
 export class PointContainerSpirit extends RectModel {
   width:number
   height:number
+  center:Pos
   points:PointSpirit[]
   constructor(canvas: HTMLCanvasElement, id: number, TLDR: number[], points: PointSpirit[]) {
     super(canvas, id)
     this.spiritType = 'PointContainer'
     this.width = Math.abs(TLDR[1] - TLDR[3]) 
     this.height= Math.abs(TLDR[0] - TLDR[2]) 
-    this.offset = {left:TLDR[1],top:TLDR[2]}
+    this.center = {left:TLDR[1],top:TLDR[2]}
+    this.offset = {left:this.center.left,top:this.center.top}
+
     this.points = points
     this.updateGuidRect()
   }
@@ -283,11 +289,13 @@ export class PointContainerSpirit extends RectModel {
   }
   updatePosition(distance:Pos){
     this.offset = distance
-    this.points.forEach((point) => point.updatePosition(distance))
+    const relativeDistance:Pos = {left:distance.left-this.center.left,top:distance.top-this.center.top}
+    this.points.forEach((point) => point.updatePosition(relativeDistance))
     this.updateGuidRect()
   }
   updateGuidRect() {
-    this.guidRect = updateContainer(this.offset,this.width,this.height,this.scale)
+    //this.guidRect = updateContainer({left:this.center.left+this.offset.left,top:this.center.top+this.offset.top},this.width,this.height,this.scale)
+    this.guidRect = updateContainer({left:this.offset.left,top:this.offset.top},this.width,this.height,this.scale)
   }
   render() {
     this.points.forEach((point) => point.render())

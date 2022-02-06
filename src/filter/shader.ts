@@ -239,12 +239,12 @@ void main(){
 		//float glRad = radius*projectionX*scale;
 		float x = cos(position.x*3.1415926/180.0)*radius*projectionX*scale;
 		float y = sin(position.x*3.1415926/180.0)*radius*projectionY*scale;
-		gl_Position = vec4(x+centerX*projectionX+offsetX,y+centerY*projectionY+offsetY,0.0,1.0);
+    gl_Position = vec4(x+(centerX+offsetX)*projectionX,y+(centerY+offsetY)*projectionY,0.0,1.0);
 		vColor = color;
 }
 `
 export const solidCircleShader = {
-  vs: circleVS,
+  vs: solidCircleVS,
   fs: circleFS,
   buffers: {
     position: { type: float },
