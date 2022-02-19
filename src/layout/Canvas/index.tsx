@@ -178,6 +178,7 @@ export function Canvas(props: Props) {
       controllSet.add(controllerList[i].spiritId)
     }
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
+    console.log(images)
 
     //choose spirit in the top level from same area
     let indexArray: number[] = []
@@ -191,6 +192,7 @@ export function Canvas(props: Props) {
             { x: cursorPos.left, y: cursorPos.top },
             images[i].getGuidRect(),
           )
+          console.log('handledown',i,images[i].getGuidRect())
           if (result !== 'out') {
             indexArray.push(i)
           }
@@ -201,6 +203,7 @@ export function Canvas(props: Props) {
     //setSelectNum(0)
     //}
     if (indexArray.length > 0) {
+    console.log({indexArray})
       const cur = maxLayer(indexArray, images)
       curImage = cur
       setSelectNum(curImage)
@@ -436,7 +439,7 @@ export function Canvas(props: Props) {
     const width = Math.abs(L - R) 
     const height= Math.abs(T - D) 
     const left = L
-    const top = T
+    const top = D
       spiritCanvas.addPointContainer(points,cmpCount,false,{width,height,left,top} )
       console.log(spiritCanvas.guidLines)
       setCmpCount(cmpCount + 1)
