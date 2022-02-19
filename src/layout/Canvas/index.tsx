@@ -31,6 +31,7 @@ import {
   ax,
   baseUrl,
   getIsHavingSpirits,
+  getPoints,
   getSpirits,
   wsbaseUrl,
 } from '../../utils/http'
@@ -290,6 +291,7 @@ export function Canvas(props: Props) {
   }, [initCount])
 
   type CModel = {
+  id:number
     spiritType: number
     model: Model
     element: Shape | string
@@ -300,6 +302,7 @@ export function Canvas(props: Props) {
       console.log('initImages:', initImages)
       const models: CModel[] = initImages.map((img) => {
         return {
+          id:img.id,
           spiritType: img.spirit_type,
           model: JSON.parse(img.model),
           element: img.element,
@@ -307,14 +310,25 @@ export function Canvas(props: Props) {
         }
       })
       console.log('models:', models)
-      for (let i = 0; i < models.length; i++) {
+      models.forEach(async (model) => {
+      // for special spirit
+      if(model.spiritType===6){
+      const points = await getPoints(model.id)
         spiritCanvas.updateFromRemote(
-          models[i].spiritType,
-          models[i].model,
-          models[i].element,
-          models[i].uniqueProps,
+          model.spiritType,
+          model.model,
+          points as any,
+          model.uniqueProps,
+        )
+      }else{
+        spiritCanvas.updateFromRemote(
+          model.spiritType,
+          model.model,
+          model.element,
+          model.uniqueProps,
         )
       }
+      })
       setTimeout(() => {
         renderAll()
       }, 1000)
@@ -400,6 +414,14 @@ export function Canvas(props: Props) {
     if (!painting) return
     const pos = getCursorPosInCanvas(e, canvas)
     if (pos === 'outOfCanvas') return
+    if(points.length>0){
+      const lastPoint = points[points.length-1]
+      if(pos.left< lastPoint.offset.left+15 && pos.left > lastPoint.offset.left-15 )
+        return
+      if(pos.top< lastPoint.offset.top+15 && pos.top > lastPoint.offset.top-15 )
+        return
+    }
+
     renderAll()
     points = [...points, new PointSpirit(canvas3dRef.current, pos)]
     calcRange(pos)
@@ -411,7 +433,12 @@ export function Canvas(props: Props) {
   const endPainting = () => {
     if (painting) {
       setPainting(false)
-      spiritCanvas.addPointContainer(points,cmpCount,false,[T,L,D,R] )
+    const width = Math.abs(L - R) 
+    const height= Math.abs(T - D) 
+    const left = L
+    const top = T
+      spiritCanvas.addPointContainer(points,cmpCount,false,{width,height,left,top} )
+      console.log(spiritCanvas.guidLines)
       setCmpCount(cmpCount + 1)
       // const pointSpirits = points.map((point)=>)
       console.log('end painting', points)

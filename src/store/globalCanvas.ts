@@ -1,5 +1,6 @@
 import { AxiosInstance } from 'axios'
 import { Beam } from 'beam-gl'
+import {type} from 'superstruct'
 import {backShader, backUniforms} from '../layout/Editor/EBack'
 import {
   BackgroundSpirit,
@@ -22,7 +23,8 @@ enum eSpiType {
   mark,
   mosaic,
   backNonImage,
-	backImage
+	backImage,
+  point,
 }
 export function loadImage(url: string) {
   return new Promise((resolve, reject) => {
@@ -80,10 +82,9 @@ export class SpiritCanvas {
     console.log('constructor: ' + this.id)
   }
   async setCanvas() {
-    console.log('asldfkjsad;lfjk')
     this.id = await createCanvas(this.ownerId)
   }
-  updateFromRemote<T extends Shape | string | MosaicType | 'background'>(
+  updateFromRemote<T extends Shape | string | MosaicType | 'background'| PointSpirit[]>(
     typeId: number,
     model: Model,
     element: T,
@@ -92,16 +93,17 @@ export class SpiritCanvas {
     const result = binarySearch(model.id, this.spirits)
     if (result === -1) {
       if (typeId === 1)
-        this.addImage(element, model.id, true, model, uniqueProps)
+        this.addImage(element as string, model.id, true, model, uniqueProps)
       else if (typeId === 2)
         this.addMark(element as Shape, model.id, true, model, uniqueProps)
       else if (typeId === 3)
         this.addMosaic(element as MosaicType, model.id, true, model)
-      else if (typeId === 4) {
-        this.addBackground(element, 'backNonImage', true,uniqueProps)
-      }else if(typeId===5){
-        this.addBackground(element, 'backImage', true)
-			}
+      else if (typeId === 4) 
+        this.addBackground(element as string, 'backNonImage', true,uniqueProps)
+      else if(typeId === 5)
+        this.addBackground(element as string, 'backImage', true)
+      else if(typeId === 6)
+        this.addPointContainer(element as PointSpirit[], model.id,true,uniqueProps,model)
     }
   }
   async addImage(
@@ -176,12 +178,13 @@ export class SpiritCanvas {
     points:PointSpirit[],
     id: number,
     exist: boolean = false,
-    TLDR?:number[],
+    uniqueProps:Partial<PointProps>,
     model?: Model,
   ) {
 
     let pointContainer:PointContainerSpirit 
-    pointContainer = new PointContainerSpirit(this.canvas3d,id,TLDR,points)
+    pointContainer = new PointContainerSpirit(this.canvas3d,id,uniqueProps,points)
+    console.log({pointContainer})
     
     if (model) pointContainer.updateFromRemote(model, 'Model')
     this.spirits[id] = pointContainer
@@ -189,9 +192,8 @@ export class SpiritCanvas {
       new GuidLine(this.canvas3d, pointContainer.getGuidRect(), pointContainer.getId()),
     )
     if (!exist){
-      //const pointsPos = points.map((point) =>  point.offset)
       const pointsPos = points.reduce((pre,cur) =>  [...pre,cur.offset.left,cur.offset.top] ,[] as number[])
-      this.spiritContainerCommit(pointContainer.getModel(), eSpiType.mosaic,JSON.stringify(pointsPos))
+      this.spiritContainerCommit(pointContainer.getModel(), eSpiType.point,JSON.stringify(pointsPos))
     }
   }
 

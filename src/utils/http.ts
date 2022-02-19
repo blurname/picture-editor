@@ -46,3 +46,19 @@ export const getCanvasUrl = (img: any) => {
   const dataurl = canvas.toDataURL()
   return dataurl
 }
+
+export const getPoints = async(spiritId:number)=>{
+  try {
+    const res = await ax.get(`/canvas/get_point/?spirit_id=${spiritId}`)
+    const data = res.data as any[]
+    const points = data.map((point) => {
+      return {
+        left:point.left,
+        top:point.top
+      }
+    })
+    return points
+  } catch (err) {
+    
+  }
+}

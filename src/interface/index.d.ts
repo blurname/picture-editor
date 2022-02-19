@@ -52,7 +52,13 @@ type CircleProps = MarkProps & {
 type BackgroundProps = MarkProps & {
 
 }
-type UniqueProps = MarkProps | ImageProps | CircleProps | BackgroundProps
+type PointProps = MarkProps &{
+  left:number
+  top:number
+  width:number
+  height:number
+}
+type UniqueProps = MarkProps | ImageProps | CircleProps | BackgroundProps | PointProps
 
 type Mosaic = Model
 type Shape = 'line' | 'hollowRect' | 'circle' | 'theW' | 'solidCircle'

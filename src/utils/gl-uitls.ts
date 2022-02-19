@@ -266,12 +266,12 @@ export class PointContainerSpirit extends RectModel {
   height:number
   center:Pos
   points:PointSpirit[]
-  constructor(canvas: HTMLCanvasElement, id: number, TLDR: number[], points: PointSpirit[]) {
+  constructor(canvas: HTMLCanvasElement, id: number, uniqueProps: Partial<PointProps>, points: PointSpirit[]) {
     super(canvas, id)
     this.spiritType = 'PointContainer'
-    this.width = Math.abs(TLDR[1] - TLDR[3]) 
-    this.height= Math.abs(TLDR[0] - TLDR[2]) 
-    this.center = {left:TLDR[1],top:TLDR[2]}
+    this.width = uniqueProps.width 
+    this.height= uniqueProps.height
+    this.center = {left:uniqueProps.left,top:uniqueProps.top}
     this.offset = {left:this.center.left,top:this.center.top}
 
     this.points = points
@@ -283,9 +283,10 @@ export class PointContainerSpirit extends RectModel {
   ) {
     if (actionType === 'Model') {
       this.updateRectModel(action as Model)
-      //} else {
-      //this.updateRectMarkProps(action as MarkProps)
     }
+    //else if(actionType === 'UniqueProps'){
+      //this.updateUniqueProps(action)
+    //}
   }
   updatePosition(distance:Pos){
     this.offset = distance
@@ -297,6 +298,10 @@ export class PointContainerSpirit extends RectModel {
     //this.guidRect = updateContainer({left:this.center.left+this.offset.left,top:this.center.top+this.offset.top},this.width,this.height,this.scale)
     this.guidRect = updateContainer({left:this.offset.left,top:this.offset.top},this.width,this.height,this.scale)
   }
+  //updateUniqueProps(uniqueProps:PointProps){
+
+
+  //}
   render() {
     this.points.forEach((point) => point.render())
   }
