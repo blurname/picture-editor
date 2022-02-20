@@ -266,6 +266,14 @@ export class PointContainerSpirit extends RectModel {
   height:number
   center:Pos
   points:PointSpirit[]
+  uniqueProps: PointProps = {
+    id: -1,
+    width: 0,
+    height: 0,
+    left:0,
+    top:0,
+    uColor:[]
+  }
   constructor(canvas: HTMLCanvasElement, id: number, uniqueProps: Partial<PointProps>, points: PointSpirit[]) {
     super(canvas, id)
     this.spiritType = 'PointContainer'
@@ -273,9 +281,11 @@ export class PointContainerSpirit extends RectModel {
     this.height= uniqueProps.height
     this.center = {left:uniqueProps.left,top:uniqueProps.top}
     this.offset = {left:this.center.left,top:this.center.top}
+    this.uniqueProps.id = this.id
 
     this.points = points
     this.updateGuidRect()
+    this.updateUniqueProps({...uniqueProps})
   }
   updateFromRemote<T extends SpiritsAction>(
     action: T,
@@ -283,10 +293,9 @@ export class PointContainerSpirit extends RectModel {
   ) {
     if (actionType === 'Model') {
       this.updateRectModel(action as Model)
+    } else {
+      this.updatePointProps(action as ImageProps)
     }
-    //else if(actionType === 'UniqueProps'){
-      //this.updateUniqueProps(action)
-    //}
   }
   updatePosition(distance:Pos){
     this.offset = distance
@@ -298,10 +307,29 @@ export class PointContainerSpirit extends RectModel {
     //this.guidRect = updateContainer({left:this.center.left+this.offset.left,top:this.center.top+this.offset.top},this.width,this.height,this.scale)
     this.guidRect = updateContainer({left:this.offset.left,top:this.offset.top},this.width,this.height,this.scale)
   }
-  //updateUniqueProps(uniqueProps:PointProps){
 
-
-  //}
+  updateUniqueProps<T extends Omit<Partial<PointProps>, 'id'>>(uniqueProps: T) {
+    this.updatePointProps(uniqueProps)
+  }
+  updateRectModel<T extends Partial<Model>>(model: T) {
+    //if (model.scale) {
+      //this.updateScaleMat(model.scale)
+      //this.updateTransMat(this.model.trans)
+    //}
+    //if (model.rotate) this.updateRotateMat(model.rotate)
+    //if (model.trans) this.updateTransMat(model.trans)
+    //if (model.layer) this.updateLayer(model.layer)
+    //this.updateGuidRect()
+  }
+  updatePointProps(props:Partial<PointProps>){
+    for (const key in props) {
+      const element = props[key]
+      if (key !== 'id') {
+        this[key] = element
+        this.uniqueProps[key] = element
+      }
+    }
+  }
   render() {
     this.points.forEach((point) => point.render())
   }

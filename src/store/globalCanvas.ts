@@ -178,7 +178,7 @@ export class SpiritCanvas {
     points:PointSpirit[],
     id: number,
     exist: boolean = false,
-    uniqueProps:Partial<PointProps>,
+    uniqueProps:Partial<UniqueProps>,
     model?: Model,
   ) {
 
@@ -187,12 +187,16 @@ export class SpiritCanvas {
     console.log({pointContainer})
     
     if (model) pointContainer.updateFromRemote(model, 'Model')
+    //if (uniqueProps) pointContainer.updateFromRemote(uniqueProps, 'uniqueProps')
     this.spirits[id] = pointContainer
     this.guidLines.push(
       new GuidLine(this.canvas3d, pointContainer.getGuidRect(), pointContainer.getId()),
     )
     if (!exist){
+      console.log('before',points)
       const pointsPos = points.reduce((pre,cur) =>  [...pre,cur.offset.left,cur.offset.top] ,[] as number[])
+
+      console.log('after',pointsPos)
       this.spiritContainerCommit(pointContainer.getModel(), eSpiType.point,JSON.stringify(pointsPos))
     }
   }

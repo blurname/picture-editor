@@ -317,10 +317,14 @@ export function Canvas(props: Props) {
       // for special spirit
       if(model.spiritType===6){
       const points = await getPoints(model.id)
+      const pointSpirits = points.map((point) => (
+new PointSpirit(canvas3dRef.current, point)
+      ))
+      console.log({points})
         spiritCanvas.updateFromRemote(
           model.spiritType,
           model.model,
-          points as any,
+          pointSpirits as any,
           model.uniqueProps,
         )
       }else{
@@ -433,7 +437,7 @@ export function Canvas(props: Props) {
 
     // console.log(points)
   }
-  const endPainting = () => {
+  const endPainting = async () => {
     if (painting) {
       setPainting(false)
     const width = Math.abs(L - R) 
@@ -441,6 +445,10 @@ export function Canvas(props: Props) {
     const left = L
     const top = D
       spiritCanvas.addPointContainer(points,cmpCount,false,{width,height,left,top} )
+      setTimeout(()=>{
+
+      operationHistory.updateRemote(cmpCount, 'UniqueProps')
+      },100)
       console.log(spiritCanvas.guidLines)
       setCmpCount(cmpCount + 1)
       // const pointSpirits = points.map((point)=>)
