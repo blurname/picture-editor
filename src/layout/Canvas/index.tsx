@@ -17,6 +17,7 @@ import {
   getCursorMovDistance,
   getCursorPosInCanvas,
 } from '../../utils/geo-utils'
+import { ChatRoom } from '../ChatRoom'
 
 import {
   BackgroundSpirit,
@@ -118,8 +119,8 @@ export function Canvas(props: Props) {
     }
   }, [controllerList, canvas2dRef])
   useMovement(socket, images, spiritCanvas, renderController)
+
   const maxLayer = (indexArray: number[], spirits: BeamSpirit[]) => {
-    console.log(indexArray)
     let min = 2
     let maxIndex = -1
     for (let i = 0; i < indexArray.length; i++) {
@@ -131,7 +132,6 @@ export function Canvas(props: Props) {
         maxIndex = j
       }
     }
-    console.log('maxIndex:', maxIndex)
     return maxIndex
   }
 
@@ -152,7 +152,6 @@ export function Canvas(props: Props) {
     //)
     //if (result === 'out') return
     const distance = getCursorMovDistance(e, canvas)
-    console.log(distance)
     images[curImage].updatePosition(distance)
     spiritCanvas.updateGuidRect(images[curImage])
     socket.emit('server-move', spiritCanvas.id, curImage, distance)
@@ -167,9 +166,9 @@ export function Canvas(props: Props) {
       }
     }
     renderController()
-
     spiritCanvas.renderAllLine()
   }
+
   const handleOnMouseDown = (e: MouseEvent) => {
     e.preventDefault()
     startPainting()
@@ -178,7 +177,6 @@ export function Canvas(props: Props) {
       controllSet.add(controllerList[i].spiritId)
     }
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
-    console.log(images)
 
     //choose spirit in the top level from same area
     let indexArray: number[] = []
@@ -203,7 +201,6 @@ export function Canvas(props: Props) {
     //setSelectNum(0)
     //}
     if (indexArray.length > 0) {
-    console.log({indexArray})
       const cur = maxLayer(indexArray, images)
       curImage = cur
       setSelectNum(curImage)
@@ -232,7 +229,6 @@ export function Canvas(props: Props) {
   const thandleOnMouseUp = (e: MouseEvent) => {
     endPainting()
     isMoveable = false
-    //console.log('oldPos:', oldPos)
     if (oldPos !== undefined) {
       const spirit = spiritCanvas.spirits[curImage]
       operationHistory.commit(
@@ -460,10 +456,10 @@ new PointSpirit(canvas3dRef.current, point)
 
   return (
     <div className="flex-grow w-max h-full bg-gray-100">
-      {users.map((cur, index) => {
-        return <h1 key={index}>{cur.name}</h1>
-      })}
-      <h1>cmpcount{cmpCount}</h1>
+      {/*{users.map((cur, index) => {*/}
+        {/*return <h1 key={index}>{cur.name}</h1>*/}
+      {/*})}*/}
+      {/*<h1>cmpcount{cmpCount}</h1>*/}
       <Button onClick={handlePating}>pating</Button>
       <Button onClick={closeSockt}>back home</Button>
       <Button onClick={showModal}>invite</Button>
@@ -534,6 +530,7 @@ new PointSpirit(canvas3dRef.current, point)
             </h1>
           )
         })}
+        <ChatRoom socket={socket} canvasId={spiritCanvas.id}/>
       </div>
     </div>
   )
