@@ -151,7 +151,7 @@ export class SpiritCanvas {
     if (uniqueProps) {
       mark.updateFromRemote(uniqueProps as any, 'UniqueProps')
     }
-    this.spirits[id] = mark
+    this.spirits.push(mark)
     this.guidLines.push(
       new GuidLine(this.canvas3d, mark.getGuidRect(), mark.getId()),
     )

@@ -108,117 +108,100 @@ export function Canvas(props: Props) {
     for (let i = 0; i < controllerList.length; i++) {
       const selectId = controllerList[i].spiritId
       if (selectId !== -1 && selectId !== 0) {
-        drawRectBorder(canvas2dRef.current, images[selectId].getGuidRect())
-        drawNames(canvas2dRef.current, images[selectId].getGuidRect(), {
-          id: controllerList[i].id,
-          name: 'baolei',
-        })
-        //if (!zoomable && !isMoveable)
-        //spiritCanvas.setChosenType(images[curImage].getSpiritType())
+        if(images[selectId]!==null){
+          drawRectBorder(canvas2dRef.current, images[selectId].getGuidRect())
+          drawNames(canvas2dRef.current, images[selectId].getGuidRect(), {
+            id: controllerList[i].id,
+            name: 'baolei',
+          })
+          //if (!zoomable && !isMoveable)
+          //spiritCanvas.setChosenType(images[curImage].getSpiritType())
+        }
+        
       }
     }
   }, [controllerList, canvas2dRef])
   useMovement(socket, images, spiritCanvas, renderController)
 
+  let curSpiritId: number
+  let oldPos: Pos
+
+  const getCurrentSpirit = (spiritId:number, spirits:BeamSpirit[])=> {
+    return spirits.find((spirit)=>spirit.getId() === spiritId)
+  }
+
+  const handleOnMouseMove = (e: MouseEvent) => {
+    handlePainting(e)
+    if (curSpiritId === 0 || !isMoveable || zoomable) return
+    e.preventDefault()
+    canvas2dRef.current.style.cursor = 'move'
+    const distance = getCursorMovDistance(e, canvas)
+    const currentSpirit = getCurrentSpirit(curSpiritId, images)
+
+    currentSpirit.updatePosition(distance)
+    spiritCanvas.updateGuidRect(currentSpirit)
+
+    socket.emit('server-move', spiritCanvas.id, curSpiritId, distance)
+    images.forEach((image)=>image.render())
+    renderController()
+    spiritCanvas.renderAllLine()
+  }
+
+
   const maxLayer = (indexArray: number[], spirits: BeamSpirit[]) => {
     let min = 2
     let maxIndex = -1
-    for (let i = 0; i < indexArray.length; i++) {
-      const j = indexArray[i]
-      const element = spirits[j]
-      const elementlayer = element.getlayer()
-      if (elementlayer < min) {
-        min = elementlayer
-        maxIndex = j
+    indexArray.forEach((spiritId)=>{
+      const layer = getCurrentSpirit(spiritId,spirits).getlayer()
+      if (layer < min) {
+        min = layer
+        maxIndex = spiritId
       }
-    }
+    })
+
     return maxIndex
-  }
-
-  let curImage: number
-  let oldPos: Pos
-
-  const handleOnMouseMove = (e: MouseEvent) => {
-    //const distance0 = getCursorMovDistance(e, canvas)
-    //console.log(distance0)
-    handlePainting(e)
-    if (curImage === 0 || !isMoveable || zoomable) return
-    e.preventDefault()
-    canvas2dRef.current.style.cursor = 'move'
-    //const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
-    //const result = getCursorIsInQuad(
-    //{ x: cursorPos.left, y: cursorPos.top },
-    //images[selectNum].getGuidRect(),
-    //)
-    //if (result === 'out') return
-    const distance = getCursorMovDistance(e, canvas)
-    images[curImage].updatePosition(distance)
-    spiritCanvas.updateGuidRect(images[curImage])
-    socket.emit('server-move', spiritCanvas.id, curImage, distance)
-    //spiritCanvas.spirits[curImage].render()
-    //renderAll()
-    for (let i = 0; i < images.length; i++) {
-      if (images[i] !== null) {
-        images[i].render()
-        ////if (!zoomable && !isMoveable)
-        ////spiritCanvas.setChosenType(images[curImage].getSpiritType())
-        //}
-      }
-    }
-    renderController()
-    spiritCanvas.renderAllLine()
   }
 
   const handleOnMouseDown = (e: MouseEvent) => {
     e.preventDefault()
     startPainting()
     const controllSet = new Set()
-    for (let i = 0; i < controllerList.length; i++) {
-      controllSet.add(controllerList[i].spiritId)
-    }
+
+    controllerList.forEach((controller)=>{controllSet.add(controller.spiritId)})
+
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
 
     //choose spirit in the top level from same area
+
     let indexArray: number[] = []
-    for (let i = 0; i < images.length; i++) {
-      if (images[i] !== null) {
-        if (
-          (!controllSet.has(i) || selectNum === i) &&
-          images[i].getIsToggle()
-        ) {
-          const result = getCursorIsInQuad(
-            { x: cursorPos.left, y: cursorPos.top },
-            images[i].getGuidRect(),
-          )
-          console.log('handledown',i,images[i].getGuidRect())
-          if (result !== 'out') {
-            indexArray.push(i)
-          }
+
+    images.forEach((spirit)=>{
+      const spiritId = spirit.getId()
+      if ((!controllSet.has(spiritId) || selectNum === spiritId) && spirit.getIsToggle()) {
+        const result = getCursorIsInQuad(
+          { x: cursorPos.left, y: cursorPos.top },
+          spirit.getGuidRect(),
+        )
+        if (result !== 'out') {
+          indexArray.push(spiritId)
         }
       }
-    }
-    //if(indexArray.length===1){
-    //setSelectNum(0)
-    //}
+    })
     if (indexArray.length > 0) {
-      const cur = maxLayer(indexArray, images)
-      curImage = cur
-      setSelectNum(curImage)
-      spiritCanvas.setChosenType(images[curImage].getSpiritType())
+      const maxLayerSpiritId = maxLayer(indexArray, images)
+      curSpiritId = maxLayerSpiritId
+      setSelectNum(curSpiritId)
+      const curSpirit = getCurrentSpirit(curSpiritId, images)
+      spiritCanvas.setChosenType(curSpirit.getSpiritType())
       renderController()
-      if (zoomable && images[curImage].getSpiritType() === 'Image') {
-        const image = images[curImage] as ImageSpirit
-        if (image.isZoomed) {
-          canvas2dRef.current.style.cursor = 'zoom-in'
-        } else {
-          canvas2dRef.current.style.cursor = 'zoom-out'
-        }
+      if (zoomable && curSpirit.getSpiritType() === 'Image') {
+        const image = curSpirit as ImageSpirit
+        canvas2dRef.current.style.cursor = `zoom-${image.isZoomed ? 'in' : 'out'}`
         image.zoom({ x: cursorPos.left, y: cursorPos.top })
         return
       }
       isMoveable = true
-      //setIsMoveable(true)
-      oldPos = images[curImage].getPos()
+      oldPos = curSpirit.getPos()
       canvas2dRef.current.style.cursor = 'move'
     } else {
       setSelectNum(0)
@@ -230,7 +213,7 @@ export function Canvas(props: Props) {
     endPainting()
     isMoveable = false
     if (oldPos !== undefined) {
-      const spirit = spiritCanvas.spirits[curImage]
+      const spirit = getCurrentSpirit(curSpiritId, spiritCanvas.spirits)
       operationHistory.commit(
         spirit.getModel(),
         { trans: oldPos },
@@ -313,9 +296,7 @@ export function Canvas(props: Props) {
       // for special spirit
       if(model.spiritType===6){
       const points = await getPoints(model.id)
-      const pointSpirits = points.map((point) => (
-new PointSpirit(canvas3dRef.current, point)
-      ))
+      const pointSpirits = points.map((point) => (new PointSpirit(canvas3dRef.current, point)))
       console.log({points})
         spiritCanvas.updateFromRemote(
           model.spiritType,
