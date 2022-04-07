@@ -56,12 +56,3 @@ export function Mark(prop:Props) {
     />
   )
 }
-    //<div className="">
-      //{marks.map((mark, index) => {
-        //return (
-          //<div className="w-1/12 mb-6" key={mark.id}>
-            //<Button onClick={addMark(mark.value)}>{mark.value}</Button>
-          //</div>
-        //)
-      //})}
-    //</div>

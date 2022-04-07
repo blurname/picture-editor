@@ -273,7 +273,7 @@ export function Canvas(props: Props) {
   }, [initCount])
 
   type CModel = {
-  id:number
+    id:number
     spiritType: number
     model: Model
     element: Shape | string

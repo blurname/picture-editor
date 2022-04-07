@@ -81,9 +81,11 @@ export class SpiritCanvas {
     this.id = id
     console.log('constructor: ' + this.id)
   }
+
   async setCanvas() {
     this.id = await createCanvas(this.ownerId)
   }
+
   updateFromRemote<T extends Shape | string | MosaicType | 'background'| PointSpirit[]>(
     typeId: number,
     model: Model,
@@ -106,6 +108,7 @@ export class SpiritCanvas {
         this.addPointContainer(element as PointSpirit[], model.id,true,uniqueProps,model)
     }
   }
+  
   async addImage(
     imgSrc: string,
     id: number,
@@ -174,6 +177,7 @@ export class SpiritCanvas {
     if (!exist)
       this.spiritCommit(mosaic.getModel(), eSpiType.mosaic, mosaicType)
   }
+
   addPointContainer(
     points:PointSpirit[],
     id: number,
@@ -193,10 +197,7 @@ export class SpiritCanvas {
       new GuidLine(this.canvas3d, pointContainer.getGuidRect(), pointContainer.getId()),
     )
     if (!exist){
-      console.log('before',points)
       const pointsPos = points.reduce((pre,cur) =>  [...pre,cur.offset.left,cur.offset.top] ,[] as number[])
-
-      console.log('after',pointsPos)
       this.spiritContainerCommit(pointContainer.getModel(), eSpiType.point,JSON.stringify(pointsPos))
     }
   }
@@ -231,6 +232,7 @@ export class SpiritCanvas {
     this.beamClener = new Beam(this.canvas3d)
   }
   updateGuidRect(spirit: BeamSpirit) {
+
     for (let index = 0; index < this.guidLines.length; index++) {
       if (this.guidLines[index] !== null) {
         if (this.guidLines[index].getId() === spirit.getId()) {
@@ -249,7 +251,6 @@ export class SpiritCanvas {
       `/canvas/add/?canvasid=${this.id}&spirittype=${spiritType}&canvas_spirit_id=${model.id}&element=${element}`,
       JSON.stringify(model),
     )
-    console.log(res.data)
   }
 
   async spiritContainerCommit<T extends Model, U extends Shape | string | 'background'|number[]>(
@@ -261,7 +262,6 @@ export class SpiritCanvas {
       `/canvas/addElementContainer/?canvasid=${this.id}&spirittype=${spiritType}&canvas_spirit_id=${model.id}`,
         {model:JSON.stringify(model),element},
     )
-    console.log(res.data)
   }
 	
   async updateBackground<T extends Model, U extends Shape | string | 'background'>(
@@ -273,14 +273,10 @@ export class SpiritCanvas {
       `/canvas/update_back/?canvasid=${this.id}&spirittype=${spiritType}&canvas_spirit_id=${model.id}&element=${element}`,
       JSON.stringify(model),
     )
-    console.log(res.data)
   }
   renderAllLine() {
-    //this.beamClener.clear()
-    //this.background.render()
     for (let index = 0; index < this.guidLines.length; index++) {
       if (this.guidLines[index] !== null) this.guidLines[index].render()
-      //console.log('renderLine:' + index)
     }
   }
 	renderNames(){
@@ -300,17 +296,8 @@ export class SpiritCanvas {
   }
 
   deleteElement(id: number) {
-    for (let index = 0; index < this.spirits.length; index++) {
-      if (this.spirits[index] !== null) {
-        const element = this.spirits[index]
-        console.log(element.getId())
-        if (element.getId() === id) {
-          this.spirits[index] = null
-          this.guidLines[index] = null
-          console.log('deleted')
-        }
-      }
-    }
+    this.spirits = this.spirits.filter((spirit)=>spirit.getId() !== id)
+    this.guidLines = this.guidLines.filter((guidLine)=>guidLine.getId() !== id)
   }
 }
 
