@@ -43,6 +43,7 @@ import { CanvasScoekt } from '../../utils/socket-utils'
 import { useNavigate } from 'react-router-dom'
 import { useUsers } from '../../hooks/useUsers'
 import { useMovement } from '../../hooks/useMovement'
+import { InviteModal } from './InviteModal'
 
 type Props = {}
 type remoteModel = {
@@ -109,16 +110,16 @@ export function Canvas(props: Props) {
       const selectId = controllerList[i].spiritId
       if (selectId !== -1 && selectId !== 0) {
         // if(global[selectId]!==null){
-          const currentSpirit = getCurrentSpirit(selectId, spiritCanvas.spirits)
-          drawRectBorder(canvas2dRef.current, currentSpirit.getGuidRect())
-          drawNames(canvas2dRef.current, currentSpirit.getGuidRect(), {
-            id: controllerList[i].id,
-            name: 'baolei',
-          })
-          //if (!zoomable && !isMoveable)
-          //spiritCanvas.setChosenType(images[curImage].getSpiritType())
+        const currentSpirit = getCurrentSpirit(selectId, spiritCanvas.spirits)
+        drawRectBorder(canvas2dRef.current, currentSpirit.getGuidRect())
+        drawNames(canvas2dRef.current, currentSpirit.getGuidRect(), {
+          id: controllerList[i].id,
+          name: 'baolei',
+        })
+        //if (!zoomable && !isMoveable)
+        //spiritCanvas.setChosenType(images[curImage].getSpiritType())
         // }
-        
+
       }
     }
     // spiritCanvas.spirits.forEach(()=>{
@@ -130,8 +131,8 @@ export function Canvas(props: Props) {
   let curSpiritId: number
   let oldPos: Pos
 
-  const getCurrentSpirit = (spiritId:number, spirits:BeamSpirit[])=> {
-    return spirits.find((spirit)=>spirit.getId() === spiritId)
+  const getCurrentSpirit = (spiritId: number, spirits: BeamSpirit[]) => {
+    return spirits.find((spirit) => spirit.getId() === spiritId)
   }
 
   const handleOnMouseMove = (e: MouseEvent) => {
@@ -146,9 +147,9 @@ export function Canvas(props: Props) {
     spiritCanvas.updateGuidRect(currentSpirit)
 
     socket.emit('server-move', spiritCanvas.id, curSpiritId, distance)
-    spiritCanvas.spirits.forEach((spirit)=>spirit.render())
+    spiritCanvas.spirits.forEach((spirit) => spirit.render())
 
-    
+
     renderController()
     spiritCanvas.renderAllLine()
   }
@@ -157,8 +158,8 @@ export function Canvas(props: Props) {
   const maxLayer = (indexArray: number[], spirits: BeamSpirit[]) => {
     let min = 2
     let maxIndex = -1
-    indexArray.forEach((spiritId)=>{
-      const layer = getCurrentSpirit(spiritId,spirits).getlayer()
+    indexArray.forEach((spiritId) => {
+      const layer = getCurrentSpirit(spiritId, spirits).getlayer()
       if (layer < min) {
         min = layer
         maxIndex = spiritId
@@ -173,7 +174,7 @@ export function Canvas(props: Props) {
     startPainting()
     const controllSet = new Set()
 
-    controllerList.forEach((controller)=>{controllSet.add(controller.spiritId)})
+    controllerList.forEach((controller) => { controllSet.add(controller.spiritId) })
 
     const cursorPos = getCursorPosInCanvas(e, canvas) as Pos
 
@@ -181,7 +182,7 @@ export function Canvas(props: Props) {
 
     let indexArray: number[] = []
     console.log(spiritCanvas.spirits)
-    spiritCanvas.spirits.forEach((spirit)=>{
+    spiritCanvas.spirits.forEach((spirit) => {
       const spiritId = spirit.getId()
       if ((!controllSet.has(spiritId) || selectNum === spiritId) && spirit.getIsToggle()) {
         const result = getCursorIsInQuad(
@@ -200,7 +201,7 @@ export function Canvas(props: Props) {
       // debugger
       setSelectNum(curSpiritId)
       const curSpirit = getCurrentSpirit(curSpiritId, images)
-      
+
       spiritCanvas.setChosenType(curSpirit.getSpiritType())
       renderController()
 
@@ -272,7 +273,7 @@ export function Canvas(props: Props) {
       const init = (await getSpirits(spiritCanvas.id)) as remoteModel[]
       const sorted = init.sort((a, b) => a.id - b.id)
       setInitImages(sorted)
-      setCmpCount(sorted[sorted.length-1].canvas_spirit_id+1)
+      setCmpCount(sorted[sorted.length - 1].canvas_spirit_id + 1)
     }
     if (initCount > 0) {
       getInit()
@@ -280,7 +281,7 @@ export function Canvas(props: Props) {
   }, [initCount])
 
   type CModel = {
-    id:number
+    id: number
     spiritType: number
     model: Model
     element: Shape | string
@@ -290,7 +291,7 @@ export function Canvas(props: Props) {
     if (initImages.length > 0) {
       const models: CModel[] = initImages.map((img) => {
         return {
-          id:img.id,
+          id: img.id,
           spiritType: img.spirit_type,
           model: JSON.parse(img.model),
           element: img.element,
@@ -298,25 +299,25 @@ export function Canvas(props: Props) {
         }
       })
       models.forEach(async (model) => {
-      // for special spirit
-      if(model.spiritType===6){
-      const points = await getPoints(model.id)
-      const pointSpirits = points.map((point) => (new PointSpirit(canvas3dRef.current, point)))
-      console.log({points})
-        spiritCanvas.updateFromRemote(
-          model.spiritType,
-          model.model,
-          pointSpirits as any,
-          model.uniqueProps,
-        )
-      }else{
-        spiritCanvas.updateFromRemote(
-          model.spiritType,
-          model.model,
-          model.element,
-          model.uniqueProps,
-        )
-      }
+        // for special spirit
+        if (model.spiritType === 6) {
+          const points = await getPoints(model.id)
+          const pointSpirits = points.map((point) => (new PointSpirit(canvas3dRef.current, point)))
+          console.log({ points })
+          spiritCanvas.updateFromRemote(
+            model.spiritType,
+            model.model,
+            pointSpirits as any,
+            model.uniqueProps,
+          )
+        } else {
+          spiritCanvas.updateFromRemote(
+            model.spiritType,
+            model.model,
+            model.element,
+            model.uniqueProps,
+          )
+        }
       })
       setTimeout(() => {
         renderAll()
@@ -353,24 +354,7 @@ export function Canvas(props: Props) {
     canvasSocket.exit()
     //navigate('/usercenter/')
   }
-  const showModal = () => {
-    setIsModalVisible(true)
-  }
 
-  const handleOk = () => {
-    ax.post(`/user/invite/?name=${invitedName}`)
-    setIsModalVisible(false)
-    setInvitedName('')
-  }
-
-  const handleCancel = () => {
-    setIsModalVisible(false)
-  }
-  const [invitedName, setInvitedName] = useState('')
-  const handleInputName = (e: ChangeEvent<HTMLInputElement>) => {
-    setInvitedName(e.target.value)
-  }
-  const [isModalVisible, setIsModalVisible] = useState(false)
 
   let points = [] as PointSpirit[]
   //painting
@@ -399,11 +383,11 @@ export function Canvas(props: Props) {
     if (!painting) return
     const pos = getCursorPosInCanvas(e, canvas)
     if (pos === 'outOfCanvas') return
-    if(points.length>0){
-      const lastPoint = points[points.length-1]
-      if(pos.left< lastPoint.offset.left+15 && pos.left > lastPoint.offset.left-15 )
+    if (points.length > 0) {
+      const lastPoint = points[points.length - 1]
+      if (pos.left < lastPoint.offset.left + 15 && pos.left > lastPoint.offset.left - 15)
         return
-      if(pos.top< lastPoint.offset.top+15 && pos.top > lastPoint.offset.top-15 )
+      if (pos.top < lastPoint.offset.top + 15 && pos.top > lastPoint.offset.top - 15)
         return
     }
 
@@ -416,14 +400,14 @@ export function Canvas(props: Props) {
   const endPainting = async () => {
     if (painting) {
       setPainting(false)
-    const width = Math.abs(L - R) 
-    const height= Math.abs(T - D) 
-    const left = L
-    const top = D
-      spiritCanvas.addPointContainer(points,cmpCount,false,{width,height,left,top} )
-      setTimeout(()=>{
+      const width = Math.abs(L - R)
+      const height = Math.abs(T - D)
+      const left = L
+      const top = D
+      spiritCanvas.addPointContainer(points, cmpCount, false, { width, height, left, top })
+      setTimeout(() => {
         operationHistory.updateRemote(cmpCount, 'UniqueProps')
-      },100)
+      }, 100)
       setCmpCount(cmpCount + 1)
       return
     }
@@ -432,24 +416,12 @@ export function Canvas(props: Props) {
   return (
     <div className="flex-grow w-max h-full bg-gray-100">
       {/*{users.map((cur, index) => {*/}
-        {/*return <h1 key={index}>{cur.name}</h1>*/}
+      {/*return <h1 key={index}>{cur.name}</h1>*/}
       {/*})}*/}
       {/*<h1>cmpcount{cmpCount}</h1>*/}
       <Button onClick={handlePating}>pating</Button>
       <Button onClick={closeSockt}>back home</Button>
-      <Button onClick={showModal}>invite</Button>
-      <Modal
-        title="Basic Modal"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <Input
-          defaultValue={invitedName}
-          onInput={handleInputName}
-          type="text"
-        />
-      </Modal>
+
       <Button onClick={screenshot(canvas3dRef.current, renderAll)}>
         screenshot
       </Button>
@@ -462,6 +434,7 @@ export function Canvas(props: Props) {
       >
         redo
       </Button>
+      <InviteModal ax={ax} userId={userId} canvasId={spiritCanvas.id} />
       <canvas
         className=""
         ref={canvas2dRef}
@@ -505,7 +478,7 @@ export function Canvas(props: Props) {
             </h1>
           )
         })}
-        <ChatRoom socket={socket} canvasId={spiritCanvas.id}/>
+        <ChatRoom socket={socket} canvasId={spiritCanvas.id} />
       </div>
     </div>
   )
