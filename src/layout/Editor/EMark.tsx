@@ -48,7 +48,7 @@ export function EMark(props: Props) {
   const onChangeRGB =
     <T extends Partial<keyof typeof RGB>>(rgb: T, cdesc: string) =>
     (e: ChangeEvent<HTMLInputElement>) => {
-      let mark = spiritCanvas.spirits[selectNum] as MarkSpirit
+      let mark = spiritCanvas.spirits.find(s=>s.getId()===selectNum) as MarkSpirit
       let color = mark.getColor().map((c) => c)
       const index = RGB[rgb] as number
       color[index] = parseInt(e.target.value) / 255.0

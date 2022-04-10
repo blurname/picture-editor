@@ -29,7 +29,7 @@ export function Editor() {
     setAdjustNum(adjustNum + 1)
   }
   const storeOld = (cdesc: string) => () => {
-    const chosen = spiritCanvas.spirits[selectNum]
+    const chosen = spiritCanvas.spirits.find(s=>s.getId()===selectNum)
     setDesc(cdesc)
     if (desc === 'rotate' || desc === 'scale') {
       setOld(chosen.getModel()[cdesc])
@@ -57,7 +57,7 @@ export function Editor() {
     curValue: number,
     func?: (a: any, b: any) => void,
   ) => {
-    let chosen = spiritCanvas.spirits[selectNum]
+    let chosen = spiritCanvas.spirits.find(s=>s.getId()===selectNum)
     if (func) {
       func(desc, curValue)
     } else if (desc === 'rotate' || desc === 'scale') {
@@ -69,7 +69,7 @@ export function Editor() {
     setValue(curValue)
   }
   const commitToHistory = () => {
-    const chosen = spiritCanvas.spirits[selectNum]
+    const chosen = spiritCanvas.spirits.find(s=>s.getId()===selectNum)
     if (desc === 'rotate' || desc === 'scale' || desc === 'layer') {
       operationHistory.commit(
         chosen.getModel(),

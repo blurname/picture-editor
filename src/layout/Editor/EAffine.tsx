@@ -24,8 +24,9 @@ export function EAffine(props: Props) {
   const { spiritCanvas, selectNum } = useContext(globalContext)
   const shaping = editorSchema.children[0]
   const onLayerChange = (value: number) => {
-    setOld(spiritCanvas.spirits[selectNum].getModel()['layer'])
-    spiritCanvas.spirits[selectNum].updateModel({ layer: 1 - value })
+    const chosen = spiritCanvas.spirits.find(s=>s.getId()===selectNum)
+    setOld(chosen.getModel()['layer'])
+    chosen.updateModel({ layer: 1 - value })
     setValue(value)
     setDesc('layer')
   }
