@@ -272,10 +272,10 @@ export function Canvas(props: Props) {
       const init = (await getSpirits(spiritCanvas.id)) as remoteModel[]
       const sorted = init.sort((a, b) => a.id - b.id)
       setInitImages(sorted)
+      setCmpCount(sorted[sorted.length-1].canvas_spirit_id+1)
     }
     if (initCount > 0) {
       getInit()
-      setCmpCount(initCount)
     }
   }, [initCount])
 
