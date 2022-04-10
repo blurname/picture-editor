@@ -108,20 +108,24 @@ export function Canvas(props: Props) {
     for (let i = 0; i < controllerList.length; i++) {
       const selectId = controllerList[i].spiritId
       if (selectId !== -1 && selectId !== 0) {
-        if(images[selectId]!==null){
-          drawRectBorder(canvas2dRef.current, images[selectId].getGuidRect())
-          drawNames(canvas2dRef.current, images[selectId].getGuidRect(), {
+        // if(global[selectId]!==null){
+          const currentSpirit = getCurrentSpirit(selectId, spiritCanvas.spirits)
+          drawRectBorder(canvas2dRef.current, currentSpirit.getGuidRect())
+          drawNames(canvas2dRef.current, currentSpirit.getGuidRect(), {
             id: controllerList[i].id,
             name: 'baolei',
           })
           //if (!zoomable && !isMoveable)
           //spiritCanvas.setChosenType(images[curImage].getSpiritType())
-        }
+        // }
         
       }
     }
+    // spiritCanvas.spirits.forEach(()=>{
+
+    // })
   }, [controllerList, canvas2dRef])
-  useMovement(socket, images, spiritCanvas, renderController)
+  useMovement(socket, spiritCanvas.spirits, spiritCanvas, renderController)
 
   let curSpiritId: number
   let oldPos: Pos
@@ -136,13 +140,15 @@ export function Canvas(props: Props) {
     e.preventDefault()
     canvas2dRef.current.style.cursor = 'move'
     const distance = getCursorMovDistance(e, canvas)
-    const currentSpirit = getCurrentSpirit(curSpiritId, images)
+    const currentSpirit = getCurrentSpirit(curSpiritId, spiritCanvas.spirits)
 
     currentSpirit.updatePosition(distance)
     spiritCanvas.updateGuidRect(currentSpirit)
 
     socket.emit('server-move', spiritCanvas.id, curSpiritId, distance)
-    images.forEach((image)=>image.render())
+    spiritCanvas.spirits.forEach((spirit)=>spirit.render())
+
+    
     renderController()
     spiritCanvas.renderAllLine()
   }
@@ -174,8 +180,8 @@ export function Canvas(props: Props) {
     //choose spirit in the top level from same area
 
     let indexArray: number[] = []
-
-    images.forEach((spirit)=>{
+    console.log(spiritCanvas.spirits)
+    spiritCanvas.spirits.forEach((spirit)=>{
       const spiritId = spirit.getId()
       if ((!controllSet.has(spiritId) || selectNum === spiritId) && spirit.getIsToggle()) {
         const result = getCursorIsInQuad(
@@ -187,13 +193,17 @@ export function Canvas(props: Props) {
         }
       }
     })
+    console.log(indexArray)
     if (indexArray.length > 0) {
       const maxLayerSpiritId = maxLayer(indexArray, images)
       curSpiritId = maxLayerSpiritId
+      // debugger
       setSelectNum(curSpiritId)
       const curSpirit = getCurrentSpirit(curSpiritId, images)
+      
       spiritCanvas.setChosenType(curSpirit.getSpiritType())
       renderController()
+
       if (zoomable && curSpirit.getSpiritType() === 'Image') {
         const image = curSpirit as ImageSpirit
         canvas2dRef.current.style.cursor = `zoom-${image.isZoomed ? 'in' : 'out'}`
@@ -205,7 +215,7 @@ export function Canvas(props: Props) {
       canvas2dRef.current.style.cursor = 'move'
     } else {
       setSelectNum(0)
-      spiritCanvas.setChosenType(images[0].getSpiritType())
+      spiritCanvas.setChosenType(spiritCanvas.spirits[0].getSpiritType())
     }
   }
 
@@ -222,7 +232,6 @@ export function Canvas(props: Props) {
       )
     }
     //operationHistory.commit(s, from, wto)
-    //console.log('images.length:' + images.length)
     if (!zoomable) canvas2dRef.current.style.cursor = 'default'
     renderAll()
     setAdjustNum(adjustNum + 1)
@@ -251,7 +260,6 @@ export function Canvas(props: Props) {
       setInitCount(count)
     }
     getCount()
-    console.log('incanvas:' + spiritCanvas.id)
 
     const ctx = canvas2dRef.current.getContext('2d')
     ctx.translate(canvas.width / 2, canvas.height / 2)
@@ -263,7 +271,6 @@ export function Canvas(props: Props) {
     const getInit = async () => {
       const init = (await getSpirits(spiritCanvas.id)) as remoteModel[]
       const sorted = init.sort((a, b) => a.id - b.id)
-      console.log('sorted:', sorted)
       setInitImages(sorted)
     }
     if (initCount > 0) {
@@ -281,7 +288,6 @@ export function Canvas(props: Props) {
   }
   useEffect(() => {
     if (initImages.length > 0) {
-      console.log('initImages:', initImages)
       const models: CModel[] = initImages.map((img) => {
         return {
           id:img.id,
@@ -291,7 +297,6 @@ export function Canvas(props: Props) {
           uniqueProps: JSON.parse(img.unique_props),
         }
       })
-      console.log('models:', models)
       models.forEach(async (model) => {
       // for special spirit
       if(model.spiritType===6){
@@ -317,7 +322,6 @@ export function Canvas(props: Props) {
         renderAll()
       }, 1000)
     } else {
-      console.log('addBackground')
     }
   }, [initImages])
   useEffect(() => {
@@ -339,7 +343,6 @@ export function Canvas(props: Props) {
   }, [zoomable])
 
   useEffect(() => {
-    console.log('canvas changed the selectNum')
     renderController()
   }, [selectNum, controllerList])
 
@@ -375,7 +378,6 @@ export function Canvas(props: Props) {
   const [painting, setPainting] = useState(false)
   const handlePating = () => {
     setIsPainting(!isPainting)
-
   }
   useEffect(() => {
     if (isPainting) canvas2dRef.current.style.cursor = 'crosshair'
@@ -386,7 +388,6 @@ export function Canvas(props: Props) {
     if (!isPainting) return
     points = []
     setPainting(true)
-    console.log('start painting')
   }
   const calcRange = (pos: Pos) => {
     if (pos.top > T) T = pos.top
@@ -411,8 +412,6 @@ export function Canvas(props: Props) {
     calcRange(pos)
 
     points.forEach((point) => { point.render() })
-
-    // console.log(points)
   }
   const endPainting = async () => {
     if (painting) {
@@ -423,14 +422,9 @@ export function Canvas(props: Props) {
     const top = D
       spiritCanvas.addPointContainer(points,cmpCount,false,{width,height,left,top} )
       setTimeout(()=>{
-
-      operationHistory.updateRemote(cmpCount, 'UniqueProps')
+        operationHistory.updateRemote(cmpCount, 'UniqueProps')
       },100)
-      console.log(spiritCanvas.guidLines)
       setCmpCount(cmpCount + 1)
-      // const pointSpirits = points.map((point)=>)
-      console.log('end painting', points)
-      console.log(T, L, D, R)
       return
     }
   }

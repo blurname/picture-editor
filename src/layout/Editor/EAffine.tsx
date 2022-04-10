@@ -32,9 +32,9 @@ export function EAffine(props: Props) {
   const afterLayerChage = () => {
     commitToHistory()
   }
-	const [curSpirit, setCurSpirit] = useState<BeamSpirit>(spiritCanvas.spirits[selectNum]);
+	const [curSpirit, setCurSpirit] = useState<BeamSpirit>(spiritCanvas.spirits.find(spirit=>spirit.getId()===selectNum));
 	useEffect(() => {
-		setCurSpirit(spiritCanvas.spirits[selectNum])
+		setCurSpirit(spiritCanvas.spirits.find(spirit=>spirit.getId()===selectNum))
 		}, [selectNum]);
   return (
     <div>

@@ -16,9 +16,9 @@ export function EImage(props: Props) {
 	
   const { spiritCanvas, selectNum } = useContext(globalContext)
   const filters = editorSchema.children[1]
-	const [curSpirit, setCurSpirit] = useState<BeamSpirit>(spiritCanvas.spirits[selectNum]);
+	const [curSpirit, setCurSpirit] = useState<BeamSpirit>(spiritCanvas.spirits.find(spirit=>spirit.getId()===selectNum));
 	useEffect(() => {
-		setCurSpirit(spiritCanvas.spirits[selectNum])
+		setCurSpirit(spiritCanvas.spirits.find(spirit=>spirit.getId()===selectNum))
 		}, [selectNum]);
   return (
     <div>

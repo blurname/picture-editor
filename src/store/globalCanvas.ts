@@ -108,7 +108,7 @@ export class SpiritCanvas {
         this.addPointContainer(element as PointSpirit[], model.id,true,uniqueProps,model)
     }
   }
-  
+
   async addImage(
     imgSrc: string,
     id: number,
@@ -125,7 +125,7 @@ export class SpiritCanvas {
     if (uniqueProps) {
       spirit.updateFromRemote(uniqueProps as ImageProps, 'UniqueProps')
     }
-    this.spirits[id] = spirit
+    this.spirits.push(spirit)
     this.guidLines.push(
       new GuidLine(this.canvas3d, spirit.getGuidRect(), spirit.getId()),
     )
@@ -170,7 +170,7 @@ export class SpiritCanvas {
     let mosaic: MosaicSpirit
     mosaic = new MosaicSpirit(this.canvas3d, mosaicType, id)
     if (model) mosaic.updateFromRemote(model, 'Model')
-    this.spirits[id] = mosaic
+    this.spirits.push(mosaic)
     this.guidLines.push(
       new GuidLine(this.canvas3d, mosaic.getGuidRect(), mosaic.getId()),
     )
@@ -192,7 +192,7 @@ export class SpiritCanvas {
     
     if (model) pointContainer.updateFromRemote(model, 'Model')
     //if (uniqueProps) pointContainer.updateFromRemote(uniqueProps, 'uniqueProps')
-    this.spirits[id] = pointContainer
+    this.spirits.push(pointContainer)
     this.guidLines.push(
       new GuidLine(this.canvas3d, pointContainer.getGuidRect(), pointContainer.getId()),
     )
@@ -253,6 +253,12 @@ export class SpiritCanvas {
     )
   }
 
+  async spiritDelCommit(spirit_id:number){
+    const res = await this.ax.post(
+      `/canvas/del/?canvas_id=${this.id}&spirit_id=${spirit_id}`
+    )
+  }
+
   async spiritContainerCommit<T extends Model, U extends Shape | string | 'background'|number[]>(
     model: T,
     spiritType: eSpiType,
@@ -298,6 +304,7 @@ export class SpiritCanvas {
   deleteElement(id: number) {
     this.spirits = this.spirits.filter((spirit)=>spirit.getId() !== id)
     this.guidLines = this.guidLines.filter((guidLine)=>guidLine.getId() !== id)
+    this.spiritDelCommit(id)
   }
 }
 
@@ -361,7 +368,7 @@ export class OperationHistory {
     }
     const key = Object.keys(dir)[0]
 
-    const spirit = this.spiritCanvas.spirits[id]
+    const spirit = this.spiritCanvas.spirits.find(s=>s.getId()===id)
     if (key === 'trans' || key === 'scale' || key === 'rotate') {
       spirit.updateModel(dir)
       this.spiritCanvas.updateGuidRect(spirit)
@@ -381,7 +388,7 @@ export class OperationHistory {
     else if (actionType === 'UniqueProps') this.updateRemoteUniqueProps(id)
   }
   async updateRemoteModel(id: number) {
-    const model = this.spiritCanvas.spirits[id].getModel()
+    const model = this.spiritCanvas.spirits.find(s=>s.getId()===id).getModel()
     const res = await this.ax.post(
       `/canvas/update_model/?canvasid=${this.spiritCanvas.id}&canvas_spirit_id=${model.id}`,
       JSON.stringify(model),
@@ -389,7 +396,7 @@ export class OperationHistory {
     console.log('update_model:', res)
   }
   async updateRemoteUniqueProps(id: number) {
-    const unique = this.spiritCanvas.spirits[id].getUniqueProps()
+    const unique = this.spiritCanvas.spirits.find(s=>s.getId()===id).getUniqueProps()
     console.log('unique:', unique)
     const res = await this.ax.post(
       `/canvas/update_unique_props/?canvasid=${this.spiritCanvas.id}&canvas_spirit_id=${unique.id}`,
