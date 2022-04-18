@@ -44,6 +44,7 @@ import { useNavigate } from 'react-router-dom'
 import { useUsers } from '../../hooks/useUsers'
 import { useMovement } from '../../hooks/useMovement'
 import { InviteModal } from './InviteModal'
+import { UploadButton } from './UploadButton'
 
 type Props = {}
 type remoteModel = {
@@ -435,6 +436,7 @@ export function Canvas(props: Props) {
         redo
       </Button>
       <InviteModal ax={ax} userId={userId} canvasId={spiritCanvas.id} />
+      <UploadButton ax={ax} userId={userId} socket={socket} />
       <canvas
         className=""
         ref={canvas2dRef}

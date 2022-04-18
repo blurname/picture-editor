@@ -530,14 +530,6 @@ export const drawNames = (canvas2dRef: HTMLCanvasElement, guidRect: Rect, user: 
 	//)
 }
 
-export const createTranslateMat = (offset: Pos) => {
-	return [
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		offset.left, offset.top, 0, 1]
-}
-
 //export const createRotateMat = (rotate: number,origin:Pos={left:0,top:0}) => {
 //rotate = (rotate * Math.PI) / 180
 //const cos = Math.cos(rotate)
@@ -550,6 +542,14 @@ export const createTranslateMat = (offset: Pos) => {
 //0, 0, 1, 0,
 //(-x0*(cos-1)+y0*sin), (-x0*sin+y0*(1-cos)), 0, 1]
 //}
+export const createTranslateMat = (offset: Pos) => {
+	return [
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		offset.left, offset.top, 0, 1]
+}
+
 export const createRotateMat = (rotate: number,) => {
 	rotate = (rotate * Math.PI) / 180
 	const cos = Math.cos(rotate)
