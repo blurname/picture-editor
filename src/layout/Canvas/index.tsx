@@ -112,11 +112,14 @@ export function Canvas(props: Props) {
       if (selectId !== -1 && selectId !== 0) {
         // if(global[selectId]!==null){
         const currentSpirit = getCurrentSpirit(selectId, spiritCanvas.spirits)
-        drawRectBorder(canvas2dRef.current, currentSpirit.getGuidRect())
-        drawNames(canvas2dRef.current, currentSpirit.getGuidRect(), {
-          id: controllerList[i].id,
-          name: 'baolei',
-        })
+        if(currentSpirit){
+          drawRectBorder(canvas2dRef.current, currentSpirit.getGuidRect())
+          drawNames(canvas2dRef.current, currentSpirit.getGuidRect(), {
+            id: controllerList[i].id,
+            name: 'baolei',
+          })
+        }
+        
         //if (!zoomable && !isMoveable)
         //spiritCanvas.setChosenType(images[curImage].getSpiritType())
         // }
@@ -126,7 +129,7 @@ export function Canvas(props: Props) {
     // spiritCanvas.spirits.forEach(()=>{
 
     // })
-  }, [controllerList, canvas2dRef])
+  }, [controllerList, canvas2dRef, spiritCanvas.spirits])
   useMovement(socket, spiritCanvas.spirits, spiritCanvas, renderController)
 
   let curSpiritId: number
@@ -160,6 +163,7 @@ export function Canvas(props: Props) {
     let min = 2
     let maxIndex = -1
     indexArray.forEach((spiritId) => {
+      console.log()
       const layer = getCurrentSpirit(spiritId, spirits).getlayer()
       if (layer < min) {
         min = layer
@@ -197,11 +201,11 @@ export function Canvas(props: Props) {
     })
     console.log(indexArray)
     if (indexArray.length > 0) {
-      const maxLayerSpiritId = maxLayer(indexArray, images)
+      const maxLayerSpiritId = maxLayer(indexArray, spiritCanvas.spirits)
       curSpiritId = maxLayerSpiritId
       // debugger
       setSelectNum(curSpiritId)
-      const curSpirit = getCurrentSpirit(curSpiritId, images)
+      const curSpirit = getCurrentSpirit(curSpiritId, spiritCanvas.spirits)
 
       spiritCanvas.setChosenType(curSpirit.getSpiritType())
       renderController()

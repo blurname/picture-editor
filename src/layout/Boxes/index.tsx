@@ -64,21 +64,6 @@ export function Boxes() {
       <Button type="primary" onClick={createNewCanvas}>
         new
       </Button>
-      <Button type="primary" onClick={() => getSpirits(829)}>
-        get
-      </Button>
-      <div>
-        <Upload {...uploadProps}>
-          <Button type="primary" onClick={() => getSpirits(829)}>
-            upload Imag
-          </Button>
-        </Upload>
-      </div>
-      <div>
-        <input onChange={changeRaw} type="file" />
-        <h3>{file.name}</h3>
-        <button onClick={uploadRaw}>upload raw</button>
-      </div>
       <Row>
         {canvases.map((item: CanvasDB, index: number) => (
           <Col span={8} key={index}>
