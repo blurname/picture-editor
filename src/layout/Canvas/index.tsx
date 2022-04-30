@@ -56,7 +56,9 @@ type remoteModel = {
   element: Shape | string
   unique_props: string
 }
-
+export const getCurrentSpirit = (spiritId: number, spirits: BeamSpirit[]) => {
+  return spirits.find((spirit) => spirit.getId() === spiritId)
+}
 export function Canvas(props: Props) {
   const {
     spiritCanvas,
@@ -135,9 +137,7 @@ export function Canvas(props: Props) {
   let curSpiritId: number
   let oldPos: Pos
 
-  const getCurrentSpirit = (spiritId: number, spirits: BeamSpirit[]) => {
-    return spirits.find((spirit) => spirit.getId() === spiritId)
-  }
+  
 
   const handleOnMouseMove = (e: MouseEvent) => {
     handlePainting(e)
@@ -276,7 +276,8 @@ export function Canvas(props: Props) {
   useEffect(() => {
     const getInit = async () => {
       const init = (await getSpirits(spiritCanvas.id)) as remoteModel[]
-      const sorted = init.sort((a, b) => a.id - b.id)
+      const sorted = init.sort((a, b) => a.canvas_spirit_id - b.canvas_spirit_id)
+      console.log('sorted',sorted)
       setInitImages(sorted)
       setCmpCount(sorted[sorted.length - 1].canvas_spirit_id + 1)
     }

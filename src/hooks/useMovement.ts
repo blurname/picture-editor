@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { Socket } from 'socket.io-client'
+import { getCurrentSpirit } from '../layout/Canvas'
 import { SpiritCanvas } from '../store/globalCanvas'
 import { BeamSpirit } from '../utils/gl-uitls'
 export function useMovement(
@@ -13,8 +14,10 @@ export function useMovement(
   useEffect(() => {
     socket.on('client-move', (spiritId: number, distance: Pos) => {
       console.log('move', spiritId, distance)
-      images[spiritId].updatePosition(distance)
-      spiritCanvas.updateGuidRect(images[spiritId])
+      const curSpirit = getCurrentSpirit(spiritId, spiritCanvas.spirits)
+
+      curSpirit.updatePosition(distance)
+      spiritCanvas.updateGuidRect(curSpirit)
       for (let i = 0; i < images.length; i++) {
         if (images[i] !== null) {
           images[i].render()
