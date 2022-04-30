@@ -138,14 +138,14 @@ export function Editor() {
           </Button>
         )}
       </div>
-      <div>
+      {/* <div>
         <Button
           onClick={onDeleteClick}
           className="bg-pink-200 text-red-500 text-lg mb-4"
         >
           delete element
         </Button>
-      </div>
+      </div> */}
       <Collapse className="w-12/12" defaultActiveKey={[1, 2, 3, 4]}>
         {selectNum > 0 && spiritCanvas?.chosenType !== 'PointContainer' && (
           <CollapsePanel header="shaping" key="1">
