@@ -147,7 +147,7 @@ export function Editor() {
         </Button>
       </div>
       <Collapse className="w-12/12" defaultActiveKey={[1, 2, 3, 4]}>
-        {selectNum > 0 && (
+        {selectNum > 0 && spiritCanvas?.chosenType !== 'PointContainer' && (
           <CollapsePanel header="shaping" key="1">
             <EAffine
               setValue={setValue}

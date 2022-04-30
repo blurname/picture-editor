@@ -44,9 +44,9 @@ export function Components() {
       <TabPane className="w-45 h-30" tab="background" key="4">
         <Background />
       </TabPane>
-      <TabPane className="w-45 h-30" tab="layers" key="5">
+      {/* <TabPane className="w-45 h-30" tab="layers" key="5">
         <SortingLayers />
-      </TabPane>
+      </TabPane> */}
     </Tabs>
   )
 }

@@ -17,7 +17,7 @@ export function ChatRoom(props:Props){
   const {socket, canvasId} = props
   const [inputValue, setInputValue] = useState('');
   const { user } = useSigned()
-  const [messageList, setMessageList] = useState([{userName:'user1',message:'a'}]);
+  const [messageList, setMessageList] = useState([{userName:'root',message:'welcome'}]);
   const handleInput = (e:ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }
@@ -36,7 +36,7 @@ export function ChatRoom(props:Props){
   
   return(
   <div className="flex flex-col">
-  <h3>同時在線人數</h3>
+  <h3>current online count</h3>
      <div className="bg-cyan-100 overflow-auto h-2xl" style={{width:300}}>
      {
      messageList.map((data) => (

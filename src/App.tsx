@@ -90,7 +90,7 @@ function App() {
                   </userContext.Provider>
                 }
               />
-              <Route
+              {/* <Route
                 path="invite/:id"
                 element={
                   <userContext.Provider
@@ -102,7 +102,7 @@ function App() {
                     <Invite />
                   </userContext.Provider>
                 }
-              />
+              /> */}
             </Route>
           </Routes>
         </div>
