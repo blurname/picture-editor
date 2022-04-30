@@ -1,3 +1,4 @@
+import { Button, Input, Modal, message } from 'antd'
 import React, { useState, useContext } from 'react'
 import { globalContext } from '../../context'
 const uploadBaseURL = 'http://localhost:7001'
@@ -22,18 +23,25 @@ export function UploadButton(props: Props) {
   const changeRaw = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const form = new FormData()
     form.append('file', e.target.files[0])
-    const res = await fetch(uploadBaseURL + '/upload', {
-      method: 'POST',
-      body: form,
-    })
-    const name = await res.text()
-    const res2 = await ax.post(
-      `/image/upload/?type=${1}}&owner=${userId}`,
-      { name },
-    )
-    console.log(res2)
+    try {
+      const res = await fetch(uploadBaseURL + '/upload', {
+        method: 'POST',
+        body: form,
+      })
+      const name = await res.text()
+      const res2 = await ax.post(
+        `/image/upload/?type=${1}}&owner=${userId}`,
+        { name },
+      )
+      console.log(res2)
     const imgUrl = baseUrl + '/image/get_single/' + name
     addToSpirits(imgUrl)()
+    } catch (error) {
+      message.error('请到 midway-upload 开启上传服务')
+    }
+
+    
+    
   }
   return (
     <div>

@@ -520,7 +520,7 @@ export const drawNames = (canvas2dRef: HTMLCanvasElement, guidRect: Rect, user: 
 	const ctx = canvas2dRef.getContext('2d')
 	ctx.font = '40px serif'
 	ctx.fillStyle = 'orange'
-	const editing = user.id + " is editing"
+	const editing = 'ID: '+ user.id + " is editing"
 	ctx.fillText(editing, guidRect.x, -(guidRect.y + guidRect.height * 1.3))
 	//ctx.fillRect(
 	//guidRect.x,

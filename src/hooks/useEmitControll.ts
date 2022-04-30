@@ -5,6 +5,7 @@ import { BeamSpirit } from '../utils/gl-uitls'
 export type Controller = {
   id: number
   spiritId: number
+  name: string
 }
 export function useController(
   socket: Socket,
