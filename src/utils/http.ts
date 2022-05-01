@@ -29,6 +29,11 @@ export const getSpirits = async (id: number) => {
     return data
   } catch (err) {}
 }
+export const getOneSpirit  = async (id:number,pcId:number) => {
+  const res = await ax.get(`/canvas/get_one_pointcontainer/?canvas_id=${id}&canvas_spirit_id=${pcId}`)
+  const data = res.data
+  return data
+}
 export const getIsHavingSpirits = async (id: number): Promise<number> => {
   try {
     const res = await ax.get(`/canvas/get_is_having_spirits/?canvas_id=${id}`)
@@ -51,6 +56,7 @@ export const getPoints = async(spiritId:number)=>{
   try {
     const res = await ax.get(`/canvas/get_point/?spirit_id=${spiritId}`)
     const data = res.data as any[]
+    console.log('points',data)
     const points = data.map((point) => {
       return {
         left:point.left,

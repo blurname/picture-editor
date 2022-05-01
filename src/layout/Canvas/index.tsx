@@ -410,14 +410,61 @@ export function Canvas(props: Props) {
       const height = Math.abs(T - D)
       const left = L
       const top = D
+      
       spiritCanvas.addPointContainer(points, cmpCount, false, { width, height, left, top })
       setTimeout(() => {
         operationHistory.updateRemote(cmpCount, 'UniqueProps')
-      }, 100)
+      }, 100);
+      setTimeout(async () => {
+        console.log(cmpCount)
+      const res = await ax.get(`/canvas/get_single_point_container/?canvas_id=${spiritCanvas.id}&canvas_spirit_id=${cmpCount}>`)
+      
+      console.log('model res',res)
+      const model = res.data[0]
+      // debugger
+      console.log('model',model)
+      const id = model.id
+      const canvasId = spiritCanvas.id
+      socket.emit('server-add-pointcontainer',canvasId, id)
+      }, 300)
+      
       setCmpCount(cmpCount + 1)
       return
     }
   }
+  useEffect(() => {
+    socket.on('client-add-pointcontainer', async (id: number) => {
+      console.log('point add id',id)
+      // debugger
+      //todo
+      // cosnt await ax.get(`/canvas/get_single_point_container/?canvas_id=${spiritCanvas.id}&canvas_spirit_id=${cmpCount}>`)
+      // const model 
+        const res = await ax.get(`/canvas/get_single_spirit/?spirit_id=${id}`)
+        const modelc: any = res.data[0]
+        const model: CModel = {
+            id: modelc.id,
+            spiritType: modelc.spirit_type,
+            model: JSON.parse(modelc.model),
+            element: modelc.element,
+            uniqueProps: JSON.parse(modelc.unique_props),
+          }
+        console.log('aa',model)
+        const points = await getPoints(id)
+          const pointSpirits = points.map((point) => (new PointSpirit(spiritCanvas.canvas3d, point)))
+          console.log('aa',points)
+          spiritCanvas.updateFromRemote(
+            6,
+            model.model,
+            pointSpirits as any,
+            model.uniqueProps,
+          )
+          // setTimeout(() => {
+          //   renderAll()
+          // }, 1000)
+      setCmpCount(id + 1)
+      setAdjustNum(adjustNum + 1)
+    })
+  }, [])
 
   return (
     <div className="flex-grow w-max h-full bg-gray-100">

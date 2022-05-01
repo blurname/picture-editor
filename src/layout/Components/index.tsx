@@ -1,6 +1,8 @@
 import { Tabs } from 'antd'
 import React, { useContext, useEffect } from 'react'
 import { globalContext, userContext } from '../../context'
+import { PointSpirit } from '../../utils/gl-uitls'
+import { getPoints } from '../../utils/http'
 import { Background } from './Background'
 import { Img } from './Img'
 import { Mark } from './Mark'
@@ -11,13 +13,23 @@ export function Components() {
   const { spiritCanvas, socket, setCmpCount, setAdjustNum, adjustNum } =
     useContext(globalContext)
   useEffect(() => {
-    socket.on('client-add', (type: string, element: any, id: number) => {
+    socket.on('client-add', async (type: string, element: any, id: number) => {
       if (type === 'Image') {
         spiritCanvas.addImage(element, id,true)
       } else if (type === 'Mark') {
         spiritCanvas.addMark(element, id,true)
       } else if (type === 'Mosaic') {
         spiritCanvas.addMosaic(element, id,true)
+      } else if (type === 'PointContainer') {
+        const points = await getPoints(id)
+          const pointSpirits = points.map((point) => (new PointSpirit(spiritCanvas.canvas3d, point)))
+          console.log({ points })
+          spiritCanvas.updateFromRemote(
+            model.spiritType,
+            model.model,
+            pointSpirits as any,
+            model.uniqueProps,
+          )
       }
       setCmpCount(id + 1)
       setAdjustNum(adjustNum + 1)

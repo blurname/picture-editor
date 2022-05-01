@@ -93,6 +93,8 @@ export class SpiritCanvas {
     uniqueProps: Partial<UniqueProps>,
   ) {
     const result = binarySearch(model.id, this.spirits)
+    // debugger
+    console.log('aa',result)
     if (result === -1) {
       if (typeId === 1)
         this.addImage(element as string, model.id, true, model, uniqueProps)
@@ -105,6 +107,8 @@ export class SpiritCanvas {
       else if(typeId === 5)
         this.addBackground(element as string, 'backImage', true)
       else if(typeId === 6)
+      // debugger
+      console.log('aa',)
         this.addPointContainer(element as PointSpirit[], model.id,true,uniqueProps,model)
     }
   }
@@ -185,7 +189,6 @@ export class SpiritCanvas {
     uniqueProps:Partial<UniqueProps>,
     model?: Model,
   ) {
-
     let pointContainer:PointContainerSpirit 
     pointContainer = new PointContainerSpirit(this.canvas3d,id,uniqueProps,points)
     console.log({pointContainer})
