@@ -1,6 +1,6 @@
 import { Button, Collapse } from 'antd'
 import CollapsePanel from 'antd/lib/collapse/CollapsePanel'
-import React, { ChangeEvent, useContext, useState } from 'react'
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react'
 import { globalContext } from '../../context'
 import { useRemoteOperation } from '../../hooks/useRemoteOperation'
 import { BeamSpirit } from '../../utils/gl-uitls'
@@ -26,6 +26,7 @@ export function Editor() {
   const [old, setOld] = useState({} as any)
   const onDeleteClick = () => {
     spiritCanvas.deleteElement(selectNum)
+    socket.emit('server-del',spiritCanvas.id, selectNum)
     setAdjustNum(adjustNum + 1)
   }
   const storeOld = (cdesc: string) => () => {
@@ -38,6 +39,14 @@ export function Editor() {
     }
     console.log('descStoreOld:', chosen.getUniqueProps())
   }
+  useEffect(() => {
+    socket.on('client-del', async ( id: number) => {
+      spiritCanvas.spirits = spiritCanvas.spirits.filter(s=>s.getId()!==id)
+      spiritCanvas.guidLines = spiritCanvas.guidLines.filter((guidLine)=>guidLine.getId() !== id)
+      // setCmpCount(id + 1)
+      setAdjustNum(adjustNum + 1)
+    })
+  }, [])
   const onChangeInput =
     (desc: string, func?: (a: any, b: any) => void) =>
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -138,14 +147,14 @@ export function Editor() {
           </Button>
         )}
       </div>
-      {/* <div>
+      <div>
         <Button
           onClick={onDeleteClick}
           className="bg-pink-200 text-red-500 text-lg mb-4"
         >
           delete element
         </Button>
-      </div> */}
+      </div>
       <Collapse className="w-12/12" defaultActiveKey={[1, 2, 3, 4]}>
         {selectNum > 0 && spiritCanvas?.chosenType !== 'PointContainer' && (
           <CollapsePanel header="shaping" key="1">
