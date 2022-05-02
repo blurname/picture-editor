@@ -47,7 +47,7 @@ import { InviteModal } from './InviteModal'
 import { UploadButton } from './UploadButton'
 
 type Props = {}
-type remoteModel = {
+export type remoteModel = {
   id: number
   canvas_id: number
   canvas_spirit_id: number
@@ -55,6 +55,13 @@ type remoteModel = {
   model: string
   element: Shape | string
   unique_props: string
+}
+export type CModel = {
+  id: number
+  spiritType: number
+  model: Model
+  element: Shape | string
+  uniqueProps: Partial<UniqueProps>
 }
 export const getCurrentSpirit = (spiritId: number, spirits: BeamSpirit[]) => {
   return spirits.find((spirit) => spirit.getId() === spiritId)
@@ -286,13 +293,7 @@ export function Canvas(props: Props) {
     }
   }, [initCount])
 
-  type CModel = {
-    id: number
-    spiritType: number
-    model: Model
-    element: Shape | string
-    uniqueProps: Partial<UniqueProps>
-  }
+
   useEffect(() => {
     if (initImages.length > 0) {
       const models: CModel[] = initImages.map((img) => {
@@ -328,7 +329,6 @@ export function Canvas(props: Props) {
       setTimeout(() => {
         renderAll()
       }, 1000)
-    } else {
     }
   }, [initImages])
   useEffect(() => {

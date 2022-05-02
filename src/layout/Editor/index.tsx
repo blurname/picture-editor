@@ -41,6 +41,23 @@ export function Editor() {
   }
   useEffect(() => {
     socket.on('client-del', async ( id: number) => {
+      // if (type === 'Image') {
+      //   spiritCanvas.addImage(element, id,true)
+      // } else if (type === 'Mark') {
+      //   spiritCanvas.addMark(element, id,true)
+      // } else if (type === 'Mosaic') {
+      //   spiritCanvas.addMosaic(element, id,true)
+      // } else if (type === 'PointContainer') {
+      //   const points = await getPoints(id)
+      //     const pointSpirits = points.map((point) => (new PointSpirit(spiritCanvas.canvas3d, point)))
+      //     console.log({ points })
+      //     spiritCanvas.updateFromRemote(
+      //       model.spiritType,
+      //       model.model,
+      //       pointSpirits as any,
+      //       model.uniqueProps,
+      //     )
+      // }
       spiritCanvas.spirits = spiritCanvas.spirits.filter(s=>s.getId()!==id)
       spiritCanvas.guidLines = spiritCanvas.guidLines.filter((guidLine)=>guidLine.getId() !== id)
       // setCmpCount(id + 1)
@@ -110,6 +127,16 @@ export function Editor() {
         { [desc]: old },
         { [desc]: value },
       )
+    }
+    const emitToServer = () => {
+      setTimeout(() => {
+        // debugger
+        const canvasId = spiritCanvas.id
+        socket.emit("server-back",canvasId)
+      }, 100)
+    }
+    if(chosen.getId()===0){
+      emitToServer()
     }
     setAdjustNum(adjustNum + 1)
   }
@@ -196,6 +223,7 @@ export function Editor() {
               commitToHistory={commitToHistory}
               storeOld={storeOld}
               onChangeInput={onChangeInput}
+              socket={socket}
             />
           </CollapsePanel>
         )}

@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useState,
 } from 'react'
+import { Socket } from 'socket.io-client'
 import { globalContext } from '../../context'
 import {
   backCellShader,
@@ -29,6 +30,7 @@ type Props = {
     desc: string,
     func?: (a: any, b: any) => void,
   ) => (e: ChangeEvent<HTMLInputElement>) => void
+  socket: Socket
 }
 
 export const backShader = {
@@ -41,7 +43,7 @@ export const backUniforms = {
 }
 export function EBack(props: Props) {
   const { spiritCanvas, selectNum } = useContext(globalContext)
-  const { commitToHistory, storeOld, onChangeInput } = props
+  const { commitToHistory, storeOld, onChangeInput, socket } = props
   enum RGB {
     R = 0,
     G,
@@ -58,32 +60,17 @@ export function EBack(props: Props) {
     mark.updateUniqueProps({ uColor: color })
     return
   }
-
+  
   const [curSpirit, setCurSpirit] = useState<BackNonImageSpirit>(
     spiritCanvas.spirits[0] as BackNonImageSpirit,
   )
-	//const shader = shaderSchema.children.filter((child) => {
-		//if (child.desc === curSpirit.getShaderName()) {
-			//console.log('backShader:', curSpirit.getShaderName())
-			//console.log('backchild:', child)
-			//return child
-		//}
-	//})
 	const [shader, setShader] = useState(shaderSchema.children.filter((child) => {
 		if (child.desc === curSpirit.getShaderName()) {
 			console.log('backShader:', curSpirit.getShaderName())
 			console.log('backchild:', child)
 			return child
 		}
-	}));
-  //useEffect(() => {
-  //setCurSpirit(spiritCanvas.spirits[selectNum] as BackNonImageSpirit)
-  //console.log('backchanged')
-  //}, [selectNum]);
-  //useEffect(() => {
-  //setCurSpirit(spiritCanvas.spirits[selectNum] as BackNonImageSpirit)
-  //console.log('backchanged')
-  //}, [spiritCanvas.spirits[selectNum].getSpiritType]);
+	}))
   useEffect(() => {
     if (spiritCanvas.spirits[selectNum].getSpiritType() === 'BackNonImage') {
       setCurSpirit(spiritCanvas.spirits[selectNum] as BackNonImageSpirit)
@@ -97,7 +84,7 @@ shaderSchema.children.filter((child) => {
 	})
 			)
     }else{
-setShader([{children:[]} as any])
+        setShader([{children:[]} as any])
 		}
     console.log('backchanged')
   }, [spiritCanvas.spirits[selectNum]])
@@ -119,7 +106,7 @@ setShader([{children:[]} as any])
                   }
                   onInput={onChangeInput(cur.desc, changeRGB)}
                   onMouseUp={commitToHistory}
-                  onMouseDown={storeOld(cur.desc)}
+                  onMouseDown={storeOld('uColor')}
                   id={cur.desc}
                 />
                 <label htmlFor={cur.desc}>{cur.desc}</label>

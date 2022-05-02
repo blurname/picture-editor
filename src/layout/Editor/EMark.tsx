@@ -27,24 +27,6 @@ export function EMark(props: Props) {
     G,
     B,
   }
-
-  //const onColorChange =
-  //(desc: string) => (e: ChangeEvent<HTMLInputElement>) => {
-  //const hex: string = e.target.value
-  //const r = parseInt('0x' + hex.slice(1, 3)) / 255.0
-  //const g = parseInt('0x' + hex.slice(3, 5)) / 255.0
-  //const b = parseInt('0x' + hex.slice(5)) / 255.0
-  //const color = [r, g, b, 1]
-  //let mark = spiritCanvas.spirits[selectNum] as MarkSpirit
-  //mark.updateUniform(desc, color)
-  //operationHistory.commit(
-  //mark.getUniqueProps() as MarkProps,
-  //{ [desc]: old },
-  //{ [desc]: color },
-  //'UniqueProps',
-  //)
-  //setAdjustNum(adjustNum + 1)
-  //}
   const onChangeRGB =
     <T extends Partial<keyof typeof RGB>>(rgb: T, cdesc: string) =>
     (e: ChangeEvent<HTMLInputElement>) => {

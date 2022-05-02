@@ -1,6 +1,10 @@
 import { Button, List } from 'antd'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
+import { Socket } from 'socket.io-client'
 import { globalContext } from '../../context'
+import { PointSpirit } from '../../utils/gl-uitls'
+import { getPoints, getSpirits } from '../../utils/http'
+import { CModel, remoteModel } from '../Canvas'
 import { imgUrl } from './Img'
 type Mosaic = {
   id: number
@@ -28,15 +32,28 @@ const backs: Mosaic[] = [
     type: 'image',
   },
 ]
-export function Background() {
+type Props = {
+  socket: Socket
+}
+export function Background(props: Props) {
+  const {socket} = props
   const { spiritCanvas, setAdjustNum, adjustNum } = useContext(globalContext)
+  const emitToServer = () => {
+    setTimeout(() => {
+      // debugger
+      const canvasId = spiritCanvas.id
+      socket.emit("server-back",canvasId)
+    }, 100)
+  }
 
   const onChangeBackNonImage = (shaderName: string) => () => {
     spiritCanvas.addBackground(shaderName, 'backNonImage', true)
+    emitToServer()
     setAdjustNum(adjustNum + 1)
   }
   const onChangeBackImage = (imgUrl: string) => async () => {
     await spiritCanvas.addBackground(imgUrl, 'backImage', true)
+    emitToServer()
     setAdjustNum(adjustNum + 1)
   }
   return (
