@@ -106,10 +106,12 @@ export class SpiritCanvas {
         this.addBackground(element as string, 'backNonImage', true,uniqueProps)
       else if(typeId === 5)
         this.addBackground(element as string, 'backImage', true)
-      else if(typeId === 6)
-      // debugger
-      console.log('aa',)
+      else if(typeId === 6){
+
+        console.log('aa',)
         this.addPointContainer(element as PointSpirit[], model.id,true,uniqueProps,model)
+      }
+      // debugger
     }
   }
 
